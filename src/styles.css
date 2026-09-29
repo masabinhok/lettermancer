@@ -435,9 +435,39 @@ button {
 .intent span {
   position: absolute;
   right: 0;
-  top: 10px;
-  color: var(--muted);
-  font-size: 11px;
+  top: 12px;
+  color: var(--paper);
+  font-size: 15px;
+}
+.enemy {
+  padding-bottom: 34px;
+}
+.enemy.danger .intent span {
+  color: var(--hot);
+}
+.enemy.windup {
+  border-color: var(--hot);
+  animation: windup-glow 0.25s infinite alternate;
+}
+.enemy.windup .glyph {
+  animation: windup-shake 0.12s infinite;
+}
+.enemy.windup .intent span {
+  font-size: 20px;
+  top: 9px;
+}
+@keyframes windup-glow {
+  from {
+    box-shadow: 0 0 0 1px var(--hot), 0 0 18px rgba(255, 56, 96, 0.35);
+  }
+  to {
+    box-shadow: 0 0 0 2px var(--hot), 0 0 40px rgba(255, 56, 96, 0.7);
+  }
+}
+@keyframes windup-shake {
+  0% { transform: translate(0, 0) scale(1.08); }
+  50% { transform: translate(-2px, 1px) scale(1.12); }
+  100% { transform: translate(2px, -1px) scale(1.08); }
 }
 .enemy-status {
   min-height: 14px;

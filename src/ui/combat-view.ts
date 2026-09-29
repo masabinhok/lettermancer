@@ -10,6 +10,8 @@ import type { Screen } from './screen';
 
 /** Blackout words vanish this long after appearing. */
 const BLACKOUT_VISIBLE_MS = 1400;
+/** How long before an attack lands the enemy visibly winds up. */
+const WINDUP_MS = 1000;
 
 interface EnemyView {
   root: HTMLElement;
@@ -235,6 +237,7 @@ export class CombatScreen implements Screen {
     const c = this.c;
     const run = this.o.run;
     const t = target(c);
+    const rate = run.relics.includes('hourglass') ? 0.85 : 1;
     for (const e of c.enemies) {
       const v = this.views.get(e.id);
       if (!v) continue;
@@ -243,6 +246,9 @@ export class CombatScreen implements Screen {
       const frac = Math.max(0, e.intent / e.intentMs);
       v.intentFill.style.width = `${frac * 100}%`;
       v.root.classList.toggle('danger', frac > 0.75);
+      // Wind-up: the last second before a hit gets an unmistakable tell.
+      const msLeft = (e.intentMs - e.intent) / rate;
+      v.root.classList.toggle('windup', e.intent > 0 && msLeft <= WINDUP_MS);
       v.intentText.textContent = `⚔ ${e.atk}`;
       v.status.textContent = e.burn > 0 ? `▲ burn ${e.burn}` : '';
       v.root.classList.toggle('targeted', e === t);
