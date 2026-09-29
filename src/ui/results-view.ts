@@ -1,7 +1,7 @@
 import { STARTERS } from '../engine/run';
 import type { Run, StarterId } from '../engine/state';
 import { keyWeakness, nemesisBigram, topWeakKeys } from '../engine/stats';
-import { el, Keyboard } from './keyboard';
+import { el, heatLegend, Keyboard } from './keyboard';
 import type { Screen } from './screen';
 
 export class ResultsScreen implements Screen {
@@ -34,7 +34,7 @@ export class ResultsScreen implements Screen {
     const weak = topWeakKeys(run.stats, 3);
     const nem = nemesisBigram(run.stats);
     const insight = el('div', 'insight');
-    insight.append(el('h3', '', 'This run’s heatmap'), kb.root);
+    insight.append(el('h3', '', 'This run’s heatmap'), kb.root, heatLegend());
     const notes = el('p', 'insight-notes');
     notes.textContent = [
       weak.length ? `Slowest keys: ${weak.map((k) => k.toUpperCase()).join(', ')} — expect to see them more next run.` : '',

@@ -708,9 +708,41 @@ button {
 .keyboard.heat .key {
   background: color-mix(in oklab, var(--hot) calc(var(--heat, 0) * 85%), var(--ink-2));
 }
-.keyboard.heat .key.no-data {
-  opacity: 0.35;
+.keyboard.heat .key.no-data,
+.heat-swatch.none {
+  /* Hatched, so "no data" never reads as "good". */
+  background: repeating-linear-gradient(135deg, var(--ink-2) 0 4px, var(--ink-3) 4px 8px);
+  border-style: dashed;
 }
+.keyboard.heat .key.no-data .key-cap {
+  opacity: 0.4;
+}
+.heat-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.heat-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.heat-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid var(--line);
+}
+.heat-swatch.gradient {
+  width: 48px;
+  background: linear-gradient(90deg, var(--ink-2), color-mix(in oklab, var(--hot) 85%, var(--ink-2)));
+}
+
 .keyboard.mini .key {
   width: 30px;
   height: 30px;

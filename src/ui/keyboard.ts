@@ -105,3 +105,17 @@ export class Keyboard {
     }
   }
 }
+
+/** Legend for heatmap keyboards. */
+export function heatLegend(): HTMLElement {
+  const box = el('div', 'heat-legend');
+  const swatch = (cls: string, label: string) => {
+    const item = el('span', 'heat-item');
+    item.append(el('i', `heat-swatch ${cls}`), label);
+    return item;
+  };
+  const scale = el('span', 'heat-item');
+  scale.append('comfortable', el('i', 'heat-swatch gradient'), 'slow or error-prone');
+  box.append(scale, swatch('none', 'not enough data yet'));
+  return box;
+}

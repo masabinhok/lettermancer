@@ -3,7 +3,7 @@ import { MODS } from '../engine/mods';
 import { STARTER_IDS, STARTERS } from '../engine/run';
 import type { StarterId } from '../engine/state';
 import { accuracy, keyWeakness, nemesisBigram, topWeakKeys, type Stats } from '../engine/stats';
-import { el, Keyboard } from './keyboard';
+import { el, heatLegend, Keyboard } from './keyboard';
 import type { Screen } from './screen';
 
 export interface MenuOptions {
@@ -92,7 +92,7 @@ export class MenuScreen implements Screen {
       this.draw();
     });
     toggles.append(t1, t2, t3);
-    side.append(el('h3', '', 'Your keyboard'), kb.root, stats, toggles);
+    side.append(el('h3', '', 'Your keyboard'), kb.root, heatLegend(), stats, toggles);
 
     const main = el('div', 'menu-main');
     main.append(title, tagline, how, el('h3', '', 'Choose your keyboard'), starters, start);
