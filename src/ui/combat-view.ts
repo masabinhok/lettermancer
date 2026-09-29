@@ -1,4 +1,5 @@
 import { backspace, cancelTarget, createCombat, pressKey, target, tick, type Combat, type CombatCtx, type CombatEvent } from '../engine/combat';
+import type { KeyboardMode } from '../engine/meta';
 import { comboTier, COMBO_TIERS, MODS } from '../engine/mods';
 import type { Enemy, EnemySpec, Run } from '../engine/state';
 import * as sfx from '../fx/audio';
@@ -26,6 +27,7 @@ export interface CombatOptions {
   specs: EnemySpec[];
   ctx: CombatCtx;
   fingerHints: boolean;
+  keyboard: KeyboardMode;
   onEnd(c: Combat): void;
 }
 
@@ -46,6 +48,8 @@ export class CombatScreen implements Screen {
     this.c = createCombat(o.specs, o.ctx);
     this.kb.setMods(o.run.keyMods);
     this.kb.setFingerHints(o.fingerHints);
+    this.kb.root.classList.toggle('compact', o.keyboard === 'compact');
+    this.kb.root.hidden = o.keyboard === 'hidden';
     this.kb.setDark(o.specs.some((s) => s.rule === 'blackout'));
     const hint = el('div', 'combat-hint', 'type a word to strike · tab or esc to switch target · backspace deletes a letter');
     this.root.append(this.hud.root, this.field, this.comboEl, this.kb.root, hint, this.pauseEl);

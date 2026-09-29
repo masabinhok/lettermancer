@@ -1,7 +1,7 @@
 import './styles.css';
 import words from './data/words.json';
 import { wpm, type Combat, type CombatCtx } from './engine/combat';
-import { applyUnlocks } from './engine/meta';
+import { applyUnlocks, KEYBOARD_MODES } from './engine/meta';
 import { makeRng } from './engine/rng';
 import { advance, BOSSES, currentNode, makeEncounter, newRun, rollReward } from './engine/run';
 import type { NodeKind, Run, StarterId } from './engine/state';
@@ -63,7 +63,10 @@ class Game {
         lifetime: this.lifetime,
         onStart: (starter) => this.startRun(starter),
         onToggle: (k) => {
-          this.meta[k] = !this.meta[k];
+          if (k === 'keyboard') {
+            const i = KEYBOARD_MODES.indexOf(this.meta.keyboard);
+            this.meta.keyboard = KEYBOARD_MODES[(i + 1) % KEYBOARD_MODES.length];
+          } else this.meta[k] = !this.meta[k];
           setSound(this.meta.sound);
           saveMeta(this.meta);
         },
@@ -117,6 +120,7 @@ class Game {
           specs: makeEncounter(run, kind, this.rng),
           ctx: this.ctx(run),
           fingerHints: this.meta.fingerHints,
+          keyboard: this.meta.keyboard,
           onEnd: (c) => this.fightOver(kind, c),
         }),
       );

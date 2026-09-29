@@ -307,7 +307,7 @@ button {
 }
 .enemy {
   position: relative;
-  width: 250px;
+  width: 290px;
   padding: 16px 16px 14px;
   background: linear-gradient(180deg, var(--ink-2), var(--ink));
   border: 1px solid var(--line);
@@ -358,14 +358,14 @@ button {
 }
 .enemy-elite {
   border-color: #6b4f2a;
-  width: 300px;
+  width: 340px;
 }
 .enemy-boss {
   border-color: #6b2a3b;
-  width: 380px;
+  width: 420px;
 }
 .enemy-head {
-  width: 190px;
+  width: 210px;
 }
 .glyph {
   font-family: var(--f-glyph);
@@ -448,14 +448,15 @@ button {
 .word {
   font-family: var(--f-mono);
   font-weight: 600;
-  font-size: 30px;
+  /* The word is the one thing your eyes are on — make it the biggest thing on the card. */
+  font-size: 44px;
   letter-spacing: 0.02em;
-  min-height: 42px;
+  min-height: 58px;
   padding: 2px 4px;
   white-space: nowrap;
 }
 .enemy-boss .word {
-  font-size: 34px;
+  font-size: 48px;
 }
 .word .l {
   display: inline-block;
@@ -699,6 +700,30 @@ button {
 }
 .keyboard.mini .kb-row:nth-child(3) {
   margin-left: 36px;
+}
+.keyboard.compact .key {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+}
+.keyboard.compact .key-cap {
+  font-size: 13px;
+}
+.keyboard.compact .key-mods {
+  font-size: 9px;
+  min-height: 9px;
+}
+.keyboard.compact .kb-row {
+  gap: 4px;
+}
+.keyboard.compact .kb-row:nth-child(2) {
+  margin-left: 16px;
+}
+.keyboard.compact .kb-row:nth-child(3) {
+  margin-left: 42px;
+}
+.keyboard[hidden] {
+  display: none;
 }
 .keyboard.picking .key:hover {
   border-color: var(--glow);

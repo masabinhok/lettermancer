@@ -10,7 +10,7 @@ export interface MenuOptions {
   meta: Meta;
   lifetime: Stats;
   onStart(starter: StarterId): void;
-  onToggle(setting: 'sound' | 'fingerHints'): void;
+  onToggle(setting: 'sound' | 'fingerHints' | 'keyboard'): void;
 }
 
 export class MenuScreen implements Screen {
@@ -86,7 +86,12 @@ export class MenuScreen implements Screen {
       this.o.onToggle('fingerHints');
       this.draw();
     });
-    toggles.append(t1, t2);
+    const t3 = el('button', 'toggle', `combat keyboard: ${meta.keyboard}`);
+    t3.addEventListener('click', () => {
+      this.o.onToggle('keyboard');
+      this.draw();
+    });
+    toggles.append(t1, t2, t3);
     side.append(el('h3', '', 'Your keyboard'), kb.root, stats, toggles);
 
     const main = el('div', 'menu-main');

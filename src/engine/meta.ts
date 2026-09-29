@@ -1,5 +1,8 @@
 import type { StarterId } from './state';
 
+export type KeyboardMode = 'full' | 'compact' | 'hidden';
+export const KEYBOARD_MODES: readonly KeyboardMode[] = ['full', 'compact', 'hidden'];
+
 export interface Meta {
   runs: number;
   wins: number;
@@ -7,6 +10,7 @@ export interface Meta {
   unlocked: StarterId[];
   lastStarter: StarterId;
   fingerHints: boolean;
+  keyboard: KeyboardMode;
   sound: boolean;
 }
 
@@ -17,6 +21,7 @@ export const defaultMeta = (): Meta => ({
   unlocked: ['apprentice'],
   lastStarter: 'apprentice',
   fingerHints: true,
+  keyboard: 'full',
   sound: true,
 });
 
