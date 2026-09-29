@@ -27,9 +27,13 @@ export const defaultMeta = (): Meta => ({
 
 export interface UnlockCheck {
   act?: number;
-  perfectFight?: boolean;
+  /** won an elite or boss fight without a single typo */
+  flawlessElite?: boolean;
   coins?: number;
 }
+
+export const UNLOCK_ACT = 3;
+export const UNLOCK_COINS = 60;
 
 /** Returns starters newly unlocked by this milestone (and records them on meta). */
 export function applyUnlocks(meta: Meta, check: UnlockCheck): StarterId[] {
@@ -40,8 +44,8 @@ export function applyUnlocks(meta: Meta, check: UnlockCheck): StarterId[] {
       earned.push(id);
     }
   };
-  unlock('glassblower', (check.act ?? 0) >= 2);
-  unlock('cryomancer', check.perfectFight);
-  unlock('tycoon', (check.coins ?? 0) >= 40);
+  unlock('glassblower', (check.act ?? 0) >= UNLOCK_ACT);
+  unlock('cryomancer', check.flawlessElite);
+  unlock('tycoon', (check.coins ?? 0) >= UNLOCK_COINS);
   return earned;
 }

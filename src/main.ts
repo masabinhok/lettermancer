@@ -168,7 +168,7 @@ class Game {
       run.hp += healed;
       if (healed) lines.push(`healed ${healed}`);
     }
-    this.milestone({ perfectFight: perfect, coins: run.coins });
+    this.milestone({ flawlessElite: c.errors === 0 && (kind === 'elite' || kind === 'boss'), coins: run.coins });
 
     const title = kind === 'boss' ? 'BOSS DEFEATED' : kind === 'elite' ? 'ELITE SLAIN' : 'VICTORY';
     this.show(new RewardScreen(run, reward, { title, lines }, () => this.next()));

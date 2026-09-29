@@ -94,9 +94,9 @@ Each starting keyboard begins the run with different mods. You unlock more by re
 | Keyboard | Start | Unlock |
 |---|---|---|
 | Apprentice | Ember on E, Gold on A, 5 coins | Available from the start |
-| Glassblower | Glass on E, T, O | Reach Act 2 |
-| Cryomancer | Frost on S and R, Spark on N | Win a fight with 100% accuracy (5+ words) |
-| Tycoon | Gold on E and T, 15 coins, Interest relic | Hold 40 coins at once |
+| Glassblower | Glass on E, T, O | Reach Act 3 |
+| Cryomancer | Frost on S and R, Spark on N | Beat an elite or boss without a single typo |
+| Tycoon | Gold on E and T, 15 coins, Interest relic | Hold 60 coins at once |
 
 ## Controls
 

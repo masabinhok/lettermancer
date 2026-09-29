@@ -33,7 +33,7 @@ export const STARTERS: Record<StarterId, StarterDef> = {
     keyMods: { e: ['glass'], t: ['glass'], o: ['glass'] },
     relics: [],
     coins: 0,
-    unlock: 'Reach Act 2',
+    unlock: 'Reach Act 3',
   },
   cryomancer: {
     id: 'cryomancer',
@@ -42,7 +42,7 @@ export const STARTERS: Record<StarterId, StarterDef> = {
     keyMods: { s: ['frost'], r: ['frost'], n: ['spark'] },
     relics: [],
     coins: 0,
-    unlock: 'Win a fight with 100% accuracy',
+    unlock: 'Beat an elite or boss without a single typo',
   },
   tycoon: {
     id: 'tycoon',
@@ -51,7 +51,7 @@ export const STARTERS: Record<StarterId, StarterDef> = {
     keyMods: { e: ['gold'], t: ['gold'] },
     relics: ['interest'],
     coins: 15,
-    unlock: 'Hold 40 coins at once',
+    unlock: 'Hold 60 coins at once',
   },
 };
 
