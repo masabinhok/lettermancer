@@ -467,8 +467,8 @@ button {
   border-bottom: 2px solid var(--mc);
 }
 .word .done {
-  color: var(--muted);
-  opacity: 0.35;
+  /* Typed letters stay readable (~4.5:1 on the card) — progress shows by dimming, not vanishing. */
+  opacity: 0.5;
   text-shadow: none;
 }
 .word .next {
