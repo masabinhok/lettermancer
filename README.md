@@ -103,7 +103,8 @@ Each starting keyboard begins the run with different mods. You unlock more by re
 | Key | Where | Action |
 |---|---|---|
 | `a`–`z` | Combat | Type |
-| `Esc` / `Backspace` | Combat | Drop your target so you can switch enemies |
+| `Backspace` | Combat | Delete the last letter (with nothing typed, drop your target) |
+| `Tab` / `Esc` | Combat | Drop your target so you can switch enemies |
 | `a`–`z` | Installing a mod | Put the mod on that key |
 | `Esc` | Installing a mod | Throw the mod away |
 | `1`–`7` | Menu, rewards, shop | Pick a card (or click it) |

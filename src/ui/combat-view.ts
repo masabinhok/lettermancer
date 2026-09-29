@@ -1,4 +1,4 @@
-import { cancelTarget, createCombat, pressKey, target, tick, type Combat, type CombatCtx, type CombatEvent } from '../engine/combat';
+import { backspace, cancelTarget, createCombat, pressKey, target, tick, type Combat, type CombatCtx, type CombatEvent } from '../engine/combat';
 import { comboTier, COMBO_TIERS, MODS } from '../engine/mods';
 import type { Enemy, EnemySpec, Run } from '../engine/state';
 import * as sfx from '../fx/audio';
@@ -47,7 +47,7 @@ export class CombatScreen implements Screen {
     this.kb.setMods(o.run.keyMods);
     this.kb.setFingerHints(o.fingerHints);
     this.kb.setDark(o.specs.some((s) => s.rule === 'blackout'));
-    const hint = el('div', 'combat-hint', 'type a word to strike · esc to switch target');
+    const hint = el('div', 'combat-hint', 'type a word to strike · tab or esc to switch target · backspace deletes a letter');
     this.root.append(this.hud.root, this.field, this.comboEl, this.kb.root, hint, this.pauseEl);
     this.pauseEl.hidden = true;
     for (const e of this.c.enemies) this.addEnemy(e);
@@ -76,8 +76,13 @@ export class CombatScreen implements Screen {
 
   onKey(key: string): void {
     if (this.c.over) return;
-    if (key === 'Escape' || key === 'Backspace') {
+    if (key === 'Escape' || key === 'Tab') {
       cancelTarget(this.c);
+      this.render();
+      return;
+    }
+    if (key === 'Backspace') {
+      backspace(this.c);
       this.render();
       return;
     }

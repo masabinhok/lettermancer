@@ -114,6 +114,14 @@ export function cancelTarget(c: Combat): void {
   c.typed = '';
 }
 
+/** Delete the last typed letter; with nothing typed, drop the target. */
+export function backspace(c: Combat): void {
+  if (c.typed.length > 0) c.typed = c.typed.slice(0, -1);
+  else cancelTarget(c);
+  // Latency across a deletion isn't a real bigram.
+  c.lastCorrectAt = null;
+}
+
 function damage(c: Combat, e: Enemy, dmg: number, ev: CombatEvent[]): void {
   e.hp -= dmg;
   if (e.hp > 0) return;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createCombat, pressKey, tick, type Combat } from '../src/engine/combat';
+import { backspace, createCombat, pressKey, tick, type Combat } from '../src/engine/combat';
 import { comboTier, installMod, resolveWord } from '../src/engine/mods';
 import type { Run } from '../src/engine/state';
 import { queueCtx, spec, testRun } from './helpers';
@@ -176,5 +176,19 @@ describe('combat', () => {
     pressKey(c, run, 'a', ctx, 0);
     pressKey(c, run, 'b', ctx, 250);
     expect(c.stats.bigrams.ab).toEqual({ lat: 250, n: 1 });
+  });
+
+  it('backspace deletes one letter, then drops the target', () => {
+    const run = testRun();
+    const ctx = queueCtx(['abcd']);
+    const c = createCombat([spec()], ctx);
+    typeWord(c, run, ctx, 'ab');
+    backspace(c);
+    expect(c.typed).toBe('a');
+    expect(c.targetId).toBe(1);
+    backspace(c);
+    backspace(c);
+    expect(c.targetId).toBeNull();
+    expect(c.combo).toBe(2); // deleting isn't a typo
   });
 });

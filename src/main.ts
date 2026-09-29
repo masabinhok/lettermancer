@@ -42,7 +42,7 @@ class Game {
     if (key.length === 1) {
       if (/[a-zA-Z]/.test(key)) key = key.toLowerCase();
       e.preventDefault(); // stop space-scrolling and Firefox quick-find on ' and /
-    } else if (key === 'Backspace' || key === 'Enter' || key === 'Escape') {
+    } else if (key === 'Backspace' || key === 'Enter' || key === 'Escape' || key === 'Tab') {
       e.preventDefault();
     }
     if (e.repeat) return;
