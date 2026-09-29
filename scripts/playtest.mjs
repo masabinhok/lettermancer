@@ -10,7 +10,7 @@ const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
 const errors = [];
 page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
 page.on('pageerror', (e) => errors.push(String(e)));
-await page.goto('process.env.URL ?? 'http://localhost:5173'');
+await page.goto(process.env.URL ?? 'http://localhost:5173');
 await page.waitForTimeout(800);
 let shot = 0;
 const snap = async (name) => page.screenshot({ path: `${OUT}${label}-${String(shot++).padStart(2, '0')}-${name}.png` });
