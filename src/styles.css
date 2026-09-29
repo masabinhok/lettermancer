@@ -1122,10 +1122,21 @@ button {
   justify-content: center;
   overflow: auto;
 }
+.results {
+  gap: 10px;
+}
 .results-title {
   font-family: var(--f-display);
-  font-size: 72px;
+  font-size: 56px;
+  line-height: 1;
   margin: 0;
+}
+.results-body {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 48px;
+  margin: 6px 0;
 }
 .results-title.win {
   color: var(--gold);
@@ -1140,9 +1151,8 @@ button {
 }
 .stat-grid {
   display: grid;
-  grid-template-columns: repeat(6, auto);
-  gap: 10px 28px;
-  margin: 10px 0;
+  grid-template-columns: repeat(2, auto);
+  gap: 14px 36px;
 }
 .stat {
   text-align: center;
@@ -1192,6 +1202,10 @@ button {
   }
   .menu-side {
     width: 100%;
+  }
+  .results-body {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
   .stat-grid {
     grid-template-columns: repeat(3, auto);

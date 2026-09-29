@@ -33,6 +33,7 @@ export class ResultsScreen implements Screen {
     kb.setHeat(keyWeakness(run.stats));
     const weak = topWeakKeys(run.stats, 3);
     const nem = nemesisBigram(run.stats);
+    kb.root.classList.add('compact');
     const insight = el('div', 'insight');
     insight.append(el('h3', '', 'This run’s heatmap'), kb.root, heatLegend());
     const notes = el('p', 'insight-notes');
@@ -44,8 +45,14 @@ export class ResultsScreen implements Screen {
       .join(' ');
     insight.append(notes);
 
-    this.root.append(head, sub, grid, insight);
-    for (const id of unlocked) this.root.append(el('div', 'unlock', `Unlocked: ${STARTERS[id].name} keyboard`));
+    // Two columns so everything fits on a 720p screen without scrolling.
+    const body = el('div', 'results-body');
+    body.append(grid, insight);
+    this.root.append(head, sub, body);
+    if (unlocked.length) {
+      const names = unlocked.map((id) => STARTERS[id].name);
+      this.root.append(el('div', 'unlock', `Unlocked: ${names.join(', ')} keyboard${names.length > 1 ? 's' : ''}`));
+    }
     const again = el('button', 'start-btn', 'press ENTER for another run');
     again.addEventListener('click', () => this.done());
     this.root.append(again);
