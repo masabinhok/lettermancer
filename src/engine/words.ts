@@ -116,3 +116,17 @@ export class WordBank {
     return best ? { word: best, reason } : fallback();
   }
 }
+
+/** Share of all letters in `words` that are each letter, in [0, 1]. */
+export function letterShare(words: readonly string[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  let total = 0;
+  for (const w of words)
+    for (const ch of w) {
+      counts[ch] = (counts[ch] ?? 0) + 1;
+      total++;
+    }
+  const out: Record<string, number> = {};
+  for (const [k, n] of Object.entries(counts)) out[k] = n / total;
+  return out;
+}

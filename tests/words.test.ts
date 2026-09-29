@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { makeRng } from '../src/engine/rng';
-import { WordBank } from '../src/engine/words';
+import { letterShare, WordBank } from '../src/engine/words';
 import words from '../src/data/words.json';
 
 const bank = new WordBank(words);
@@ -42,5 +42,11 @@ describe('WordBank', () => {
       if (bank.pick({ min: 4, max: 8, modded: new Set(['z']), weakBias: 0, modBias: 1 }, rng).word.includes('z')) withZ++;
     }
     expect(withZ / N).toBeGreaterThan(0.95);
+  });
+
+  it('computes letter share', () => {
+    expect(letterShare(['aab', 'b'])).toEqual({ a: 0.5, b: 0.5 });
+    const share = letterShare(words);
+    expect(share.e).toBeGreaterThan(share.q * 10);
   });
 });

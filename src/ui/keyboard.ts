@@ -79,6 +79,14 @@ export class Keyboard {
     node.classList.add(cls);
   }
 
+  /** Small corner label on each key (e.g. letter frequency). */
+  setLabels(labels: Record<string, string>): void {
+    for (const [k, node] of this.keys) {
+      node.querySelector('.key-label')?.remove();
+      if (labels[k]) node.append(el('span', 'key-label', labels[k]));
+    }
+  }
+
   setFingerHints(on: boolean): void {
     this.root.classList.toggle('finger-hints', on);
   }

@@ -755,6 +755,15 @@ button {
 .keyboard[hidden] {
   display: none;
 }
+.key-label {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: var(--gold);
+  opacity: 0.85;
+}
 .keyboard.picking .key:hover {
   border-color: var(--glow);
 }
