@@ -27,6 +27,8 @@ export interface Settings {
   reducedMotion: 'system' | 'on' | 'off';
   fontScale: number;
   layout: KeyboardLayout;
+  /** draw each power's symbol above empowered letters, so color isn't the only cue */
+  powerSymbols: boolean;
 }
 
 export const defaultSettings = (): Settings => ({
@@ -38,6 +40,7 @@ export const defaultSettings = (): Settings => ({
   reducedMotion: 'system',
   fontScale: 1,
   layout: 'qwerty',
+  powerSymbols: false,
 });
 
 const KEYS = {

@@ -7,7 +7,7 @@
   import Hud from '../ui/Hud.svelte';
   import OfferCard from '../ui/OfferCard.svelte';
 
-  let { session }: { session: Session } = $props();
+  let { session, onbuild }: { session: Session; onbuild?: () => void } = $props();
   const v = $derived(session.view.kind === 'shop' ? session.view : null);
   const run = $derived(session.machine.run);
   const rerollCost = $derived(REROLL_BASE + (v?.rerolls ?? 0));
@@ -49,7 +49,7 @@
 
 {#if v}
   <div class="screen" data-screen="shop" bind:this={root}>
-    <Hud hp={run.hp} maxHp={run.maxHp} coins={run.coins} act={run.act} node={run.node} relics={run.relics} />
+    <Hud hp={run.hp} maxHp={run.maxHp} coins={run.coins} act={run.act} node={run.node} relics={run.relics} {onbuild} />
     <div class="body">
       <header>
         <h1>The Type Foundry</h1>

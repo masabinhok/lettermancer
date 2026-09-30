@@ -28,6 +28,7 @@
   const weak = $derived(topWeakKeys(profile.stats, 3));
   const nem = $derived(nemesisBigram(profile.stats));
   const played = $derived(meta.runs > 0);
+  const firstTime = !meta.prologueDone && meta.runs === 0;
 
   function start() {
     meta.lastStarter = selected;
@@ -44,8 +45,10 @@
     const i = Number(e.key) - 1;
     if (e.key === 'Enter') {
       if (hasSave) nav('/run?resume');
+      else if (firstTime) nav('/prologue');
       else start();
-    } else if (e.key === 'n' && hasSave) start();
+    } else if (e.key === 'n' && (hasSave || firstTime)) start();
+    else if (e.key === 't') nav('/prologue');
     else if (e.key === 's') settingsOpen = true;
     else if (STARTER_IDS[i] && meta.unlocked.includes(STARTER_IDS[i])) selected = STARTER_IDS[i];
     else return;
@@ -71,10 +74,14 @@
       {#if hasSave}
         <Button hotkey="Enter" onclick={() => nav('/run?resume')}>Continue your run</Button>
         <Button kind="quiet" hotkey="N" onclick={start}>Start a new run</Button>
+      {:else if firstTime}
+        <Button hotkey="Enter" onclick={() => nav('/prologue')}>Learn to play</Button>
+        <Button kind="quiet" hotkey="N" onclick={start}>Skip to a run</Button>
       {:else}
         <Button hotkey="Enter" onclick={start}>Begin a run</Button>
       {/if}
       <Button kind="quiet" hotkey="S" onclick={() => (settingsOpen = true)}>Settings</Button>
+      {#if !firstTime}<Button kind="quiet" hotkey="T" onclick={() => nav('/prologue')}>Tutorial</Button>{/if}
     </div>
 
     <h2>Choose your keyboard</h2>

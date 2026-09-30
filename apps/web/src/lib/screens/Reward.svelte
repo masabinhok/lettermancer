@@ -5,7 +5,7 @@
   import Hud from '../ui/Hud.svelte';
   import OfferCard from '../ui/OfferCard.svelte';
 
-  let { session }: { session: Session } = $props();
+  let { session, onbuild }: { session: Session; onbuild?: () => void } = $props();
   const v = $derived(session.view.kind === 'reward' ? session.view : null);
   const run = $derived(session.machine.run);
 
@@ -42,7 +42,7 @@
 
 {#if v}
   <div class="screen" data-screen="reward">
-    <Hud hp={run.hp} maxHp={run.maxHp} coins={run.coins} act={run.act} node={run.node} relics={run.relics} />
+    <Hud hp={run.hp} maxHp={run.maxHp} coins={run.coins} act={run.act} node={run.node} relics={run.relics} {onbuild} />
     <div class="body">
       <header>
         <h1>{title}</h1>

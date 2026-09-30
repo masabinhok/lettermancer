@@ -86,6 +86,14 @@
             <option value="off">Never</option>
           </select>
         </label>
+        <label class="check">
+          <input
+            type="checkbox"
+            checked={s.powerSymbols}
+            onchange={(e) => set('powerSymbols', e.currentTarget.checked)}
+          />
+          <span>Show power symbols above letters, not just color</span>
+        </label>
         <label>
           <span>Text size</span>
           <select value={String(s.fontScale)} onchange={(e) => set('fontScale', Number(e.currentTarget.value))}>

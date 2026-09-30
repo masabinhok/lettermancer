@@ -8,12 +8,20 @@
   import Hud from '../ui/Hud.svelte';
   import Keyboard from '../ui/Keyboard.svelte';
 
-  let { session }: { session: Session } = $props();
+  let { session, onbuild }: { session: Session; onbuild?: () => void } = $props();
   const v = $derived(session.view.kind === 'install' ? session.view : null);
   const run = $derived(session.machine.run);
   let wrap = $state<HTMLElement>();
 
   const share = letterShare(WORDS);
+  // Which letters your recent enemies actually used — a better guide than the dictionary average.
+  const recent = (() => {
+    const counts: Record<string, number> = {};
+    for (const w of session.recentWords) for (const ch of w) if (/[a-z]/.test(ch)) counts[ch] = (counts[ch] ?? 0) + 1;
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6);
+  })();
   const labels = Object.fromEntries(
     Object.entries(share).map(([k, s]) => [k, s < 0.01 ? '<1%' : `${Math.round(s * 100)}%`]),
   );
@@ -42,7 +50,7 @@
 {#if v}
   {@const m = MODS[v.mod]}
   <div class="screen" data-screen="install" bind:this={wrap}>
-    <Hud hp={run.hp} maxHp={run.maxHp} coins={run.coins} act={run.act} node={run.node} relics={run.relics} />
+    <Hud hp={run.hp} maxHp={run.maxHp} coins={run.coins} act={run.act} node={run.node} relics={run.relics} {onbuild} />
     <div class="body">
       <h1>Press the key that should carry <span style:color={m.color}>{m.glyph} {m.name}</span></h1>
       <p class="desc">{m.desc}</p>
@@ -55,6 +63,14 @@
         onpick={install}
         fingerHints={profile.settings.fingerHints}
       />
+      {#if recent.length && session.recentWords.length >= 8}
+        <p class="recent">
+          In your last {session.recentWords.length} words:
+          {#each recent as [k, n], i (k)}<span
+              ><kbd>{k.toUpperCase()}</kbd> {n} time{n === 1 ? '' : 's'}{i < recent.length - 1 ? ', ' : ''}</span
+            >{/each}
+        </p>
+      {/if}
       <p class="tip">
         The percentage on each key is how often that letter appears in enemy words. A key holds {MAX_MODS_PER_KEY} powers;
         a third replaces the oldest, and the same power twice stacks.
@@ -86,6 +102,10 @@
   }
   .desc {
     color: var(--moon-dim);
+  }
+  .recent {
+    color: var(--moon-dim);
+    font-size: var(--t-sm);
   }
   .tip {
     max-width: 62ch;

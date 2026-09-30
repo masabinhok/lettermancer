@@ -11,6 +11,7 @@
     act,
     node,
     relics,
+    onbuild,
   }: {
     hp: number;
     maxHp: number;
@@ -19,6 +20,7 @@
     act: number;
     node: number;
     relics: RelicId[];
+    onbuild?: () => void;
   } = $props();
 
   const NODE_NAME: Record<NodeKind, string> = { fight: 'Fight', elite: 'Elite', shop: 'Shop', boss: 'Boss' };
@@ -48,16 +50,19 @@
     <span class="here-name">{NODE_NAME[ACT_LAYOUT[node]]}</span>
   </nav>
 
-  <ul class="relics" aria-label="Relics">
-    {#each relics as r (r)}
-      <li>
-        <button type="button" class="relic" aria-label="{RELICS[r].name}: {RELICS[r].desc}">
-          <span aria-hidden="true">{RELICS[r].glyph}</span>
-          <span class="tip" role="tooltip"><b>{RELICS[r].name}</b>{RELICS[r].desc}</span>
-        </button>
-      </li>
-    {/each}
-  </ul>
+  <div class="right">
+    <ul class="relics" aria-label="Relics">
+      {#each relics as r (r)}
+        <li>
+          <button type="button" class="relic" aria-label="{RELICS[r].name}: {RELICS[r].desc}">
+            <span aria-hidden="true">{RELICS[r].glyph}</span>
+            <span class="tip" role="tooltip"><b>{RELICS[r].name}</b>{RELICS[r].desc}</span>
+          </button>
+        </li>
+      {/each}
+    </ul>
+    {#if onbuild}<button type="button" class="build" onclick={onbuild}>Build</button>{/if}
+  </div>
 </header>
 
 <style>
@@ -142,6 +147,25 @@
     min-width: 3.5em;
     color: var(--moon-dim);
     font-size: var(--t-sm);
+  }
+  .right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .build {
+    padding: 4px 12px;
+    font-family: var(--f-display);
+    font-size: var(--t-sm);
+    color: var(--moon-dim);
+    background: var(--ink);
+    border: 1px solid var(--rule);
+    cursor: pointer;
+  }
+  .build:hover {
+    color: var(--moon);
+    border-color: var(--gold-deep);
   }
   .relics {
     display: flex;

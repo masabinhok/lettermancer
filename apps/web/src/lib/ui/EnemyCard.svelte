@@ -1,12 +1,15 @@
 <!-- One enemy: its illuminated initial, health, the word you must type, and when it will strike. -->
 <script lang="ts">
+  import { MODS } from '@keycraft/engine';
   import { FIELD, letterColors } from '../game/look';
+  import { profile } from '../stores/profile.svelte';
   import type { EnemySnap } from '../game/snapshot';
   import Bar from './Bar.svelte';
   import Initial from './Initial.svelte';
 
   let { e }: { e: EnemySnap } = $props();
-  const size = $derived(e.kind === 'boss' ? 132 : e.kind === 'elite' ? 108 : e.kind === 'head' ? 64 : 88);
+  const size = $derived(e.kind === 'boss' ? 112 : e.kind === 'elite' ? 92 : e.kind === 'head' ? 56 : 76);
+  const harmless = $derived(e.atk === 0 || e.msToHit > 60_000);
   const secs = $derived(Math.ceil(e.msToHit / 100) / 10);
 </script>
 
@@ -41,18 +44,25 @@
         class:modded={!!c.fill}
         class:stacked={l.mods.length > 1}
         style:--fill={c.fill}
-        style:--under={c.under}>{l.hidden ? '·' : l.ch}</span
+        style:--under={c.under}
+        >{#if profile.settings.powerSymbols && l.mods.length && !l.hidden}<span class="sym"
+            >{l.mods.map((m) => MODS[m].glyph).join('')}</span
+          >{/if}{l.hidden ? '·' : l.ch}</span
       >
     {/each}
   </p>
 
   <div class="threat">
-    <Bar value={e.intent} max={1} tone={e.intent > 0.75 ? 'danger' : 'threat'} height={6} />
-    <span class="hit" title="Damage of its next hit">
-      <span aria-hidden="true">⚔</span>
-      {e.atk}
-      <span class="when">{e.windup ? 'now' : `in ${secs.toFixed(1)}s`}</span>
-    </span>
+    {#if harmless}
+      <span class="when calm">Does not attack</span>
+    {:else}
+      <Bar value={e.intent} max={1} tone={e.intent > 0.75 ? 'danger' : 'threat'} height={6} />
+      <span class="hit" title="Damage of its next hit">
+        <span aria-hidden="true">⚔</span>
+        {e.atk}
+        <span class="when">{e.windup ? 'now' : `in ${secs.toFixed(1)}s`}</span>
+      </span>
+    {/if}
   </div>
 </article>
 
@@ -60,7 +70,7 @@
   .enemy {
     position: relative;
     width: 300px;
-    padding: var(--space-5) var(--space-4) var(--space-4);
+    padding: var(--space-4) var(--space-4) var(--space-3);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -156,6 +166,15 @@
     display: inline-block;
     position: relative;
   }
+  .sym {
+    position: absolute;
+    left: 50%;
+    top: -0.55em;
+    transform: translateX(-50%);
+    font-size: 0.32em;
+    letter-spacing: 0;
+    color: var(--fill);
+  }
   .l.modded {
     color: var(--fill);
     text-shadow: 0 0 14px color-mix(in oklab, var(--fill) 55%, transparent);
@@ -216,6 +235,10 @@
   }
   .windup .hit {
     font-size: var(--t-lg);
+  }
+  .calm {
+    grid-column: span 2;
+    text-align: center;
   }
   .when {
     font-weight: 400;

@@ -2,8 +2,12 @@
   import Button from '../ui/Button.svelte';
   import Frame from '../ui/Frame.svelte';
 
-  let { onresume, onsettings, onabandon }: { onresume: () => void; onsettings: () => void; onabandon: () => void } =
-    $props();
+  let {
+    onresume,
+    onsettings,
+    onbuild,
+    onabandon,
+  }: { onresume: () => void; onsettings: () => void; onbuild: () => void; onabandon: () => void } = $props();
   let confirming = $state(false);
 
   export function onKey(k: string): boolean {
@@ -31,6 +35,7 @@
       {:else}
         <div class="stack">
           <Button hotkey="Esc" onclick={onresume}>Resume</Button>
+          <Button kind="quiet" onclick={onbuild}>Your build</Button>
           <Button kind="quiet" onclick={onsettings}>Settings</Button>
           <Button kind="quiet" onclick={() => (confirming = true)}>Abandon run</Button>
         </div>

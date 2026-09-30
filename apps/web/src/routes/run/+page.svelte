@@ -8,6 +8,7 @@
   import Combat from '$lib/screens/Combat.svelte';
   import Install from '$lib/screens/Install.svelte';
   import Intro from '$lib/screens/Intro.svelte';
+  import Build from '$lib/screens/Build.svelte';
   import Pause from '$lib/screens/Pause.svelte';
   import Results from '$lib/screens/Results.svelte';
   import Reward from '$lib/screens/Reward.svelte';
@@ -18,6 +19,26 @@
 
   let session = $state<Session | null>(null);
   let settingsOpen = $state(false);
+  let buildOpen = $state(false);
+
+  function openBuild() {
+    session?.pause();
+    buildOpen = true;
+  }
+
+  function closeBuild() {
+    buildOpen = false;
+    // Opened from a room (not the pause menu): nothing else is paused, so carry on.
+    if (session?.view.kind !== 'combat') session?.unpause();
+  }
+
+  /** Move keyboard focus between the buttons and cards on a room screen. */
+  function moveFocus(dir: 1 | -1) {
+    const items = [...document.querySelectorAll<HTMLElement>('[data-screen] :is(.card, .btn):not(:disabled)')];
+    if (!items.length) return;
+    const i = items.indexOf(document.activeElement as HTMLElement);
+    items[(i + dir + items.length) % items.length].focus();
+  }
   let screen = $state<KeyTarget>();
   let overlay = $state<KeyTarget>();
 
@@ -56,7 +77,9 @@
     if (e.repeat && k.length > 1) return;
     let handled: boolean;
 
-    if (settingsOpen || (session.paused && overlay)) {
+    const focusedButton = document.activeElement instanceof HTMLButtonElement;
+
+    if (settingsOpen || buildOpen || (session.paused && overlay)) {
       handled = overlay?.onKey(k) ?? false;
     } else if (session.intro) {
       handled = screen?.onKey(k) ?? false;
@@ -70,6 +93,15 @@
     } else if (k === 'Escape' && session.view.kind !== 'over' && session.view.kind !== 'install') {
       session.pause();
       handled = true;
+    } else if (k === 'b' && (session.view.kind === 'reward' || session.view.kind === 'shop')) {
+      openBuild();
+      handled = true;
+    } else if (k.startsWith('Arrow') && session.view.kind !== 'over') {
+      moveFocus(k === 'ArrowRight' || k === 'ArrowDown' ? 1 : -1);
+      handled = true;
+    } else if (k === 'Enter' && focusedButton) {
+      // Let the focused card or button take the Enter natively.
+      return;
     } else {
       handled = screen?.onKey(k) ?? false;
     }
@@ -85,13 +117,13 @@
     {#if session.intro}
       <Intro {session} bind:this={screen} />
     {:else if session.view.kind === 'combat'}
-      <Combat {session} />
+      <Combat {session} onbuild={openBuild} />
     {:else if session.view.kind === 'reward'}
-      <Reward {session} bind:this={screen} />
+      <Reward {session} onbuild={openBuild} bind:this={screen} />
     {:else if session.view.kind === 'install'}
-      <Install {session} bind:this={screen} />
+      <Install {session} onbuild={openBuild} bind:this={screen} />
     {:else if session.view.kind === 'shop'}
-      <Shop {session} bind:this={screen} />
+      <Shop {session} onbuild={openBuild} bind:this={screen} />
     {:else}
       <Results {session} bind:this={screen} onagain={newRun} onhome={() => nav('/')} />
     {/if}
@@ -99,11 +131,19 @@
 
   {#if settingsOpen}
     <Settings bind:this={overlay} onclose={() => (settingsOpen = false)} />
+  {:else if buildOpen}
+    <Build
+      bind:this={overlay}
+      keyMods={session.machine.run.keyMods}
+      relics={session.machine.run.relics}
+      onclose={closeBuild}
+    />
   {:else if session.paused}
     <Pause
       bind:this={overlay}
       onresume={() => session?.unpause()}
       onsettings={() => (settingsOpen = true)}
+      onbuild={() => (buildOpen = true)}
       onabandon={() => {
         session?.abandon();
         nav('/');

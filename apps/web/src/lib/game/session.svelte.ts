@@ -18,6 +18,7 @@ import { combatSnapshot, type CombatSnap } from './snapshot';
 const SAVE_KEY = 'keycraft.run.v1';
 /** Autosave cadence during combat. */
 const SAVE_EVERY_MS = 2000;
+const RECENT_WORDS = 40;
 
 interface SavedRun {
   config: RunConfig | null;
@@ -38,6 +39,8 @@ export class Session {
   intro = $state<Intro>(null);
   /** starters unlocked during this run */
   unlocked = $state<StarterId[]>([]);
+  /** the last words enemies carried, newest last — the install screen reads letter use from these */
+  recentWords: string[] = [];
 
   // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a plain registry, never rendered
   private listeners = new Set<Listener>();
@@ -225,6 +228,12 @@ export class Session {
 
   private sync(): void {
     const m = this.machine;
+    for (const e of m.combat?.enemies ?? []) {
+      if (this.recentWords.at(-1) !== e.word && !this.recentWords.slice(-4).includes(e.word)) {
+        this.recentWords.push(e.word);
+        if (this.recentWords.length > RECENT_WORDS) this.recentWords.shift();
+      }
+    }
     this.view = m.view.kind === 'combat' ? { ...m.view } : m.view;
     this.snap = m.combat ? combatSnapshot(m.combat, m.run) : null;
   }

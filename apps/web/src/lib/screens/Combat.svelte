@@ -9,7 +9,7 @@
   import Hud from '../ui/Hud.svelte';
   import Keyboard from '../ui/Keyboard.svelte';
 
-  let { session }: { session: Session } = $props();
+  let { session, onbuild }: { session: Session; onbuild?: () => void } = $props();
 
   let stage: HTMLElement;
   let comboEl: HTMLElement;
@@ -151,6 +151,7 @@
     act={run.act}
     node={run.node}
     relics={run.relics}
+    {onbuild}
   />
 
   <section class="field" aria-label="Enemies">

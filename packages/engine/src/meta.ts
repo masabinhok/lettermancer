@@ -9,9 +9,8 @@ export interface Meta {
   bestAct: number;
   unlocked: StarterId[];
   lastStarter: StarterId;
-  fingerHints: boolean;
-  keyboard: KeyboardMode;
-  sound: boolean;
+  /** finished (or skipped) the tutorial */
+  prologueDone: boolean;
 }
 
 export const defaultMeta = (): Meta => ({
@@ -20,9 +19,7 @@ export const defaultMeta = (): Meta => ({
   bestAct: 0,
   unlocked: ['apprentice'],
   lastStarter: 'apprentice',
-  fingerHints: true,
-  keyboard: 'full',
-  sound: true,
+  prologueDone: false,
 });
 
 export interface UnlockCheck {
