@@ -1,0 +1,14 @@
+{
+  "name": "@keycraft/engine",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Keycraft game rules: pure, deterministic, and framework-free.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "words": "node scripts/build-words.mjs"
+  }
+}

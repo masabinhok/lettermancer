@@ -1,14 +1,23 @@
 {
   "name": "keycraft",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc --noEmit && vite build",
-    "preview": "vite preview",
+    "dev": "npm run dev -w @keycraft/web",
+    "build": "npm run build -w @keycraft/web",
+    "preview": "npm run preview -w @keycraft/web",
     "test": "vitest run",
-    "words": "node scripts/build-words.mjs"
+    "test:e2e": "playwright test",
+    "check": "npm run check -w @keycraft/web && tsc -p packages/engine --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "playtest": "node scripts/playtest.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

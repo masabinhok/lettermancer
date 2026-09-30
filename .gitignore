@@ -2,3 +2,5 @@ node_modules
 dist
 .vercel
 playtest-shots
+.svelte-kit
+build
