@@ -4,18 +4,20 @@
     kind = 'primary',
     hotkey = null,
     disabled = false,
+    type = 'button',
     onclick,
     children,
   }: {
     kind?: 'primary' | 'quiet';
     hotkey?: string | null;
     disabled?: boolean;
+    type?: 'button' | 'submit';
     onclick?: () => void;
     children: Snippet;
   } = $props();
 </script>
 
-<button class="btn {kind}" {disabled} {onclick} type="button">
+<button class="btn {kind}" {disabled} {onclick} {type}>
   {@render children()}
   {#if hotkey}<kbd>{hotkey}</kbd>{/if}
 </button>

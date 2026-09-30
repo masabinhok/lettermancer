@@ -17,6 +17,8 @@
     type StarterId,
   } from '@keycraft/engine';
   import { onMount } from 'svelte';
+  import { account } from '$lib/cloud/account.svelte';
+  import { cloudEnabled } from '$lib/cloud/client';
   import * as sfx from '$lib/fx/audio';
   import { Session } from '$lib/game/session.svelte';
   import CodexOfHands from '$lib/hub/CodexOfHands.svelte';
@@ -100,6 +102,7 @@
     else if (k === 'p') panel = 'prophecies';
     else if (k === 'c') panel = 'codex';
     else if (k === 'r') nav('/practice');
+    else if (k === 'a') nav(account.user || !cloudEnabled ? '/profile' : '/login');
     else if (k === 'g') toggleGentle();
     else if (k === 'x') trade();
     else if (STARTER_IDS[i] && meta.unlocked.includes(STARTER_IDS[i])) selected = STARTER_IDS[i];
@@ -119,6 +122,9 @@
     </h1>
     <Currencies ink={meta.ink} leaf={meta.leaf} seals={meta.seals} />
     <nav class="util">
+      <Button kind="quiet" hotkey="A" onclick={() => nav(account.user || !cloudEnabled ? '/profile' : '/login')}
+        >{account.user ? (account.username ?? 'Profile') : cloudEnabled ? 'Sign in' : 'Profile'}</Button
+      >
       <Button kind="quiet" hotkey="T" onclick={() => nav('/prologue')}>Tutorial</Button>
       <Button kind="quiet" hotkey="S" onclick={open('settings')}>Settings</Button>
     </nav>

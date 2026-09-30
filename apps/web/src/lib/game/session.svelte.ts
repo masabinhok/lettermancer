@@ -17,6 +17,7 @@ import {
   type StarterId,
   type View,
 } from '@keycraft/engine';
+import { account, type SubmitResult } from '../cloud/account.svelte';
 import { profile, readStore, writeStore } from '../stores/profile.svelte';
 import { combatSnapshot, type CombatSnap } from './snapshot';
 
@@ -55,6 +56,8 @@ export class Session {
   intro = $state<Intro>(null);
   /** starters unlocked during this run */
   unlocked = $state<StarterId[]>([]);
+  /** the leaderboard verdict for a finished run, when signed in */
+  submission = $state.raw<SubmitResult | 'sending' | null>(null);
   /** what the finished run earned (set when the run ends) */
   award = $state.raw<Award | null>(null);
   /** the last words enemies carried — the install screen reads letter use from these */
@@ -279,9 +282,18 @@ export class Session {
       } else if (e.t === 'run-end') {
         this.award = profile.finishRun(this.machine);
         clearSave();
+        this.submit();
       }
       for (const fn of this.listeners) fn(e);
     }
+  }
+
+  /** Post a finished run for verification and ranking (signed-in players, never gentle runs). */
+  private submit(): void {
+    const m = this.machine;
+    if (!account.user || m.config.gentle) return;
+    this.submission = 'sending';
+    void account.submitRun(m.config, [...m.actions]).then((r) => (this.submission = r));
   }
 
   private gain(ids: StarterId[]): void {

@@ -1,6 +1,7 @@
 <script lang="ts">
   import '../app.css';
   import type { Snippet } from 'svelte';
+  import { account } from '$lib/cloud/account.svelte';
   import { setVolumes } from '$lib/fx/audio';
   import { attachCanvas, setReducedMotion } from '$lib/fx/particles';
   import { profile } from '$lib/stores/profile.svelte';
@@ -18,6 +19,7 @@
   });
 
   $effect(() => attachCanvas(canvas));
+  $effect(() => account.start());
 
   // Apply settings everywhere, live.
   $effect(() => {

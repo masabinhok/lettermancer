@@ -6,3 +6,7 @@ playtest-shots
 build
 test-results
 playwright-report
+supabase/functions/_shared/engine.js
+supabase/.temp
+supabase/.branches
+.env.local

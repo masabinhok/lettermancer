@@ -20,6 +20,7 @@
     type TrialDef,
   } from '@keycraft/engine';
   import { onMount, tick } from 'svelte';
+  import { account, type SubmitResult } from '$lib/cloud/account.svelte';
   import * as sfx from '$lib/fx/audio';
   import { nav } from '$lib/nav';
   import SpeedChart from '$lib/practice/SpeedChart.svelte';
@@ -45,6 +46,8 @@
   let prophecies = $state.raw<ProphecyDef[]>([]);
   let unlockedLetter = $state<string | null>(null);
   let textEl = $state<HTMLElement>();
+  let submission = $state.raw<SubmitResult | 'sending' | null>(null);
+  let inputs: { k: string; at: number }[] = [];
   let caretTop = $state(0);
   let clockStart = 0;
 
@@ -93,6 +96,8 @@
     award = null;
     prophecies = [];
     unlockedLetter = null;
+    submission = null;
+    inputs = [];
     rev++;
     await tick();
     caretTop = 0;
@@ -127,6 +132,10 @@
       }
     }
     prophecies = profile.checkProphecies({ mode: r.mode, seconds: r.seconds, wpm: r.wpm, accuracy: r.accuracy });
+    if (account.user) {
+      submission = 'sending';
+      void account.submitPractice(test.config, inputs, trial?.id ?? null).then((s) => (submission = s));
+    }
     profile.saveMeta();
     if (award.trials.length || prophecies.length || award.newBest) sfx.boon();
   }
@@ -162,7 +171,9 @@
     e.preventDefault();
     const now = performance.now();
     if (test.startAt === null) clockStart = now;
-    const ok = pressPractice(test, e.key, Math.round(now - clockStart));
+    const at = Math.round(now - clockStart);
+    inputs.push({ k: e.key, at });
+    const ok = pressPractice(test, e.key, at);
     if (ok) sfx.keyClick(0);
     else sfx.miss();
     rev++;
@@ -301,6 +312,12 @@
         {#if unlockedLetter}<b> New letter unlocked: {unlockedLetter.toUpperCase()}.</b>{/if}
         {#each prophecies as p (p.id)}<b> ✦ {p.name}.</b>{/each}
       </p>
+      {#if submission && submission !== 'sending' && submission.ok}
+        {@const st = Object.values(submission.standings)[0]}
+        {#if st}<p class="earned">
+            Verified and ranked: {st.rank ? `#${st.rank}` : ''}{st.improved ? ', a new best' : ''}.
+          </p>{/if}
+      {/if}
       <Button hotkey="Enter" onclick={() => restart()}>Next test</Button>
     </section>
   {:else if view}

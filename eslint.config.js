@@ -12,7 +12,7 @@ export default ts.config(
       '**/.svelte-kit',
       '**/dist',
       'playtest-shots',
-      'supabase/functions/_shared/engine.js',
+      'supabase/functions/**',
     ],
   },
   js.configs.recommended,

@@ -14,7 +14,8 @@
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@fontsource/alegreya-sans": "^5.3.0",
     "@fontsource/cormorant-garamond": "^5.3.0",
-    "@keycraft/engine": "*"
+    "@keycraft/engine": "*",
+    "@supabase/supabase-js": "^2.117.2"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.10",

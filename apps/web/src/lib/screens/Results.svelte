@@ -109,6 +109,22 @@
     </section>
   {/if}
 
+  {#if session.submission}
+    {@const s = session.submission}
+    <p class="ranked">
+      {#if s === 'sending'}Checking your run with the server…
+      {:else if s.ok}
+        {@const all = s.standings['all-time']}
+        {#if all}Verified. {all.improved ? 'A new personal best' : `Your best is ${all.best.toLocaleString()}`}{all.rank
+            ? `, rank ${all.rank} of all time`
+            : ''}.{/if}
+        {#each Object.entries(s.standings).filter(([b]) => b !== 'all-time') as [b, st] (b)}
+          {b.startsWith('daily') ? ' Today' : ' This week'}: rank {st.rank}.
+        {/each}
+      {:else}{s.reason}{/if}
+    </p>
+  {/if}
+
   {#if session.unlocked.length}
     <p class="unlock">
       New keyboard{session.unlocked.length > 1 ? 's' : ''} unlocked: {session.unlocked
@@ -235,6 +251,10 @@
   }
   .prophecy b {
     color: var(--gold-bright);
+  }
+  .ranked {
+    font-size: var(--t-sm);
+    color: var(--moon-dim);
   }
   .unlock {
     padding: var(--space-2) var(--space-4);
