@@ -1,7 +1,9 @@
 # Keycraft roadmap
 
 ## Context
+
 Keycraft v0.1 (github.com/masabinhok/keycraft, private) works and is fun, but it plays like a prototype:
+
 - Players don't get enough guidance, and the screens are cluttered.
 - The fonts don't hang together, and there is almost nothing that carries over between runs.
 - Difficulty is fixed, and there is no login or database.
@@ -9,6 +11,7 @@ Keycraft v0.1 (github.com/masabinhok/keycraft, private) works and is fun, but it
 The goal is a polished, premium web game in the spirit of Hades II: a mythic ink-and-gold style, a hub you return to between runs, progress you earn by improving, and permanent unlocks. It should also have a Monkeytype-grade practice mode. The user will polish it privately, phase by phase. The final phase is open-sourcing it.
 
 **Decisions so far:**
+
 - **Backend:** Supabase.
 - **Look:** original "mythic ink & gold". No Supergiant assets or characters.
 - **Frontend:** SvelteKit for screens, the existing pure-TS engine, and canvas for effects.
@@ -17,6 +20,7 @@ The goal is a polished, premium web game in the spirit of Hades II: a mythic ink
 ---
 
 ## 1. Review prompt
+
 The quality gate for every phase lives in [prompts/game-review.md](prompts/game-review.md).
 
 ---
@@ -24,31 +28,38 @@ The quality gate for every phase lives in [prompts/game-review.md](prompts/game-
 ## 2. Current review: what feels off in v0.1 (from the code and design)
 
 **Onboarding / understandability**
+
 - The menu is a wall of text with four rules. There's no tutorial fight. The targeting model ("first letter picks the enemy") is never taught.
 - Backspace drops your target. Every typing site uses Backspace to delete a character, so this clashes with players' habits.
 - Mods are installed blind. You don't see how often a letter comes up, or what your current mods are doing.
 - Relic tooltips only appear on hover, and you can't hover while you're typing.
 
 **Clarity in combat**
+
 - The word competes with the mod colors, the next-letter underline and the dimmed typed letters. Already-typed letters become hard to read.
 - Enemy threat is a thin bar with a tiny "⚔ 5". There's no wind-up warning before a hit.
 - The on-screen keyboard takes about a third of the screen during combat, and most players don't need it.
 
 **Visuals**
+
 - Four fonts that don't match (Bungee, DM Serif, JetBrains Mono, Space Grotesk). Bungee reads "arcade", not "mythic".
 - The HUD crams HP, coins, map dots and relics into one row. The shop squeezes 7 cards side by side.
 
 **Depth**
+
 - Rewards are always 3 random mods, with no rarity, no way to steer a build and no combo rewards like Hades duo boons.
 - The path through each act is fixed, with no choices, and bosses have one gimmick each.
 
 **Progression**
+
 - Only 3 unlocks. There's nothing to spend between runs, and dying teaches nothing.
 
 **Difficulty**
+
 - One fixed level. The balance bot shows a 30 wpm typist stalling in Act 2, while a 70 wpm typist wins about 95% of runs. There's no opt-in challenge like Hades' Heat.
 
 **Missing**
+
 - Settings, pause menu, closing the tab and resuming a run, non-QWERTY layouts, colorblind and reduced-motion modes, timed practice, accounts.
 
 **Keep:** the core loop of typing to strike and installing a mod by pressing the key. Also keep the adaptive weak-key word picking, the tested pure engine and the balance bot.
@@ -56,26 +67,29 @@ The quality gate for every phase lives in [prompts/game-review.md](prompts/game-
 ---
 
 ## 3. What we borrow, and from where
-| Source | Borrow |
-|---|---|
-| Hades / Hades II | Hub between runs with NPCs and story that moves on every death; god boons with rarities and duo boons; door choices that preview their reward; Mirror/Arcana permanent upgrades; the Pact of Punishment / Fear difficulty system; keepsakes; weapon aspects |
-| Balatro | Very readable scoring (base × mult shown as it happens); jokers that combine; a satisfying count-up on every word |
-| Slay the Spire | Branching act map; enemies show what they'll do next; ascension levels |
-| Monkeytype | Clean focus mode; timed/word/quote tests; wpm/raw/accuracy/consistency graph; themes; strong settings culture |
-| Keybr | Letters unlock as you master them; per-key mastery goals |
-| ZType / Typing of the Dead | Typing that feels like an action game; lock-on targeting feedback |
+
+| Source                     | Borrow                                                                                                                                                                                                                                                      |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hades / Hades II           | Hub between runs with NPCs and story that moves on every death; god boons with rarities and duo boons; door choices that preview their reward; Mirror/Arcana permanent upgrades; the Pact of Punishment / Fear difficulty system; keepsakes; weapon aspects |
+| Balatro                    | Very readable scoring (base × mult shown as it happens); jokers that combine; a satisfying count-up on every word                                                                                                                                           |
+| Slay the Spire             | Branching act map; enemies show what they'll do next; ascension levels                                                                                                                                                                                      |
+| Monkeytype                 | Clean focus mode; timed/word/quote tests; wpm/raw/accuracy/consistency graph; themes; strong settings culture                                                                                                                                               |
+| Keybr                      | Letters unlock as you master them; per-key mastery goals                                                                                                                                                                                                    |
+| ZType / Typing of the Dead | Typing that feels like an action game; lock-on targeting feedback                                                                                                                                                                                           |
 
 **Design pillars:** (1) your fingers are the weapon, and skill is the only real power; (2) every run teaches you something; (3) always one more run; (4) readable while you type, even at 120 wpm.
 
 ---
 
 ## 4. Target architecture (arrives across the phases)
+
 ```
 apps/web/            SvelteKit: routes for hub, run, practice, profile, leaderboards, settings
 packages/engine/     current src/engine moved here: pure, deterministic, tested (rules, sim bot, replay verifier)
 packages/content/    data: muses/boons, enemies, bosses, achievements, word lists, quotes
 supabase/            migrations, RLS policies, edge functions (verify-run, daily-seed)
 ```
+
 - **Rendering:**
   - Text stays in the DOM, for crisp words and accessibility.
   - A canvas layer draws effects: particles, trails, hit-stop flashes. It can move to PixiJS later if needed.
@@ -86,9 +100,11 @@ supabase/            migrations, RLS policies, edge functions (verify-run, daily
 ---
 
 ## 5. Phases
+
 Each phase ends with: all tests green; a playtest with 3–5 people (including someone new to typing games); the review prompt re-run with no open Blocker or Major findings; a tagged release.
 
 ### Phase 0 — Foundations & audit
+
 - Commit the review prompt and run it on v0.1. File every finding as a GitHub issue.
 - Restructure into a pnpm monorepo:
   - Move `src/engine` → `packages/engine` without changing behavior.
@@ -102,6 +118,7 @@ Each phase ends with: all tests green; a playtest with 3–5 people (including s
 - Lightweight local analytics, no remote tracking yet: where players die, how long fights take, which words are typed slowest, what players choose. Feeds balance work.
 
 ### Phase 1 — Art direction & design system ("mythic ink & gold")
+
 - Style guide:
   - Palette: deep ink blacks and underworld purples, gold filigree, ember/verdigris/moonlight accent colors per muse.
   - Texture: grain and paper textures; vignette.
@@ -120,6 +137,7 @@ Each phase ends with: all tests green; a playtest with 3–5 people (including s
 - Restyle every existing screen in the new system, keeping gameplay unchanged. A 1280×720 screenshot of each screen should look premium.
 
 ### Phase 2 — UX clarity & onboarding
+
 - **Prologue:** a scripted first run, about 3 minutes:
   - Fight 1 teaches striking and targeting.
   - Fight 2 teaches combo.
@@ -138,6 +156,7 @@ Each phase ends with: all tests green; a playtest with 3–5 people (including s
 - **Settings:** keyboard layouts (QWERTY/Dvorak/Colemak/AZERTY, which affects the finger map and heatmap), colorblind-safe icons alongside colors, font size, reduced motion, volume.
 
 ### Phase 3 — Gameplay depth
+
 - **Muses**, like Hades gods: 5–6 muses. Each owns a boon family:
   - Ember (burn), Frost (control), Spark (chain), Gilt (economy), Echo (amplify), Ward (defense).
   - Boons have rarity (Common / Rare / Epic / Heroic) and levels.
@@ -152,6 +171,7 @@ Each phase ends with: all tests green; a playtest with 3–5 people (including s
   - Target win rates: base game ~50% at 40 wpm for a returning player; Oath levels scale up to 90+ wpm.
 
 ### Phase 4 — Meta progression & the hub
+
 - **The Scriptorium** hub, the place you go between runs:
   - Walk between stations with the keyboard.
   - NPCs have short dialogue that reacts to how the last run went (how you died, milestones), so every death moves the story on.
@@ -167,6 +187,7 @@ Each phase ends with: all tests green; a playtest with 3–5 people (including s
 - **Codex:** a bestiary and boon encyclopedia that fills in as you discover things.
 
 ### Phase 5 — Practice & Trials (Monkeytype-grade)
+
 - **Practice mode:**
   - Timed tests of 15/30/60/120s; word counts of 10/25/50/100; quotes.
   - Toggles for punctuation and numbers.
@@ -177,6 +198,7 @@ Each phase ends with: all tests green; a playtest with 3–5 people (including s
 - Practice pays a small amount of Ink and counts toward a daily streak. It's capped so it can't be farmed.
 
 ### Phase 6 — Accounts & cloud (Supabase)
+
 - **Sign-in:** email magic link, GitHub, Google. Playing as a guest stays fully supported. Signing in merges local progress into the account, and the merge rules are tested.
 - **Database schema:**
   - `profiles`, `meta_progress`
@@ -188,6 +210,7 @@ Each phase ends with: all tests green; a playtest with 3–5 people (including s
 - Data export and account deletion.
 
 ### Phase 7 — Competitive & social
+
 - **Daily run:** the same seed for everyone, one attempt per day.
 - **Weekly challenge:** a fixed set of Oaths.
 - **Leaderboards:** daily run, practice 15/60s, highest Oath cleared. Submissions are verified by the `verify-run` edge function, which replays the keystroke log through the engine and rejects impossible timings.
@@ -195,6 +218,7 @@ Each phase ends with: all tests green; a playtest with 3–5 people (including s
 - **Share card:** an image of the run summary with build and stats.
 
 ### Phase 8 — Open-source launch
+
 - **Licensing:**
   - MIT for the code.
   - Assets under CC BY 4.0, or kept separate if commissioned art can't be relicensed.
@@ -218,6 +242,7 @@ Each phase ends with: all tests green; a playtest with 3–5 people (including s
 ---
 
 ## Verification (applies to every phase)
+
 - `pnpm test`: engine unit tests, replay determinism, and the sim-bot balance guardrails, with thresholds updated each phase.
 - `pnpm test:e2e`: Playwright plays the prologue and one full run headless. Covers keyboard-only navigation.
 - Manual play in Chrome via claude-in-chrome, with screenshots of every screen before and after each phase.

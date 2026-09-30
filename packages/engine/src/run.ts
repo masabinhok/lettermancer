@@ -105,9 +105,27 @@ const ACT_PARAMS: ActParams[] = [
 ];
 
 const MONSTERS: [string, string][][] = [
-  [['Typo Imp', 'ʇ'], ['Serif Slime', '§'], ['Tilde Worm', '~'], ['Pilcrow', '¶'], ['Caret Bat', '^']],
-  [['Ligature Leech', 'æ'], ['Glyph Golem', 'Ω'], ['Ampersand', '&'], ['Caps Wraith', 'Ⱥ'], ['Dagger', '‡']],
-  [['Null Knight', '∅'], ['Backspace Banshee', '⌫'], ['Sigma Beast', 'Σ'], ['Lambda Lurker', 'λ'], ['Integral', '∫']],
+  [
+    ['Typo Imp', 'ʇ'],
+    ['Serif Slime', '§'],
+    ['Tilde Worm', '~'],
+    ['Pilcrow', '¶'],
+    ['Caret Bat', '^'],
+  ],
+  [
+    ['Ligature Leech', 'æ'],
+    ['Glyph Golem', 'Ω'],
+    ['Ampersand', '&'],
+    ['Caps Wraith', 'Ⱥ'],
+    ['Dagger', '‡'],
+  ],
+  [
+    ['Null Knight', '∅'],
+    ['Backspace Banshee', '⌫'],
+    ['Sigma Beast', 'Σ'],
+    ['Lambda Lurker', 'λ'],
+    ['Integral', '∫'],
+  ],
 ];
 
 const ELITES: [string, string][] = [
@@ -238,7 +256,8 @@ export function rollShop(run: Run, rng: Rng): ShopItem[] {
     cost: MODS[mod].cost + bump,
     sold: false,
   }));
-  for (const relic of rollRelics(run, rng, 2)) items.push({ kind: 'relic', relic, cost: RELICS[relic].cost + bump * 2, sold: false });
+  for (const relic of rollRelics(run, rng, 2))
+    items.push({ kind: 'relic', relic, cost: RELICS[relic].cost + bump * 2, sold: false });
   items.push({ kind: 'heal', amount: 15, cost: 6 + bump * 2, sold: false });
   return items;
 }

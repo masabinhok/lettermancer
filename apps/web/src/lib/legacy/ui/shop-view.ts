@@ -42,7 +42,13 @@ export class ShopScreen implements Screen {
       else if (it.kind === 'relic') card = relicCard(it.relic, hk, price);
       else {
         card = el('div', 'card heal-card');
-        card.append(el('span', 'hotkey', hk), el('div', 'card-glyph', '+'), el('div', 'card-name', 'Patch Kit'), el('div', 'card-desc', `Heal ${it.amount} HP.`), el('div', 'card-cost', price));
+        card.append(
+          el('span', 'hotkey', hk),
+          el('div', 'card-glyph', '+'),
+          el('div', 'card-name', 'Patch Kit'),
+          el('div', 'card-desc', `Heal ${it.amount} HP.`),
+          el('div', 'card-cost', price),
+        );
       }
       if (it.sold) card.classList.add('sold');
       else if (it.cost > this.run.coins) card.classList.add('too-expensive');

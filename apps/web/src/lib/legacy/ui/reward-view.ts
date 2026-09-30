@@ -10,7 +10,12 @@ import type { Screen } from './screen';
 export function relicCard(relic: RelicId, hotkey: string, extra?: string): HTMLElement {
   const r = RELICS[relic];
   const card = el('div', 'card relic-card');
-  card.append(el('span', 'hotkey', hotkey), el('div', 'card-glyph', r.glyph), el('div', 'card-name', r.name), el('div', 'card-desc', r.desc));
+  card.append(
+    el('span', 'hotkey', hotkey),
+    el('div', 'card-glyph', r.glyph),
+    el('div', 'card-name', r.name),
+    el('div', 'card-desc', r.desc),
+  );
   if (extra) card.append(el('div', 'card-cost', extra));
   return card;
 }

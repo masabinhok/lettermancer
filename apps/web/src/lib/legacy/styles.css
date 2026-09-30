@@ -38,8 +38,7 @@ body {
 body {
   background:
     radial-gradient(ellipse at 50% -10%, #2a1f38 0%, transparent 60%),
-    radial-gradient(ellipse at 50% 120%, #1c1424 0%, transparent 55%),
-    var(--ink);
+    radial-gradient(ellipse at 50% 120%, #1c1424 0%, transparent 55%), var(--ink);
 }
 
 /* Faint scanline texture */
@@ -104,11 +103,22 @@ button {
   --amp: 9px;
 }
 @keyframes shake {
-  0%, 100% { transform: translate(0, 0); }
-  20% { transform: translate(calc(var(--amp, 4px) * -1), 2px); }
-  40% { transform: translate(var(--amp, 4px), -2px); }
-  60% { transform: translate(calc(var(--amp, 4px) * -0.6), 1px); }
-  80% { transform: translate(calc(var(--amp, 4px) * 0.6), -1px); }
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(calc(var(--amp, 4px) * -1), 2px);
+  }
+  40% {
+    transform: translate(var(--amp, 4px), -2px);
+  }
+  60% {
+    transform: translate(calc(var(--amp, 4px) * -0.6), 1px);
+  }
+  80% {
+    transform: translate(calc(var(--amp, 4px) * 0.6), -1px);
+  }
 }
 
 .hurt-flash::before,
@@ -146,21 +156,62 @@ button {
   white-space: nowrap;
 }
 @keyframes float-up {
-  0% { opacity: 0; transform: translate(-50%, 10px) scale(0.6); }
-  15% { opacity: 1; transform: translate(-50%, -6px) scale(1.15); }
-  100% { opacity: 0; transform: translate(-50%, -60px) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 10px) scale(0.6);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -6px) scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -60px) scale(1);
+  }
 }
-.ft-dmg { color: var(--paper); }
-.ft-crit { color: var(--hot); font-size: 34px; }
-.ft-burn { color: var(--ember); font-size: 16px; }
-.ft-spark { color: var(--spark); }
-.ft-frost { color: var(--frost); font-size: 16px; }
-.ft-hurt { color: var(--hot); font-size: 28px; }
-.ft-heal { color: var(--heal); }
-.ft-shield { color: var(--ward); font-size: 16px; }
-.ft-coin { color: var(--gold); font-size: 16px; }
-.ft-bad { color: var(--hot); font-family: var(--f-mono); font-size: 14px; font-weight: 800; }
-.ft-combo { color: var(--spark); font-size: 40px; }
+.ft-dmg {
+  color: var(--paper);
+}
+.ft-crit {
+  color: var(--hot);
+  font-size: 34px;
+}
+.ft-burn {
+  color: var(--ember);
+  font-size: 16px;
+}
+.ft-spark {
+  color: var(--spark);
+}
+.ft-frost {
+  color: var(--frost);
+  font-size: 16px;
+}
+.ft-hurt {
+  color: var(--hot);
+  font-size: 28px;
+}
+.ft-heal {
+  color: var(--heal);
+}
+.ft-shield {
+  color: var(--ward);
+  font-size: 16px;
+}
+.ft-coin {
+  color: var(--gold);
+  font-size: 16px;
+}
+.ft-bad {
+  color: var(--hot);
+  font-family: var(--f-mono);
+  font-size: 14px;
+  font-weight: 800;
+}
+.ft-combo {
+  color: var(--spark);
+  font-size: 40px;
+}
 
 /* ---------- HUD ---------- */
 .hud {
@@ -316,7 +367,10 @@ button {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  transition:
+    transform 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
   animation: enemy-in 0.35s ease-out;
 }
 @keyframes enemy-in {
@@ -327,7 +381,9 @@ button {
 }
 .enemy.targeted {
   border-color: var(--paper);
-  box-shadow: 0 0 0 1px var(--paper), 0 10px 40px rgba(244, 239, 230, 0.12);
+  box-shadow:
+    0 0 0 1px var(--paper),
+    0 10px 40px rgba(244, 239, 230, 0.12);
   transform: translateY(-4px);
 }
 .enemy.danger .glyph {
@@ -458,16 +514,26 @@ button {
 }
 @keyframes windup-glow {
   from {
-    box-shadow: 0 0 0 1px var(--hot), 0 0 18px rgba(255, 56, 96, 0.35);
+    box-shadow:
+      0 0 0 1px var(--hot),
+      0 0 18px rgba(255, 56, 96, 0.35);
   }
   to {
-    box-shadow: 0 0 0 2px var(--hot), 0 0 40px rgba(255, 56, 96, 0.7);
+    box-shadow:
+      0 0 0 2px var(--hot),
+      0 0 40px rgba(255, 56, 96, 0.7);
   }
 }
 @keyframes windup-shake {
-  0% { transform: translate(0, 0) scale(1.08); }
-  50% { transform: translate(-2px, 1px) scale(1.12); }
-  100% { transform: translate(2px, -1px) scale(1.08); }
+  0% {
+    transform: translate(0, 0) scale(1.08);
+  }
+  50% {
+    transform: translate(-2px, 1px) scale(1.12);
+  }
+  100% {
+    transform: translate(2px, -1px) scale(1.08);
+  }
 }
 .enemy-status {
   min-height: 14px;
@@ -555,14 +621,33 @@ button {
   background: var(--paper);
   transition: width 0.1s;
 }
-.combo.tier-1 .combo-mult { color: var(--frost); }
-.combo.tier-1 .combo-bar i { background: var(--frost); }
-.combo.tier-2 .combo-mult { color: var(--spark); }
-.combo.tier-2 .combo-bar i { background: var(--spark); }
-.combo.tier-3 .combo-mult { color: var(--ember); text-shadow: 0 0 20px var(--ember); }
-.combo.tier-3 .combo-bar i { background: var(--ember); }
-.combo.tier-4 .combo-mult { color: var(--hot); text-shadow: 0 0 26px var(--hot); animation: throb 0.5s infinite alternate; }
-.combo.tier-4 .combo-bar i { background: var(--hot); }
+.combo.tier-1 .combo-mult {
+  color: var(--frost);
+}
+.combo.tier-1 .combo-bar i {
+  background: var(--frost);
+}
+.combo.tier-2 .combo-mult {
+  color: var(--spark);
+}
+.combo.tier-2 .combo-bar i {
+  background: var(--spark);
+}
+.combo.tier-3 .combo-mult {
+  color: var(--ember);
+  text-shadow: 0 0 20px var(--ember);
+}
+.combo.tier-3 .combo-bar i {
+  background: var(--ember);
+}
+.combo.tier-4 .combo-mult {
+  color: var(--hot);
+  text-shadow: 0 0 26px var(--hot);
+  animation: throb 0.5s infinite alternate;
+}
+.combo.tier-4 .combo-bar i {
+  background: var(--hot);
+}
 @keyframes throb {
   to {
     transform: scale(1.12);
@@ -619,7 +704,10 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
   --glow: transparent;
 }
 .key-cap {
@@ -637,7 +725,9 @@ button {
 }
 .key.modded {
   border-color: var(--glow);
-  box-shadow: 0 0 14px color-mix(in srgb, var(--glow) 45%, transparent), inset 0 0 12px color-mix(in srgb, var(--glow) 18%, transparent);
+  box-shadow:
+    0 0 14px color-mix(in srgb, var(--glow) 45%, transparent),
+    inset 0 0 12px color-mix(in srgb, var(--glow) 18%, transparent);
 }
 .key.home-bump .key-cap {
   text-decoration: underline;
@@ -672,25 +762,55 @@ button {
 .mod-chip {
   font-size: 11px;
 }
-.mod-ember { color: var(--ember); }
-.mod-frost { color: var(--frost); }
-.mod-spark { color: var(--spark); }
-.mod-gold { color: var(--gold); }
-.mod-echo { color: var(--echo); }
-.mod-glass { color: var(--glass); }
-.mod-ward { color: var(--ward); }
+.mod-ember {
+  color: var(--ember);
+}
+.mod-frost {
+  color: var(--frost);
+}
+.mod-spark {
+  color: var(--spark);
+}
+.mod-gold {
+  color: var(--gold);
+}
+.mod-echo {
+  color: var(--echo);
+}
+.mod-glass {
+  color: var(--glass);
+}
+.mod-ward {
+  color: var(--ward);
+}
 
 .finger-hints .key {
   border-bottom-color: var(--finger);
 }
-.finger-0 { --finger: #ff7aa2; }
-.finger-1 { --finger: #ffb86b; }
-.finger-2 { --finger: #f5e06b; }
-.finger-3 { --finger: #7be495; }
-.finger-4 { --finger: #6bd6f5; }
-.finger-5 { --finger: #8da2ff; }
-.finger-6 { --finger: #c38dff; }
-.finger-7 { --finger: #ff8df0; }
+.finger-0 {
+  --finger: #ff7aa2;
+}
+.finger-1 {
+  --finger: #ffb86b;
+}
+.finger-2 {
+  --finger: #f5e06b;
+}
+.finger-3 {
+  --finger: #7be495;
+}
+.finger-4 {
+  --finger: #6bd6f5;
+}
+.finger-5 {
+  --finger: #8da2ff;
+}
+.finger-6 {
+  --finger: #c38dff;
+}
+.finger-7 {
+  --finger: #ff8df0;
+}
 
 .keyboard.dark .key {
   background: #070608;
@@ -821,7 +941,10 @@ button {
   text-align: center;
   gap: 8px;
   cursor: pointer;
-  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  transition:
+    transform 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
   --mc: var(--gold);
 }
 .card:hover {
@@ -972,16 +1095,42 @@ button {
   border-radius: 10px;
   animation: title-key 3s infinite;
 }
-.title span:nth-child(2) { animation-delay: 0.15s; color: var(--ember); }
-.title span:nth-child(3) { animation-delay: 0.3s; }
-.title span:nth-child(4) { animation-delay: 0.45s; color: var(--frost); }
-.title span:nth-child(5) { animation-delay: 0.6s; }
-.title span:nth-child(6) { animation-delay: 0.75s; color: var(--gold); }
-.title span:nth-child(7) { animation-delay: 0.9s; }
-.title span:nth-child(8) { animation-delay: 1.05s; color: var(--echo); }
+.title span:nth-child(2) {
+  animation-delay: 0.15s;
+  color: var(--ember);
+}
+.title span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.title span:nth-child(4) {
+  animation-delay: 0.45s;
+  color: var(--frost);
+}
+.title span:nth-child(5) {
+  animation-delay: 0.6s;
+}
+.title span:nth-child(6) {
+  animation-delay: 0.75s;
+  color: var(--gold);
+}
+.title span:nth-child(7) {
+  animation-delay: 0.9s;
+}
+.title span:nth-child(8) {
+  animation-delay: 1.05s;
+  color: var(--echo);
+}
 @keyframes title-key {
-  0%, 85%, 100% { transform: translateY(0); border-bottom-width: 6px; }
-  90% { transform: translateY(4px); border-bottom-width: 2px; }
+  0%,
+  85%,
+  100% {
+    transform: translateY(0);
+    border-bottom-width: 6px;
+  }
+  90% {
+    transform: translateY(4px);
+    border-bottom-width: 2px;
+  }
 }
 .tagline {
   font-size: 20px;

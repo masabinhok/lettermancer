@@ -7,14 +7,22 @@ import type { Screen } from './screen';
 export class ResultsScreen implements Screen {
   readonly root = el('div', 'screen results');
 
-  constructor(run: Run, unlocked: StarterId[], private done: () => void) {
+  constructor(
+    run: Run,
+    unlocked: StarterId[],
+    private done: () => void,
+  ) {
     const t = run.totals;
     const won = run.result === 'won';
     const wpm = t.activeMs ? t.correct / 5 / (t.activeMs / 60000) : 0;
     const acc = t.correct + t.errors ? (t.correct / (t.correct + t.errors)) * 100 : 100;
 
     const head = el('h1', `results-title ${won ? 'win' : 'loss'}`, won ? 'VICTORY' : 'DEFEATED');
-    const sub = el('p', 'results-sub', won ? 'Every glyph bows to your keyboard.' : `Fell in Act ${run.act}. The keys remember.`);
+    const sub = el(
+      'p',
+      'results-sub',
+      won ? 'Every glyph bows to your keyboard.' : `Fell in Act ${run.act}. The keys remember.`,
+    );
 
     const grid = el('div', 'stat-grid');
     const stat = (label: string, value: string) => {
@@ -38,7 +46,9 @@ export class ResultsScreen implements Screen {
     insight.append(el('h3', '', 'This run’s heatmap'), kb.root, heatLegend());
     const notes = el('p', 'insight-notes');
     notes.textContent = [
-      weak.length ? `Slowest keys: ${weak.map((k) => k.toUpperCase()).join(', ')} — expect to see them more next run.` : '',
+      weak.length
+        ? `Slowest keys: ${weak.map((k) => k.toUpperCase()).join(', ')} — expect to see them more next run.`
+        : '',
       nem ? `Nemesis pair: “${nem.bigram}” at ${Math.round(nem.ms)}ms.` : '',
     ]
       .filter(Boolean)

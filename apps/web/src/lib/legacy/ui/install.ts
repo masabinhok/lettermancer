@@ -11,7 +11,8 @@ let shareLabels: Record<string, string> | null = null;
 function frequencyLabels(): Record<string, string> {
   if (!shareLabels) {
     shareLabels = {};
-    for (const [k, v] of Object.entries(letterShare(words))) shareLabels[k] = v < 0.01 ? '<1%' : `${Math.round(v * 100)}%`;
+    for (const [k, v] of Object.entries(letterShare(words)))
+      shareLabels[k] = v < 0.01 ? '<1%' : `${Math.round(v * 100)}%`;
   }
   return shareLabels;
 }
@@ -36,7 +37,11 @@ export class Installer {
     this.root.append(
       title,
       el('p', 'install-desc', m.desc),
-      el('p', 'install-tip', 'The % on each key is how often that letter shows up in enemy words. Each key holds 2 mods — a 3rd pushes out the oldest.'),
+      el(
+        'p',
+        'install-tip',
+        'The % on each key is how often that letter shows up in enemy words. Each key holds 2 mods — a 3rd pushes out the oldest.',
+      ),
       this.kb.root,
       el('p', 'install-skip', 'esc — discard'),
     );
@@ -61,7 +66,12 @@ export function modCard(mod: ModId, hotkey: string, extra?: string): HTMLElement
   const m = MODS[mod];
   const card = el('div', `card mod-card mod-${mod}`);
   card.style.setProperty('--mc', m.color);
-  card.append(el('span', 'hotkey', hotkey), el('div', 'card-glyph', m.glyph), el('div', 'card-name', m.name), el('div', 'card-desc', m.desc));
+  card.append(
+    el('span', 'hotkey', hotkey),
+    el('div', 'card-glyph', m.glyph),
+    el('div', 'card-name', m.name),
+    el('div', 'card-desc', m.desc),
+  );
   if (extra) card.append(el('div', 'card-cost', extra));
   return card;
 }

@@ -1,4 +1,14 @@
-import { backspace, cancelTarget, createCombat, pressKey, target, tick, type Combat, type CombatCtx, type CombatEvent } from '@keycraft/engine';
+import {
+  backspace,
+  cancelTarget,
+  createCombat,
+  pressKey,
+  target,
+  tick,
+  type Combat,
+  type CombatCtx,
+  type CombatEvent,
+} from '@keycraft/engine';
 import type { KeyboardMode } from '@keycraft/engine';
 import { comboTier, COMBO_TIERS, MODS } from '@keycraft/engine';
 import type { Enemy, EnemySpec, Run } from '@keycraft/engine';
@@ -53,7 +63,11 @@ export class CombatScreen implements Screen {
     this.kb.root.classList.toggle('compact', o.keyboard === 'compact');
     this.kb.root.hidden = o.keyboard === 'hidden';
     this.kb.setDark(o.specs.some((s) => s.rule === 'blackout'));
-    const hint = el('div', 'combat-hint', 'type a word to strike · tab or esc to switch target · backspace deletes a letter');
+    const hint = el(
+      'div',
+      'combat-hint',
+      'type a word to strike · tab or esc to switch target · backspace deletes a letter',
+    );
     this.root.append(this.hud.root, this.field, this.comboEl, this.kb.root, hint, this.pauseEl);
     this.pauseEl.hidden = true;
     for (const e of this.c.enemies) this.addEnemy(e);
@@ -193,7 +207,11 @@ export class CombatScreen implements Screen {
         case 'player-hit':
           sfx.hurt();
           shake('big');
-          floatText(this.hud.root.querySelector('.hp-bar'), ev.blocked ? `−${ev.dmg} (■${ev.blocked})` : `−${ev.dmg}`, 'ft-hurt');
+          floatText(
+            this.hud.root.querySelector('.hp-bar'),
+            ev.blocked ? `−${ev.dmg} (■${ev.blocked})` : `−${ev.dmg}`,
+            'ft-hurt',
+          );
           this.enemyEl(ev.enemyId)?.classList.add('attacking');
           setTimeout(() => this.enemyEl(ev.enemyId)?.classList.remove('attacking'), 300);
           this.root.classList.remove('hurt-flash');
@@ -273,7 +291,7 @@ export class CombatScreen implements Screen {
         v.word.classList.toggle('blacked', hidden);
       }
     }
-    this.kb.setNext(t ? t.word[c.typed.length] ?? null : null);
+    this.kb.setNext(t ? (t.word[c.typed.length] ?? null) : null);
     this.hud.update(run, c.shield);
     this.renderCombo();
   }

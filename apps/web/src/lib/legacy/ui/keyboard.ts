@@ -4,16 +4,7 @@ export const ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
 
 /** Touch-typing finger for each key: 0-3 left pinky→index, 4-7 right index→pinky. */
 const FINGER: Record<string, number> = {};
-[
-  'qaz',
-  'wsx',
-  'edc',
-  'rfvtgb',
-  'yhnujm',
-  'ik',
-  'ol',
-  'p',
-].forEach((keys, f) => {
+['qaz', 'wsx', 'edc', 'rfvtgb', 'yhnujm', 'ik', 'ol', 'p'].forEach((keys, f) => {
   for (const k of keys) FINGER[k] = f;
 });
 

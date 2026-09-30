@@ -70,9 +70,19 @@ export class MenuScreen implements Screen {
     const nem = nemesisBigram(lifetime);
     const stats = el('div', 'lifetime');
     stats.append(
-      el('div', '', `Runs ${meta.runs} · Wins ${meta.wins} · Best ${meta.bestAct > 3 ? 'cleared!' : meta.bestAct ? `act ${meta.bestAct}` : '—'}`),
+      el(
+        'div',
+        '',
+        `Runs ${meta.runs} · Wins ${meta.wins} · Best ${meta.bestAct > 3 ? 'cleared!' : meta.bestAct ? `act ${meta.bestAct}` : '—'}`,
+      ),
       el('div', '', `Lifetime accuracy ${(accuracy(lifetime) * 100).toFixed(1)}%`),
-      el('div', '', weak.length ? `Weakest keys: ${weak.map((k) => k.toUpperCase()).join(' ')}` : 'Play a run to map your weak keys.'),
+      el(
+        'div',
+        '',
+        weak.length
+          ? `Weakest keys: ${weak.map((k) => k.toUpperCase()).join(' ')}`
+          : 'Play a run to map your weak keys.',
+      ),
     );
     if (nem) stats.append(el('div', '', `Nemesis pair: “${nem.bigram}” (${Math.round(nem.ms)}ms)`));
     const toggles = el('div', 'toggles');

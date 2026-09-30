@@ -47,7 +47,16 @@ export function burst(x: number, y: number, color: string, count = 14, speed = 2
     const a = Math.random() * Math.PI * 2;
     const s = speed * (0.3 + Math.random());
     const max = 0.4 + Math.random() * 0.5;
-    parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 120, life: max, max, color, size: 2 + Math.random() * 4 });
+    parts.push({
+      x,
+      y,
+      vx: Math.cos(a) * s,
+      vy: Math.sin(a) * s - 120,
+      life: max,
+      max,
+      color,
+      size: 2 + Math.random() * 4,
+    });
   }
   if (!running) {
     running = true;

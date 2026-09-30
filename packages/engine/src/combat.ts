@@ -143,7 +143,14 @@ function checkEnd(c: Combat, run: Run, ev: CombatEvent[]): void {
   }
 }
 
-function miss(c: Combat, run: Run, key: string, e: Enemy | undefined, expected: string | null, ev: CombatEvent[]): void {
+function miss(
+  c: Combat,
+  run: Run,
+  key: string,
+  e: Enemy | undefined,
+  expected: string | null,
+  ev: CombatEvent[],
+): void {
   c.errors++;
   if (expected) recordError(c.stats, expected);
   const before = c.combo;

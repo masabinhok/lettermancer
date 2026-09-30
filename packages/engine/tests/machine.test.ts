@@ -78,7 +78,7 @@ describe('RunMachine', () => {
     const cfg = newRunConfig('apprentice', 77);
     const live = playRun(cfg, { wpm: 60, accuracy: 0.97, rng: makeRng(3) });
     const tampered: Action[] = live.actions.map((a) => (a.t === 'key' ? { ...a, k: 'q' } : a));
-    let differs = false;
+    let differs: boolean;
     try {
       differs = JSON.stringify(fingerprint(RunMachine.replay(cfg, tampered))) !== JSON.stringify(fingerprint(live));
     } catch (e) {

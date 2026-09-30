@@ -39,7 +39,8 @@ describe('WordBank', () => {
     let withZ = 0;
     const N = 1000;
     for (let i = 0; i < N; i++) {
-      if (bank.pick({ min: 4, max: 8, modded: new Set(['z']), weakBias: 0, modBias: 1 }, rng).word.includes('z')) withZ++;
+      if (bank.pick({ min: 4, max: 8, modded: new Set(['z']), weakBias: 0, modBias: 1 }, rng).word.includes('z'))
+        withZ++;
     }
     expect(withZ / N).toBeGreaterThan(0.95);
   });

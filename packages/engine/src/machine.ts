@@ -8,11 +8,31 @@
  * Time only moves in fixed `STEP_MS` increments, so a replay that jumps straight to the
  * next key press lands in exactly the same state as a live game that ran frame by frame.
  */
-import { backspace, cancelTarget, createCombat, pressKey, tick, wpm, type Combat, type CombatCtx, type CombatEvent } from './combat';
+import {
+  backspace,
+  cancelTarget,
+  createCombat,
+  pressKey,
+  tick,
+  wpm,
+  type Combat,
+  type CombatCtx,
+  type CombatEvent,
+} from './combat';
 import WORDS from './content/words.json';
 import { installMod, type ModId, type RelicId } from './mods';
 import { deriveSeed, makeRng, type Rng } from './rng';
-import { advance, currentNode, makeEncounter, newRun, REROLL_BASE, rollReward, rollShop, type FightReward, type ShopItem } from './run';
+import {
+  advance,
+  currentNode,
+  makeEncounter,
+  newRun,
+  REROLL_BASE,
+  rollReward,
+  rollShop,
+  type FightReward,
+  type ShopItem,
+} from './run';
 import type { NodeKind, Run, StarterId } from './state';
 import { mergeStats, type Stats } from './stats';
 import { WordBank } from './words';
@@ -121,7 +141,16 @@ export class RunMachine {
   constructor(readonly config: RunConfig) {
     const s = config.seed;
     this.run = newRun(config.starter, s, makeRng(deriveSeed(s, 0)));
-    this.report = { starter: config.starter, result: null, act: 1, node: 0, killedBy: null, fights: [], picks: [], slowWords: [] };
+    this.report = {
+      starter: config.starter,
+      result: null,
+      act: 1,
+      node: 0,
+      killedBy: null,
+      fights: [],
+      picks: [],
+      slowWords: [],
+    };
     this.rngWords = makeRng(deriveSeed(s, 1));
     this.rngEncounters = makeRng(deriveSeed(s, 2));
     this.rngRewards = makeRng(deriveSeed(s, 3));
@@ -178,7 +207,8 @@ export class RunMachine {
       case 'time': {
         if (v.kind !== 'combat') throw new InvalidAction(`${a.t} outside combat`);
         const c = v.combat;
-        if (!Number.isFinite(a.at) || a.at < c.time) throw new InvalidAction(`time went backwards (${a.at} < ${c.time})`);
+        if (!Number.isFinite(a.at) || a.at < c.time)
+          throw new InvalidAction(`time went backwards (${a.at} < ${c.time})`);
         const endedByTime = this.advanceTo(c, a.at, ev);
         if (a.t === 'time') {
           // Idle time only matters for the record when it decides the fight.
@@ -240,7 +270,10 @@ export class RunMachine {
         this.run.coins -= it.cost;
         it.sold = true;
         ev.push({ t: 'bought', item: it });
-        this.report.picks.push({ kind: 'buy', id: it.kind === 'mod' ? it.mod : it.kind === 'relic' ? it.relic : 'heal' });
+        this.report.picks.push({
+          kind: 'buy',
+          id: it.kind === 'mod' ? it.mod : it.kind === 'relic' ? it.relic : 'heal',
+        });
         if (it.kind === 'relic') this.run.relics.push(it.relic);
         else if (it.kind === 'heal') this.run.hp = Math.min(this.run.maxHp, this.run.hp + it.amount);
         else {
@@ -273,7 +306,8 @@ export class RunMachine {
   private advanceTo(c: Combat, at: number, ev: MachineEvent[]): boolean {
     while (!c.over && c.time + STEP_MS <= at) {
       const tev = tick(c, this.run, STEP_MS);
-      for (const e of tev) if (e.t === 'player-hit') this.lastHitBy = c.enemies.find((x) => x.id === e.enemyId)?.name ?? this.lastHitBy;
+      for (const e of tev)
+        if (e.t === 'player-hit') this.lastHitBy = c.enemies.find((x) => x.id === e.enemyId)?.name ?? this.lastHitBy;
       ev.push(...tev);
     }
     return c.over !== null;

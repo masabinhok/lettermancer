@@ -25,7 +25,9 @@ describe('balance', () => {
   ].map(([w, a]) => ({ w, a, ...outcome(w, a) }));
 
   it('prints the balance table', () => {
-    console.log(table.map((r) => `${r.w} wpm ${r.a * 100}%: wins ${r.wins}/20, avg act ${r.avgAct.toFixed(2)}`).join('\n'));
+    console.log(
+      table.map((r) => `${r.w} wpm ${r.a * 100}%: wins ${r.wins}/20, avg act ${r.avgAct.toFixed(2)}`).join('\n'),
+    );
   });
 
   it('skill is rewarded: faster, cleaner typists get further', () => {

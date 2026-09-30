@@ -58,4 +58,3 @@ export function playRun(config: RunConfig, o: BotOptions): RunMachine {
   }
   return m;
 }
-

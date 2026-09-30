@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { accuracy, emptyStats, keyWeakness, mergeStats, nemesisBigram, recordCorrect, recordError, topWeakKeys } from '../src/stats';
+import {
+  accuracy,
+  emptyStats,
+  keyWeakness,
+  mergeStats,
+  nemesisBigram,
+  recordCorrect,
+  recordError,
+  topWeakKeys,
+} from '../src/stats';
 
 describe('stats', () => {
   it('ranks slow and error-prone keys as weakest', () => {

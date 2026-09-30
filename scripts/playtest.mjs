@@ -22,27 +22,68 @@ let lastScreen = '';
 while (Date.now() - t0 < 12 * 60_000) {
   const s = await screen();
   if (s !== lastScreen) {
-    log.push(`${((Date.now() - t0) / 1000).toFixed(0)}s ${s} ${await page.evaluate(() => document.querySelector('.hp-text')?.textContent ?? '')}`);
+    log.push(
+      `${((Date.now() - t0) / 1000).toFixed(0)}s ${s} ${await page.evaluate(() => document.querySelector('.hp-text')?.textContent ?? '')}`,
+    );
     lastScreen = s;
     const key = s.split(' ')[0];
-    if (!seen.has(key) || key === 'results' || (key === 'banner')) { await page.waitForTimeout(300); await snap(key); seen.add(key); }
+    if (!seen.has(key) || key === 'results' || key === 'banner') {
+      await page.waitForTimeout(300);
+      await snap(key);
+      seen.add(key);
+    }
   }
-  if (s.startsWith('menu') || s.startsWith('banner')) { await page.keyboard.press('Enter'); await page.waitForTimeout(400); continue; }
-  if (s.startsWith('results')) { await snap('results-final'); break; }
+  if (s.startsWith('menu') || s.startsWith('banner')) {
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(400);
+    continue;
+  }
+  if (s.startsWith('results')) {
+    await snap('results-final');
+    break;
+  }
   if (s.startsWith('reward')) {
     await page.waitForTimeout(500);
-    await page.keyboard.press('1'); await page.waitForTimeout(400);
-    if (await page.$('.installer')) { if (!seen.has('install')) { await snap('install'); seen.add('install'); } await page.keyboard.press('e'); await page.waitForTimeout(700); }
-    else { await page.keyboard.press('1'); await page.waitForTimeout(400); if (await page.$('.installer')) { await page.keyboard.press('t'); await page.waitForTimeout(700); } }
+    await page.keyboard.press('1');
+    await page.waitForTimeout(400);
+    if (await page.$('.installer')) {
+      if (!seen.has('install')) {
+        await snap('install');
+        seen.add('install');
+      }
+      await page.keyboard.press('e');
+      await page.waitForTimeout(700);
+    } else {
+      await page.keyboard.press('1');
+      await page.waitForTimeout(400);
+      if (await page.$('.installer')) {
+        await page.keyboard.press('t');
+        await page.waitForTimeout(700);
+      }
+    }
     continue;
   }
   if (s.startsWith('shop')) {
-    if (shopBuy) { for (const k of ['7', '5', '1']) { await page.keyboard.press(k); await page.waitForTimeout(300); if (await page.$('.installer')) { await page.keyboard.press('a'); await page.waitForTimeout(700); } } }
-    await page.keyboard.press('Enter'); await page.waitForTimeout(400); continue;
+    if (shopBuy) {
+      for (const k of ['7', '5', '1']) {
+        await page.keyboard.press(k);
+        await page.waitForTimeout(300);
+        if (await page.$('.installer')) {
+          await page.keyboard.press('a');
+          await page.waitForTimeout(700);
+        }
+      }
+    }
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(400);
+    continue;
   }
   if (s.startsWith('combat')) {
     // mid-combat snapshot once, after a few seconds
-    if (!seen.has('combat-mid') && Date.now() - t0 > 8000) { await snap('combat-mid'); seen.add('combat-mid'); }
+    if (!seen.has('combat-mid') && Date.now() - t0 > 8000) {
+      await snap('combat-mid');
+      seen.add('combat-mid');
+    }
     const st = await page.evaluate(() => {
       const t = document.querySelector('.enemy.targeted .word');
       if (t) return { next: t.querySelector('.l.next')?.textContent };
@@ -50,8 +91,14 @@ while (Date.now() - t0 < 12 * 60_000) {
       return { first: w.find((x) => x && x[0] !== '_')?.[0] };
     });
     const k = st.next ?? st.first;
-    if (!k || k === '_') { await page.waitForTimeout(100); continue; }
-    if (Math.random() < typo) { await page.keyboard.press('q'); await page.waitForTimeout(msPerKey); }
+    if (!k || k === '_') {
+      await page.waitForTimeout(100);
+      continue;
+    }
+    if (Math.random() < typo) {
+      await page.keyboard.press('q');
+      await page.waitForTimeout(msPerKey);
+    }
     await page.keyboard.press(k);
     await page.waitForTimeout(msPerKey * (0.6 + Math.random() * 0.8));
     continue;

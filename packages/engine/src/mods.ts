@@ -10,13 +10,48 @@ export interface ModDef {
 }
 
 export const MODS: Record<ModId, ModDef> = {
-  ember: { id: 'ember', name: 'Ember', glyph: '▲', color: '#ff6b35', desc: 'Each letter applies 2 Burn (damage every second, then fades).', cost: 7 },
-  frost: { id: 'frost', name: 'Frost', glyph: '◆', color: '#5ee7ff', desc: "Each letter pushes the target's attack back 0.7s.", cost: 6 },
-  spark: { id: 'spark', name: 'Spark', glyph: 'ϟ', color: '#ffe14d', desc: 'Each letter zaps another enemy for 3 (scaled by combo).', cost: 7 },
+  ember: {
+    id: 'ember',
+    name: 'Ember',
+    glyph: '▲',
+    color: '#ff6b35',
+    desc: 'Each letter applies 2 Burn (damage every second, then fades).',
+    cost: 7,
+  },
+  frost: {
+    id: 'frost',
+    name: 'Frost',
+    glyph: '◆',
+    color: '#5ee7ff',
+    desc: "Each letter pushes the target's attack back 0.7s.",
+    cost: 6,
+  },
+  spark: {
+    id: 'spark',
+    name: 'Spark',
+    glyph: 'ϟ',
+    color: '#ffe14d',
+    desc: 'Each letter zaps another enemy for 3 (scaled by combo).',
+    cost: 7,
+  },
   gold: { id: 'gold', name: 'Gold', glyph: '●', color: '#f5b83d', desc: 'Each letter earns +1 coin.', cost: 5 },
   echo: { id: 'echo', name: 'Echo', glyph: '◎', color: '#b48cff', desc: 'Letter counts double for damage.', cost: 6 },
-  glass: { id: 'glass', name: 'Glass', glyph: '◇', color: '#e8f4ff', desc: 'Letter deals ×3 — but mistyping it shatters the Glass.', cost: 8 },
-  ward: { id: 'ward', name: 'Ward', glyph: '■', color: '#6bdc8a', desc: 'Each letter grants 1 Shield for this fight.', cost: 6 },
+  glass: {
+    id: 'glass',
+    name: 'Glass',
+    glyph: '◇',
+    color: '#e8f4ff',
+    desc: 'Letter deals ×3 — but mistyping it shatters the Glass.',
+    cost: 8,
+  },
+  ward: {
+    id: 'ward',
+    name: 'Ward',
+    glyph: '■',
+    color: '#6bdc8a',
+    desc: 'Each letter grants 1 Shield for this fight.',
+    cost: 6,
+  },
 };
 
 export const MOD_IDS = Object.keys(MODS) as ModId[];
@@ -42,15 +77,39 @@ export interface RelicDef {
 }
 
 export const RELICS: Record<RelicId, RelicDef> = {
-  'twin-fangs': { id: 'twin-fangs', name: 'Twin Fangs', glyph: 'ᵂ', desc: 'Words with a double letter (ll, ee, ss…) deal ×2.', cost: 16 },
+  'twin-fangs': {
+    id: 'twin-fangs',
+    name: 'Twin Fangs',
+    glyph: 'ᵂ',
+    desc: 'Words with a double letter (ll, ee, ss…) deal ×2.',
+    cost: 16,
+  },
   'no-e': { id: 'no-e', name: 'Lipogram', glyph: 'Ɇ', desc: 'Words without the letter E deal +50%.', cost: 14 },
   marathon: { id: 'marathon', name: 'Marathon', glyph: '∞', desc: 'Words of 8+ letters heal 2 HP.', cost: 15 },
-  'steady-hands': { id: 'steady-hands', name: 'Steady Hands', glyph: '≈', desc: 'A typo halves your combo instead of resetting it.', cost: 18 },
+  'steady-hands': {
+    id: 'steady-hands',
+    name: 'Steady Hands',
+    glyph: '≈',
+    desc: 'A typo halves your combo instead of resetting it.',
+    cost: 18,
+  },
   whetstone: { id: 'whetstone', name: 'Whetstone', glyph: '⟋', desc: '+2 base damage on every word.', cost: 14 },
   hourglass: { id: 'hourglass', name: 'Hourglass', glyph: '⧗', desc: 'Enemies attack 15% slower.', cost: 18 },
-  interest: { id: 'interest', name: 'Interest', glyph: '%', desc: 'After each fight, +1 coin per 5 held (max 5).', cost: 12 },
+  interest: {
+    id: 'interest',
+    name: 'Interest',
+    glyph: '%',
+    desc: 'After each fight, +1 coin per 5 held (max 5).',
+    cost: 12,
+  },
   vampire: { id: 'vampire', name: 'Fang Ink', glyph: '†', desc: 'Every 25 combo heals 3 HP.', cost: 16 },
-  'first-strike': { id: 'first-strike', name: 'First Strike', glyph: '»', desc: 'Your first word each fight deals ×3.', cost: 13 },
+  'first-strike': {
+    id: 'first-strike',
+    name: 'First Strike',
+    glyph: '»',
+    desc: 'Your first word each fight deals ×3.',
+    cost: 13,
+  },
   thorns: { id: 'thorns', name: 'Thorns', glyph: '✱', desc: 'When hit, deal 4 damage back to the attacker.', cost: 13 },
 };
 
@@ -116,7 +175,17 @@ export function resolveWord(
   firstWord: boolean,
 ): WordResult {
   let base = 0;
-  const r: WordResult = { dmg: 0, crit: false, burn: 0, frost: 0, sparks: 0, sparkDmg: 0, coins: 0, shield: 0, heal: 0 };
+  const r: WordResult = {
+    dmg: 0,
+    crit: false,
+    burn: 0,
+    frost: 0,
+    sparks: 0,
+    sparkDmg: 0,
+    coins: 0,
+    shield: 0,
+    heal: 0,
+  };
   for (const ch of word) {
     const mods = keyMods[ch] ?? [];
     let v = 1;

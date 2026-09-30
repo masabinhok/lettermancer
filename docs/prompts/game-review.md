@@ -12,16 +12,18 @@ Review the web game "Keycraft" in this repository. It is a roguelike typing game
 words, typing a word strikes that enemy, and players install "mods" onto physical keys.
 
 ## How to review
+
 1. Read README.md, then skim src/engine (the rules) and src/ui (the screens) so you know what
    exists. Do not review code style. Review the player experience.
 2. Run the game (`npm install && npm run dev`) and play it in the browser. Do at least:
    - one run as a total newcomer: don't read the README first, and note every moment of confusion
    - one run playing deliberately well
    - one run typing slowly (~25 wpm) with frequent typos
-   Take screenshots of every screen and of any moment worth commenting on.
+     Take screenshots of every screen and of any moment worth commenting on.
 3. Run the balance bot (`npm test`, tests/sim.test.ts) and interpret the results.
 
 ## Judge it on
+
 - First 60 seconds: does a new player know what to do, why, and how to win? (onboarding)
 - Clarity during combat: can you read the word, target, threat and your own state at a glance
   while your eyes are on the text? What competes for attention?
@@ -38,11 +40,13 @@ words, typing a word strikes that enemy, and players install "mods" onto physica
 - Technical: frame rate, input latency, load time, save/resume, errors in the console.
 
 ## Compare against
+
 For each area, name what a specific reference game does better and what we could borrow
 (for example: Hades' door reward previews and hub, Balatro's scoring readability,
 Monkeytype's minimal focus mode and results graph, Keybr's adaptive lessons).
 
 ## Output
+
 1. A 5-line verdict: what the game is today and the single biggest thing holding it back.
 2. Findings, ranked by severity (Blocker / Major / Minor / Polish). Each one has:
    what happened, the evidence (screenshot or steps), why it matters to the player,
@@ -50,4 +54,4 @@ Monkeytype's minimal focus mode and results graph, Keybr's adaptive lessons).
 3. Quick wins (< 1 day each) versus deep changes (need design work).
 4. Suggested improvements to mechanics and progression, each with the reason behind it.
 5. What is already good and must be protected in any redesign.
-Be blunt and specific. No generic advice like "improve the UI". Say what, where and how.
+   Be blunt and specific. No generic advice like "improve the UI". Say what, where and how.

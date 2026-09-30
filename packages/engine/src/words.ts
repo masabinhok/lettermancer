@@ -61,7 +61,13 @@ export class WordBank {
   }
 
   /** Random word containing `letter` within the length range. */
-  private wordWith(rng: Rng, letter: string, min: number, max: number, excludeFirst?: ReadonlySet<string>): string | null {
+  private wordWith(
+    rng: Rng,
+    letter: string,
+    min: number,
+    max: number,
+    excludeFirst?: ReadonlySet<string>,
+  ): string | null {
     const list = this.byLetter.get(letter);
     if (!list?.length) return null;
     for (let tries = 0; tries < 200; tries++) {
@@ -73,7 +79,10 @@ export class WordBank {
 
   pick(opts: PickOptions, rng: Rng): { word: string; reason: PickReason } {
     const { min, max, excludeFirst, weak, modded, weakBias = 0.3, modBias = 0.25 } = opts;
-    const fallback = () => ({ word: this.randomWord(rng, min, max, excludeFirst) ?? 'type', reason: 'random' as const });
+    const fallback = () => ({
+      word: this.randomWord(rng, min, max, excludeFirst) ?? 'type',
+      reason: 'random' as const,
+    });
     const roll = rng();
 
     let reason: PickReason;

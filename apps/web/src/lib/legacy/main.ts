@@ -81,7 +81,9 @@ class Game {
     this.rng = makeRng(seed);
     this.run = newRun(starter, seed, this.rng);
     this.unlockedThisRun = [];
-    this.show(new BannerScreen('ACT I', ACT_NAMES[0], 'Four fights, two shops, one boss. Good luck.', () => this.enterNode()));
+    this.show(
+      new BannerScreen('ACT I', ACT_NAMES[0], 'Four fights, two shops, one boss. Good luck.', () => this.enterNode()),
+    );
   }
 
   private ctx(run: Run): CombatCtx {
@@ -190,7 +192,11 @@ class Game {
     } else if (r === 'new-act') {
       this.milestone({ act: run.act });
       const numeral = ['I', 'II', 'III'][run.act - 1];
-      this.show(new BannerScreen(`ACT ${numeral}`, ACT_NAMES[run.act - 1], 'Longer words. Faster enemies.', () => this.enterNode()));
+      this.show(
+        new BannerScreen(`ACT ${numeral}`, ACT_NAMES[run.act - 1], 'Longer words. Faster enemies.', () =>
+          this.enterNode(),
+        ),
+      );
     } else {
       this.enterNode();
     }
