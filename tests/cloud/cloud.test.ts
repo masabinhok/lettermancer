@@ -3,12 +3,22 @@
  * Run with: npm run test:cloud
  */
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { makeRng, newRunConfig, playRun, createPractice, pressPractice, type Action } from '@keycraft/engine';
+import {
+  createPractice,
+  makeRng,
+  newRunConfig,
+  playRun,
+  pressPractice,
+  sharedRunConfig,
+  type Action,
+} from '@keycraft/engine';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 const URL = process.env.SUPABASE_URL ?? 'http://127.0.0.1:54321';
 const ANON = process.env.SUPABASE_ANON_KEY!;
 const FN = `${URL}/functions/v1`;
+// Unique per run, so the tests pass against a database that already has players.
+const NAME = `quill_${Date.now() % 1_000_000}`;
 
 async function newPlayer(): Promise<{ db: SupabaseClient; id: string; token: string }> {
   const db = createClient(URL, ANON, { auth: { persistSession: false } });
@@ -77,7 +87,7 @@ describe('row-level security', () => {
 
   it('rejects bad usernames', async () => {
     expect((await a.db.from('profiles').update({ username: 'no spaces!' }).eq('id', a.id)).error).not.toBeNull();
-    expect((await a.db.from('profiles').update({ username: 'quill_master' }).eq('id', a.id)).error).toBeNull();
+    expect((await a.db.from('profiles').update({ username: NAME }).eq('id', a.id)).error).toBeNull();
   });
 });
 
@@ -103,7 +113,7 @@ describe('verify-run', () => {
       .eq('board', 'all-time')
       .eq('user_id', a.id)
       .single();
-    expect(board.data?.username).toBe('quill_master');
+    expect(board.data?.username).toBe(NAME);
   });
 
   it('rejects a forged run', async () => {
@@ -133,6 +143,71 @@ describe('verify-practice', () => {
     expect(body.ok).toBe(true);
     expect(body.ranked).toBe(true);
     expect(body.result.wpm).toBeGreaterThan(60);
+  });
+});
+
+describe('daily runs', () => {
+  const today = new Date().toISOString().slice(0, 10);
+
+  it('lets a player claim only today, and only once', async () => {
+    const c = await newPlayer();
+    expect((await c.db.from('daily_entries').insert({ user_id: c.id, day: '2020-01-01' })).error).not.toBeNull();
+    expect((await c.db.from('daily_entries').insert({ user_id: c.id, day: today })).error).toBeNull();
+    expect((await c.db.from('daily_entries').insert({ user_id: c.id, day: today })).error).not.toBeNull();
+    expect((await c.db.from('daily_entries').delete().eq('user_id', c.id).select()).data).toEqual([]);
+  });
+
+  it('ranks a claimed daily once and refuses a second or unclaimed one', async () => {
+    const c = await newPlayer();
+    const cfg = sharedRunConfig('daily', 'apprentice');
+    const played = playRun(cfg, { wpm: 70, accuracy: 0.97, rng: makeRng(3) });
+    const body = { config: cfg, actions: played.actions };
+    const unclaimed = await call('verify-run', c.token, body);
+    expect(unclaimed.status).toBe(422);
+    await c.db.from('daily_entries').insert({ user_id: c.id, day: today });
+    const first = await (await call('verify-run', c.token, body)).json();
+    expect(first.ok).toBe(true);
+    expect(first.standings[`daily:${today}`].rank).toBeGreaterThanOrEqual(1);
+    const again = await call('verify-run', c.token, body);
+    expect(again.status).toBe(422);
+  });
+
+  it('refuses a daily with bonuses', async () => {
+    const cfg = sharedRunConfig('daily', 'apprentice');
+    const res = await call('verify-run', b.token, {
+      config: { ...cfg, bonuses: { ...cfg.bonuses, maxHp: 30 } },
+      actions: [],
+    });
+    expect((await res.json()).reason).toBe('shared runs start without bonuses');
+  });
+});
+
+describe('ghosts and the Heat board', () => {
+  it("lets anyone race a ranked practice test's keystrokes", async () => {
+    const { data } = await b.db
+      .from('leaderboard_named')
+      .select('practice_id')
+      .eq('board', 'practice:time-15')
+      .eq('user_id', a.id)
+      .single();
+    expect(data?.practice_id).toBeTruthy();
+    const ghost = await b.db.from('practice_results').select('replay').eq('id', data!.practice_id).single();
+    expect((ghost.data?.replay as { inputs: unknown[] }).inputs.length).toBeGreaterThan(50);
+    // Unranked results stay private.
+    const others = await b.db.from('practice_results').select('id').eq('user_id', a.id);
+    expect(others.data).toHaveLength(1);
+  });
+
+  it('puts a won run with Oaths on the Heat board', async () => {
+    const cfg = newRunConfig('apprentice', 99, {}, { oaths: { fragile: 1 } });
+    let won = null;
+    for (let i = 0; i < 12 && !won; i++) {
+      const r = playRun({ ...cfg, seed: 99 + i }, { wpm: 110, accuracy: 0.99, rng: makeRng(i) });
+      if (r.run.result === 'won') won = { config: { ...cfg, seed: 99 + i }, actions: r.actions };
+    }
+    expect(won).not.toBeNull();
+    const body = await (await call('verify-run', b.token, won)).json();
+    expect(body.standings.heat).toMatchObject({ best: 1 });
   });
 });
 

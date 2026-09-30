@@ -26,3 +26,42 @@ jobs:
         with:
           name: playwright-results
           path: test-results
+
+  cloud:
+    # Accounts, sync, RLS and run verification against a local Supabase stack.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run supabase:start
+      - name: Point the app and tests at the local stack
+        run: |
+          eval "$(npx supabase status -o env)"
+          echo "SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
+          echo "SUPABASE_ANON_KEY=$ANON_KEY" >> "$GITHUB_ENV"
+          echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY" >> "$GITHUB_ENV"
+          printf 'VITE_SUPABASE_URL=%s\nVITE_SUPABASE_ANON_KEY=%s\n' "$API_URL" "$ANON_KEY" > apps/web/.env.local
+      - name: Serve edge functions
+        run: |
+          nohup npx supabase functions serve > functions.log 2>&1 &
+          for i in $(seq 1 60); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' -X OPTIONS "$SUPABASE_URL/functions/v1/verify-run") || true
+            [ "$code" = "200" ] && exit 0
+            sleep 2
+          done
+          cat functions.log
+          exit 1
+      - run: npm run test:cloud
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e:cloud
+      - if: failure()
+        run: cat functions.log
+      - uses: actions/upload-artifact@v5
+        if: failure()
+        with:
+          name: playwright-cloud-results
+          path: test-results

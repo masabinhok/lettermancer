@@ -29,6 +29,19 @@ Deno.serve(async (req) => {
   const run = machine.run;
   const t = run.totals;
   const db = admin();
+
+  // The daily counts once: it must have been claimed at the start, and the claim must still be open.
+  const day = now.toISOString().slice(0, 10);
+  if (machine.config.mode === 'daily') {
+    const { data: entry } = await db
+      .from('daily_entries')
+      .select('run_id')
+      .eq('user_id', user.id)
+      .eq('day', day)
+      .maybeSingle();
+    if (!entry) return json({ ok: false, reason: 'start the daily while signed in to rank it' }, 422);
+    if (entry.run_id !== null) return json({ ok: false, reason: 'you already played today’s daily' }, 422);
+  }
   const { data: row, error } = await db
     .from('runs')
     .insert({
@@ -53,6 +66,18 @@ Deno.serve(async (req) => {
     .single();
   if (error) return json({ error: error.message }, 500);
 
+  if (machine.config.mode === 'daily') {
+    // Close the claim; if another submission beat us to it, this one doesn't count.
+    const { data: closed } = await db
+      .from('daily_entries')
+      .update({ run_id: row.id })
+      .eq('user_id', user.id)
+      .eq('day', day)
+      .is('run_id', null)
+      .select('day');
+    if (!closed?.length) return json({ ok: false, reason: 'you already played today’s daily' }, 422);
+  }
+
   const detail = {
     result: run.result,
     act: run.act,
@@ -66,6 +91,12 @@ Deno.serve(async (req) => {
   for (const board of boards) {
     const r = await submitBest(db, board, user.id, score, detail, row.id);
     standings[board] = { ...r, rank: await rankOn(db, board, user.id) };
+  }
+  // The Oath board: the highest Heat a player has won at.
+  const runHeat = heat(machine.config.oaths);
+  if (run.result === 'won' && runHeat > 0) {
+    const r = await submitBest(db, 'heat', user.id, runHeat, detail, row.id);
+    standings.heat = { ...r, rank: await rankOn(db, 'heat', user.id) };
   }
   return json({ ok: true, runId: row.id, score, standings });
 });

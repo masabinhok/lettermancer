@@ -1,7 +1,9 @@
 <script lang="ts">
   import { heat, KEEPSAKES, keyWeakness, nemesisBigram, runScore, STARTERS, topWeakKeys } from '@keycraft/engine';
   import { untrack } from 'svelte';
+  import { account } from '../cloud/account.svelte';
   import type { Session } from '../game/session.svelte';
+  import { cardBlob, drawShareCard, saveCard, shareCard } from '../game/shareCard';
   import { profile } from '../stores/profile.svelte';
   import Button from '../ui/Button.svelte';
   import HeatLegend from '../ui/HeatLegend.svelte';
@@ -24,12 +26,42 @@
   const nem = nemesisBigram(run.stats);
   const score = runScore(run);
   const runHeat = heat(run.oaths);
+  const mode = untrack(() => session.machine.config.mode);
+  const modeName = mode === 'daily' ? 'Daily rite' : mode === 'weekly' ? 'Weekly challenge' : null;
   const minutes = Math.floor(typingMs / 60000);
+
+  let shared = $state<string | null>(null);
+  const card = () =>
+    drawShareCard(session.machine, {
+      avgWpm,
+      accuracy: acc,
+      mode: modeName ? `${modeName} · ${new Date().toISOString().slice(0, 10)}` : null,
+      player: account.username,
+    });
+  const fileName = `keycraft-${won ? 'victory' : 'run'}-${score}.png`;
+
+  async function share() {
+    shared = 'Drawing…';
+    try {
+      shared = (await shareCard(await card(), fileName)) === 'copied' ? 'Copied the card to your clipboard.' : 'Saved.';
+    } catch {
+      shared = 'Could not make the card.';
+    }
+  }
+
+  async function save() {
+    saveCard(await cardBlob(await card()), fileName);
+    shared = 'Saved.';
+  }
+
+  const boardName = (b: string) =>
+    b.startsWith('daily') ? 'Today' : b.startsWith('weekly') ? 'This week' : b === 'heat' ? 'Heat board' : b;
   const seconds = Math.round((typingMs % 60000) / 1000);
 
   export function onKey(k: string): boolean {
     if (k === 'Enter') onagain();
     else if (k === 'Escape') onhome();
+    else if (k === 'c') void share();
     else return false;
     return true;
   }
@@ -37,6 +69,7 @@
 
 <div class="results" data-screen="results">
   <header>
+    {#if modeName}<p class="mode">{modeName}</p>{/if}
     <h1 class:won>{won ? 'Victory' : 'Fallen'}</h1>
     <p>
       {#if won}
@@ -119,7 +152,7 @@
             ? `, rank ${all.rank} of all time`
             : ''}.{/if}
         {#each Object.entries(s.standings).filter(([b]) => b !== 'all-time') as [b, st] (b)}
-          {b.startsWith('daily') ? ' Today' : ' This week'}: rank {st.rank}.
+          {boardName(b)}: rank {st.rank}{st.improved ? '' : ` (your best there is ${st.best.toLocaleString()})`}.
         {/each}
       {:else}{s.reason}{/if}
     </p>
@@ -135,8 +168,15 @@
 
   <div class="actions">
     <Button kind="quiet" hotkey="Esc" onclick={onhome}>Title screen</Button>
-    <Button hotkey="Enter" onclick={onagain}>Start another run</Button>
+    <Button kind="quiet" hotkey="C" onclick={share}>Share card</Button>
+    <Button hotkey="Enter" onclick={onagain}>{mode === 'weekly' ? 'Try the week again' : 'Start another run'}</Button>
   </div>
+  {#if shared}
+    <p class="shared" role="status">
+      {shared}
+      {#if shared.startsWith('Copied')}<button class="save" onclick={save} type="button">Save as image</button>{/if}
+    </p>
+  {/if}
 </div>
 
 <style>
@@ -158,6 +198,24 @@
   }
   header {
     text-align: center;
+  }
+  .mode {
+    font-family: var(--f-display);
+    color: var(--gold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: var(--t-sm);
+  }
+  .shared {
+    font-size: var(--t-sm);
+    color: var(--moon-dim);
+  }
+  .save {
+    background: none;
+    border: none;
+    color: var(--gold);
+    text-decoration: underline;
+    cursor: pointer;
   }
   h1 {
     font-size: var(--t-hero);

@@ -26,21 +26,26 @@ Deno.serve(async (req) => {
   if (!result) return json({ ok: false, reason: 'the keystrokes do not complete the test' }, 422);
 
   const db = admin();
-  const { error } = await db.from('practice_results').insert({
-    user_id: user.id,
-    test_id: result.testId,
-    wpm: result.wpm,
-    raw: result.raw,
-    accuracy: result.accuracy,
-    consistency: result.consistency,
-    seconds: result.seconds,
-    trial: typeof body.trial === 'string' ? body.trial : null,
-    verified: true,
-  });
+  const { data: row, error } = await db
+    .from('practice_results')
+    .insert({
+      user_id: user.id,
+      test_id: result.testId,
+      wpm: result.wpm,
+      raw: result.raw,
+      accuracy: result.accuracy,
+      consistency: result.consistency,
+      seconds: result.seconds,
+      trial: typeof body.trial === 'string' ? body.trial : null,
+      verified: true,
+      replay: { config: body.config, inputs: body.inputs },
+    })
+    .select('id')
+    .single();
   if (error) return json({ error: error.message }, 500);
 
   if (!RANKED.has(result.testId) || result.accuracy < MIN_ACCURACY) return json({ ok: true, result, ranked: false });
   const board = `practice:${result.testId}`;
-  const r = await submitBest(db, board, user.id, result.wpm, { accuracy: result.accuracy }, null);
+  const r = await submitBest(db, board, user.id, result.wpm, { accuracy: result.accuracy }, null, row.id);
   return json({ ok: true, result, ranked: true, standing: { ...r, rank: await rankOn(db, board, user.id) } });
 });

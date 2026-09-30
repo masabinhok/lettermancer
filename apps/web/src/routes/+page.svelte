@@ -3,8 +3,11 @@
   import {
     archivistLine,
     clampOaths,
+    dailyLabel,
+    dailyStarter,
     heat,
     heatCap,
+    OATHS,
     keepsakeLevel,
     KEEPSAKES,
     keyMastery,
@@ -14,6 +17,9 @@
     STARTER_IDS,
     STARTERS,
     tradeSeals,
+    weeklyLabel,
+    weeklyOaths,
+    type OathId,
     type StarterId,
   } from '@keycraft/engine';
   import { onMount } from 'svelte';
@@ -51,7 +57,16 @@
   const fulfilled = $derived(Object.keys(meta.prophecies).length);
   const carried = $derived(meta.equipped ? KEEPSAKES[meta.equipped] : null);
 
+  // Shared runs: the same seed for everyone. The daily is once a day; the weekly is as often as you like.
+  const now = new Date();
+  const today = dailyLabel(now);
+  const todayStarter = STARTERS[dailyStarter(today)];
+  const week = weeklyOaths(weeklyLabel(now));
+  const weekHeat = heat(week);
+  let dailyDone = $state(false);
+
   onMount(() => {
+    void account.dailyPlayed(today.slice('daily:'.length)).then((p) => (dailyDone = p));
     // The Archivist doesn't repeat himself.
     if (line.id !== 'general' && !meta.heard.includes(line.id)) {
       meta.heard.push(line.id);
@@ -63,6 +78,16 @@
     meta.lastStarter = selected;
     profile.saveMeta();
     nav(`/run?starter=${selected}`);
+  }
+
+  function daily() {
+    if (!dailyDone) nav('/run?mode=daily');
+  }
+
+  function weekly() {
+    meta.lastStarter = selected;
+    profile.saveMeta();
+    nav(`/run?mode=weekly&starter=${selected}`);
   }
 
   function toggleGentle() {
@@ -102,6 +127,9 @@
     else if (k === 'p') panel = 'prophecies';
     else if (k === 'c') panel = 'codex';
     else if (k === 'r') nav('/practice');
+    else if (k === 'd' && !dailyDone) daily();
+    else if (k === 'w') weekly();
+    else if (k === 'l') nav('/leaderboards');
     else if (k === 'a') nav(account.user || !cloudEnabled ? '/profile' : '/login');
     else if (k === 'g') toggleGentle();
     else if (k === 'x') trade();
@@ -206,6 +234,26 @@
           </label>
         </div>
       </div>
+
+      <div class="shared" aria-label="Shared runs">
+        <button class="rite" onclick={daily} disabled={dailyDone} type="button">
+          <kbd>D</kbd>
+          <span class="name">Daily rite</span>
+          <span class="desc">
+            {#if dailyDone}Played. A new rite opens at midnight UTC.
+            {:else}One attempt. Everyone plays today's seed with the {todayStarter.name}, no upgrades.{/if}
+          </span>
+        </button>
+        <button class="rite" onclick={weekly} type="button">
+          <kbd>W</kbd>
+          <span class="name">Weekly challenge · Heat {weekHeat}</span>
+          <span class="desc">
+            {Object.entries(week)
+              .map(([id, l]) => `${OATHS[id as OathId].name}${OATHS[id as OathId].max > 1 ? ` ${l}` : ''}`)
+              .join(', ')}. Your chosen keyboard, no upgrades, best score counts.
+          </span>
+        </button>
+      </div>
     </section>
 
     <aside class="right">
@@ -224,6 +272,11 @@
           <span class="g">✎</span><span class="n">Practice desk</span><span class="h"
             >{meta.practice.streak ? `${meta.practice.streak}-day streak` : 'Tests, lessons and trials'}</span
           ><kbd>R</kbd>
+        </button>
+        <button class="station" onclick={() => nav('/leaderboards')} type="button">
+          <span class="g">♛</span><span class="n">Leaderboards</span><span class="h"
+            >Daily, weekly, Heat and practice</span
+          ><kbd>L</kbd>
         </button>
         <button class="station" onclick={open('codex')} type="button">
           <span class="g">❦</span><span class="n">Codex</span><span class="h">Foes, bosses and boons</span><kbd>C</kbd>
@@ -409,6 +462,35 @@
   }
   .gentle input {
     accent-color: var(--witchfire);
+  }
+  .shared {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+  .rite {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    text-align: left;
+    padding: var(--space-3);
+    background: linear-gradient(160deg, color-mix(in oklab, var(--gold-deep) 18%, var(--ink)), var(--ink));
+    border: 1px solid var(--gold-deep);
+    cursor: pointer;
+  }
+  .rite:hover:not(:disabled),
+  .rite:focus-visible {
+    border-color: var(--gold);
+  }
+  .rite:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+  .rite kbd {
+    position: absolute;
+    top: 8px;
+    right: 8px;
   }
   .right {
     display: flex;

@@ -83,6 +83,11 @@ export class Session {
       gentle: o.gentle,
       mode: o.mode,
     });
+    return Session.fromConfig(cfg);
+  }
+
+  /** Start a run from a ready-made config (daily and weekly runs build theirs in the engine). */
+  static fromConfig(cfg: RunConfig): Session {
     const s = new Session(new RunMachine(cfg), true);
     s.persist();
     return s;

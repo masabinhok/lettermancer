@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { TRIALS } from '../src/content/trials';
 import { defaultMeta, heatCap, PRACTICE_INK_PER_DAY, recordPractice } from '../src/meta';
 import {
+  ghostPos,
+  ghostTrack,
   advancePractice,
   createPractice,
   lessonFocus,
@@ -135,5 +137,25 @@ describe('practice rewards', () => {
     expect(a.trials.map((t) => t.id)).toEqual(['steady']);
     expect(m.leaf).toBe(TRIALS[0].leaf);
     expect(heatCap(m)).toBe(capBefore + 1);
+  });
+});
+
+describe('ghosts', () => {
+  it('replays a recorded test into a cursor track', () => {
+    const config = { mode: 'words' as const, amount: 10, punctuation: false, numbers: false, seed: 11 };
+    const s = createPractice(config);
+    const inputs: { k: string; at: number }[] = [];
+    let at = 500;
+    while (!s.done) {
+      inputs.push({ k: s.text[s.pos], at });
+      pressPractice(s, s.text[s.pos], at);
+      at += 100;
+    }
+    const track = ghostTrack(config, inputs);
+    expect(track[0].at).toBe(0);
+    expect(ghostPos(track, -5)).toBe(0);
+    expect(ghostPos(track, 0)).toBe(1);
+    expect(ghostPos(track, 250)).toBe(3);
+    expect(ghostPos(track, 1e9)).toBe(s.text.length);
   });
 });

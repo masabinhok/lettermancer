@@ -32,6 +32,7 @@ export async function submitBest(
   score: number,
   detail: Record<string, unknown>,
   runId: number | null,
+  practiceId: number | null = null,
 ): Promise<{ best: number; improved: boolean }> {
   const { data: cur } = await db
     .from('leaderboard')
@@ -40,9 +41,15 @@ export async function submitBest(
     .eq('user_id', userId)
     .maybeSingle();
   if (cur && Number(cur.score) >= score) return { best: Number(cur.score), improved: false };
-  const { error } = await db
-    .from('leaderboard')
-    .upsert({ board, user_id: userId, score, detail, run_id: runId, updated_at: new Date().toISOString() });
+  const { error } = await db.from('leaderboard').upsert({
+    board,
+    user_id: userId,
+    score,
+    detail,
+    run_id: runId,
+    practice_id: practiceId,
+    updated_at: new Date().toISOString(),
+  });
   if (error) throw error;
   return { best: score, improved: true };
 }

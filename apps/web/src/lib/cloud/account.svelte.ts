@@ -26,6 +26,7 @@ import { functionsUrl, supabase } from './client';
 
 const LINK_KEY = 'keycraft.cloud.v1';
 const OUTBOX_KEY = 'keycraft.outbox.v1';
+const DAILY_KEY = 'keycraft.daily.v1';
 const PUSH_DELAY_MS = 2000;
 
 interface Link {
@@ -39,6 +40,17 @@ export interface Standing {
   best: number;
   improved: boolean;
   rank: number | null;
+}
+
+export interface BoardRow {
+  user_id: string;
+  username: string;
+  score: number;
+  detail: Record<string, unknown>;
+  rank: number;
+  run_id: number | null;
+  practice_id: number | null;
+  updated_at: string;
 }
 
 export type SubmitResult =
@@ -236,6 +248,71 @@ class Account {
     if (!box.length) return;
     writeStore(OUTBOX_KEY, []);
     for (const job of box) await this.send(job);
+  }
+
+  // ---------- daily runs, leaderboards and ghosts ----------
+
+  /**
+   * Claim today's daily before playing it. Signed-in players may claim each day once (the server
+   * enforces it); guests are held to once a day on this device.
+   */
+  async claimDaily(day: string): Promise<{ ok: true; ranked: boolean } | { ok: false; reason: string }> {
+    const local = readStore<{ day: string | null }>(DAILY_KEY, () => ({ day: null }));
+    if (local.day === day)
+      return { ok: false, reason: 'You’ve already played today’s daily. A new one opens at midnight UTC.' };
+    let ranked = false;
+    if (supabase && this.user) {
+      const { error } = await supabase.from('daily_entries').insert({ user_id: this.user.id, day });
+      if (error?.code === '23505')
+        return { ok: false, reason: 'You’ve already played today’s daily. A new one opens at midnight UTC.' };
+      ranked = !error;
+    }
+    writeStore(DAILY_KEY, { day });
+    return { ok: true, ranked };
+  }
+
+  /** Has this device (or account) already played the daily for `day`? */
+  async dailyPlayed(day: string): Promise<boolean> {
+    if (readStore<{ day: string | null }>(DAILY_KEY, () => ({ day: null })).day === day) return true;
+    if (!supabase || !this.user) return false;
+    const { data } = await supabase
+      .from('daily_entries')
+      .select('day')
+      .eq('user_id', this.user.id)
+      .eq('day', day)
+      .maybeSingle();
+    return !!data;
+  }
+
+  /** The top of a board, plus where you stand if you're further down. */
+  async board(name: string, limit = 50): Promise<{ rows: BoardRow[]; you: BoardRow | null } | null> {
+    if (!supabase) return null;
+    const { data, error } = await supabase
+      .from('leaderboard_named')
+      .select('user_id, username, score, detail, rank, run_id, practice_id, updated_at')
+      .eq('board', name)
+      .order('rank', { ascending: true })
+      .limit(limit);
+    if (error) return null;
+    const rows = (data ?? []) as BoardRow[];
+    let you: BoardRow | null = null;
+    if (this.user && !rows.some((r) => r.user_id === this.user!.id)) {
+      const { data: mine } = await supabase
+        .from('leaderboard_named')
+        .select('user_id, username, score, detail, rank, run_id, practice_id, updated_at')
+        .eq('board', name)
+        .eq('user_id', this.user.id)
+        .maybeSingle();
+      you = (mine as BoardRow | null) ?? null;
+    }
+    return { rows, you };
+  }
+
+  /** The keystrokes of a ranked practice test, to race as a ghost. */
+  async practiceGhost(practiceId: number): Promise<{ config: PracticeConfig; inputs: PracticeInput[] } | null> {
+    if (!supabase) return null;
+    const { data } = await supabase.from('practice_results').select('replay').eq('id', practiceId).maybeSingle();
+    return (data?.replay as { config: PracticeConfig; inputs: PracticeInput[] } | undefined) ?? null;
   }
 
   // ---------- your data ----------

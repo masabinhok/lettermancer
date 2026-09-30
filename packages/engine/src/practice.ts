@@ -304,3 +304,34 @@ export function letterProgress(k: string, stats: Stats): number {
   const acc = v.n + v.err ? Math.min(1, LESSON_TARGET.errorRate / Math.max(0.001, v.err / (v.n + v.err))) : 0;
   return Math.min(samples, speed, acc);
 }
+
+// ---------- ghosts ----------
+
+/** Where a recorded test's cursor was over time: one point per keystroke, times from its first key. */
+export type GhostTrack = { at: number; pos: number }[];
+
+/** Replay a recorded test's keystrokes into a track to race against. */
+export function ghostTrack(config: PracticeConfig, inputs: { k: string; at: number }[]): GhostTrack {
+  const s = createPractice(config);
+  const track: GhostTrack = [];
+  const t0 = inputs[0]?.at ?? 0;
+  for (const { k, at } of inputs) {
+    if (s.done) break;
+    pressPractice(s, k, at);
+    track.push({ at: at - t0, pos: s.pos });
+  }
+  return track;
+}
+
+/** The ghost's cursor `t` ms after its first keystroke. */
+export function ghostPos(track: GhostTrack, t: number): number {
+  let lo = 0;
+  let hi = track.length - 1;
+  if (hi < 0 || t < track[0].at) return 0;
+  while (lo < hi) {
+    const mid = (lo + hi + 1) >> 1;
+    if (track[mid].at <= t) lo = mid;
+    else hi = mid - 1;
+  }
+  return track[lo].pos;
+}

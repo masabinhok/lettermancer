@@ -3,14 +3,19 @@
   import {
     advancePractice,
     createPractice,
+    ghostPos,
+    ghostTrack,
     LESSON_ORDER,
     lessonFocus,
     letterLearned,
     letterProgress,
     pressPractice,
     recordPractice,
+    replayPractice,
     summarizePractice,
+    testId,
     TRIALS,
+    type GhostTrack,
     type PracticeAward,
     type PracticeConfig,
     type PracticeMode,
@@ -24,7 +29,8 @@
   import * as sfx from '$lib/fx/audio';
   import { nav } from '$lib/nav';
   import SpeedChart from '$lib/practice/SpeedChart.svelte';
-  import { profile } from '$lib/stores/profile.svelte';
+  import { page } from '$app/state';
+  import { profile, readStore, writeStore } from '$lib/stores/profile.svelte';
   import Button from '$lib/ui/Button.svelte';
   import Frame from '$lib/ui/Frame.svelte';
   import Keyboard from '$lib/ui/Keyboard.svelte';
@@ -51,6 +57,62 @@
   let caretTop = $state(0);
   let clockStart = 0;
 
+  // ---------- ghosts ----------
+  // Your best recording of each test, kept on this device, and any ghost you chose to race from a leaderboard.
+  const GHOST_KEY = 'keycraft.ghosts.v1';
+  interface Recording {
+    config: PracticeConfig;
+    inputs: { k: string; at: number }[];
+    wpm: number;
+  }
+  interface Ghost {
+    name: string;
+    wpm: number;
+    config: PracticeConfig;
+    track: GhostTrack;
+  }
+  const recordings = () => readStore<Record<string, Recording>>(GHOST_KEY, () => ({}));
+  const toGhost = (name: string, r: Recording): Ghost => ({
+    name,
+    wpm: r.wpm,
+    config: r.config,
+    track: ghostTrack(r.config, r.inputs),
+  });
+
+  let raceBest = $state(false);
+  let remote = $state.raw<Ghost | null>(null);
+  let ghostNote = $state<string | null>(null);
+  /** The ghost for the test you're set up to take, if racing one. */
+  let ghost = $state.raw<Ghost | null>(null);
+  const bestRecording = $derived.by(() => {
+    void rev;
+    if (trial || mode === 'lesson') return null;
+    return recordings()[testId({ mode, amount, punctuation, numbers, seed: 0 })] ?? null;
+  });
+
+  function pickGhost(): Ghost | null {
+    if (trial || mode === 'lesson') return null;
+    if (remote) return remote;
+    return raceBest && bestRecording ? toGhost('Your best', bestRecording) : null;
+  }
+
+  function toggleBest() {
+    if (remote) {
+      remote = null;
+      raceBest = false;
+    } else raceBest = !raceBest;
+    void restart();
+  }
+
+  /** Keep the recording of a new best so it can be raced later. */
+  function keepRecording(r: PracticeResult, cfg: PracticeConfig) {
+    if (trial || cfg.mode === 'lesson') return;
+    const all = recordings();
+    if ((all[r.testId]?.wpm ?? -1) >= r.wpm) return;
+    all[r.testId] = { config: cfg, inputs: [...inputs], wpm: r.wpm };
+    writeStore(GHOST_KEY, all);
+  }
+
   const letters = $derived(LESSON_ORDER.slice(0, meta.practice.lessonLetters));
   const typing = $derived.by(() => {
     void rev;
@@ -71,10 +133,14 @@
           : test.text.split(' ').length - test.text.slice(0, test.pos).split(' ').length + 1,
       wpm: elapsed > 1000 ? Math.round(correct / 5 / (elapsed / 60000)) : 0,
       next: test.text[test.pos]?.toLowerCase() ?? null,
+      ghost: ghost ? ghostPos(ghost.track, test.startAt === null ? -1 : elapsed) : null,
     };
   });
 
   function config(): PracticeConfig {
+    ghost = pickGhost();
+    // Racing a ghost means the same words: take its config, seed and all.
+    if (ghost) return { ...ghost.config };
     const seed = (Math.random() * 2 ** 32) >>> 0;
     if (trial) return { mode: trial.mode, amount: trial.amount, punctuation: trial.punctuation, numbers: false, seed };
     if (mode === 'lesson')
@@ -105,6 +171,7 @@
 
   function setMode(m: PracticeMode) {
     trial = null;
+    remote = null;
     mode = m;
     if (m === 'time' && !AMOUNTS.time.includes(amount)) amount = 30;
     if (m === 'words' && !AMOUNTS.words.includes(amount)) amount = 25;
@@ -112,6 +179,7 @@
   }
 
   function startTrial(t: TrialDef) {
+    remote = null;
     trial = t;
     showTrials = false;
     void restart();
@@ -121,6 +189,7 @@
     if (!test) return;
     const r = summarizePractice(test);
     result = r;
+    keepRecording(r, test.config);
     profile.addStats(test.stats);
     const day = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in local time
     award = recordPractice(meta, r, day, trial?.id ?? null);
@@ -181,7 +250,25 @@
     else void followCaret();
   }
 
+  /** `?ghost=<id>` races a ranked test from the leaderboards. */
+  async function loadRemoteGhost(id: number) {
+    const rec = await account.practiceGhost(id);
+    const wpm = rec ? replayPractice(rec.config, rec.inputs)?.wpm : undefined;
+    if (!rec || wpm === undefined) {
+      ghostNote = 'That ghost could not be found.';
+      return;
+    }
+    remote = toGhost(page.url.searchParams.get('name') ?? 'Ghost', { ...rec, wpm });
+    mode = rec.config.mode;
+    amount = rec.config.amount;
+    punctuation = rec.config.punctuation;
+    numbers = rec.config.numbers;
+    await restart();
+  }
+
   onMount(() => {
+    const g = Number(page.url.searchParams.get('ghost'));
+    if (g) void loadRemoteGhost(g);
     void restart();
     let raf = 0;
     const frame = () => {
@@ -215,7 +302,9 @@
           type="button">{label}</button
         >
       {/each}
-      <button class:on={!!trial} onclick={() => (showTrials = true)} type="button">Trials</button>
+      <button role="tab" aria-selected={!!trial} class:on={!!trial} onclick={() => (showTrials = true)} type="button"
+        >Trials</button
+      >
     </div>
     {#if !trial && (mode === 'time' || mode === 'words')}
       <div class="amounts">
@@ -234,6 +323,16 @@
           >punctuation</button
         >
         <button class:on={numbers} onclick={() => ((numbers = !numbers), restart())} type="button">numbers</button>
+        {#if bestRecording || remote}
+          <span class="sep"></span>
+          <button
+            class:on={!!ghost}
+            onclick={toggleBest}
+            title="Race a ghost of your best run at this test"
+            type="button"
+            >{remote ? `ghost: ${remote.name}` : `ghost${bestRecording ? ` ${bestRecording.wpm}` : ''}`}</button
+          >
+        {/if}
       </div>
     {/if}
     <p class="streak" title="Days in a row with practice">
@@ -312,6 +411,16 @@
         {#if unlockedLetter}<b> New letter unlocked: {unlockedLetter.toUpperCase()}.</b>{/if}
         {#each prophecies as p (p.id)}<b> ✦ {p.name}.</b>{/each}
       </p>
+      {#if ghost}
+        {@const diff = result.wpm - ghost.wpm}
+        <p class="earned ghost-line">
+          {ghost.name} typed {ghost.wpm} wpm. {diff > 0
+            ? `You beat the ghost by ${diff}.`
+            : diff === 0
+              ? 'A dead heat.'
+              : `The ghost won by ${-diff}.`}
+        </p>
+      {/if}
       {#if submission && submission !== 'sending' && submission.ok}
         {@const st = Object.values(submission.standings)[0]}
         {#if st}<p class="earned">
@@ -321,8 +430,10 @@
       <Button hotkey="Enter" onclick={() => restart()}>Next test</Button>
     </section>
   {:else if view}
+    {#if ghostNote}<p class="hint">{ghostNote}</p>{/if}
     <div class="live">
       <span class="left">{view.left}{test?.config.mode === 'time' ? 's' : ' words'}</span>
+      {#if ghost}<span class="ghost-name">racing {ghost.name} · {ghost.wpm} wpm</span>{/if}
       <span class="wpm">{view.wpm ? `${view.wpm} wpm` : ''}</span>
     </div>
     <div class="window">
@@ -330,6 +441,7 @@
         {#each [...view.text] as ch, i (i)}<span
             class:done={i < view.pos}
             class:caret={i === view.pos}
+            class:ghost={i === view.ghost && i !== view.pos}
             class:missed={view.missed.has(i)}>{ch}</span
           >{/each}
       </p>
@@ -518,6 +630,13 @@
     color: var(--moon);
     box-shadow: inset 2px 0 0 var(--gold-bright);
     animation: caret 1s steps(2) infinite;
+  }
+  .ghost {
+    box-shadow: inset 2px 0 0 var(--witchfire);
+  }
+  .ghost-name {
+    color: var(--witchfire);
+    font-size: var(--t-sm);
   }
   .focus .caret {
     animation: none;

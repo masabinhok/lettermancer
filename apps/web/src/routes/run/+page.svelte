@@ -1,7 +1,8 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import { clampOaths, STARTER_IDS, type StarterId } from '@keycraft/engine';
+  import { clampOaths, dailyLabel, sharedRunConfig, STARTER_IDS, type StarterId } from '@keycraft/engine';
   import { onMount } from 'svelte';
+  import { account } from '$lib/cloud/account.svelte';
   import { startMusic, stopMusic } from '$lib/fx/audio';
   import { runBonuses } from '$lib/game/progression';
   import { Session } from '$lib/game/session.svelte';
@@ -18,6 +19,7 @@
   import Reward from '$lib/screens/Reward.svelte';
   import Settings from '$lib/screens/Settings.svelte';
   import Shop from '$lib/screens/Shop.svelte';
+  import Button from '$lib/ui/Button.svelte';
   import { profile } from '$lib/stores/profile.svelte';
 
   type KeyTarget = { onKey(k: string): boolean };
@@ -38,9 +40,28 @@
     s.mount();
   }
 
-  function newRun() {
+  let refused = $state<string | null>(null);
+
+  function chosenStarter(): StarterId {
     const q = page.url.searchParams.get('starter') as StarterId | null;
-    const starter = q && STARTER_IDS.includes(q) ? q : profile.meta.lastStarter;
+    return q && STARTER_IDS.includes(q) ? q : profile.meta.lastStarter;
+  }
+
+  /** Today's daily or this week's challenge, from the URL (`?mode=daily`, `?mode=weekly`). */
+  async function sharedRun(mode: 'daily' | 'weekly') {
+    const now = new Date();
+    if (mode === 'daily') {
+      const claim = await account.claimDaily(dailyLabel(now).slice('daily:'.length));
+      if (!claim.ok) {
+        refused = claim.reason;
+        return;
+      }
+    }
+    begin(Session.fromConfig(sharedRunConfig(mode, chosenStarter(), now)));
+  }
+
+  function newRun() {
+    const starter = chosenStarter();
     begin(
       Session.start({
         starter,
@@ -73,7 +94,9 @@
   }
 
   onMount(() => {
+    const mode = page.url.searchParams.get('mode');
     if (page.url.searchParams.has('resume')) begin(Session.resume());
+    else if (mode === 'daily' || mode === 'weekly') void sharedRun(mode);
     else newRun();
     startMusic();
     const blur = () => session?.pause();
@@ -86,6 +109,11 @@
   });
 
   function onkeydown(e: KeyboardEvent) {
+    if (refused && (e.key === 'Enter' || e.key === 'Escape')) {
+      e.preventDefault();
+      nav('/');
+      return;
+    }
     if (!session || e.ctrlKey || e.metaKey || e.altKey) return;
     const k = e.key;
     if (e.repeat && k.length > 1) return;
@@ -127,7 +155,12 @@
 <svelte:window {onkeydown} />
 <svelte:head><title>Keycraft</title></svelte:head>
 
-{#if session}
+{#if refused}
+  <div class="refused" data-screen="refused">
+    <p>{refused}</p>
+    <Button hotkey="Enter" onclick={() => nav('/')}>Back to the Scriptorium</Button>
+  </div>
+{:else if session}
   {#key session}
     {#if session.intro}
       <Intro {session} bind:this={screen} />
@@ -146,7 +179,12 @@
     {:else if session.view.kind === 'event'}
       <Event {session} onbuild={openBuild} bind:this={screen} />
     {:else}
-      <Results {session} bind:this={screen} onagain={newRun} onhome={() => nav('/')} />
+      <Results
+        {session}
+        bind:this={screen}
+        onagain={() => (session?.machine.config.mode === 'weekly' ? void sharedRun('weekly') : newRun())}
+        onhome={() => nav('/')}
+      />
     {/if}
   {/key}
 
@@ -173,3 +211,18 @@
     />
   {/if}
 {/if}
+
+<style>
+  .refused {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-5);
+    font-size: var(--t-lg);
+    color: var(--moon-dim);
+    text-align: center;
+    padding: var(--space-5);
+  }
+</style>

@@ -122,3 +122,42 @@ test('a 10-word practice test gives a result with a speed chart', async ({ page 
   await expect(page.locator('.result .big')).toContainText('wpm');
   await expect(page.locator('.result svg[role="img"]')).toBeVisible();
 });
+
+test('the daily rite is one attempt a day; the weekly can be played again', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('[data-screen="title"]')).toBeVisible();
+  await page.keyboard.press('d');
+  await expect(page.locator('[data-screen="intro"]')).toBeVisible();
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: /Daily rite/ })).toBeDisabled();
+  await page.goto('/run?mode=daily');
+  await expect(page.locator('[data-screen="refused"]')).toContainText('already played');
+  await page.keyboard.press('Enter');
+  await expect(page.locator('[data-screen="title"]')).toBeVisible();
+  await page.keyboard.press('w');
+  await expect(page.locator('[data-screen="intro"]')).toBeVisible();
+});
+
+test('racing your best practice test shows its ghost', async ({ page }) => {
+  await page.goto('/practice');
+  await page.getByRole('tab', { name: 'Words' }).click();
+  await page.getByRole('button', { name: '10', exact: true }).click();
+  for (let i = 0; i < 400 && !(await page.locator('.result').count()); i++)
+    await page.keyboard.press((await page.locator('.text .caret').textContent())!);
+  await page.keyboard.press('Enter');
+  await page.getByRole('button', { name: /^ghost \d+/ }).click();
+  await expect(page.locator('.ghost-name')).toContainText('Your best');
+  for (let i = 0; i < 3; i++) await page.keyboard.press((await page.locator('.text .caret').textContent())!);
+  await expect(page.locator('.text .ghost')).toHaveCount(1);
+});
+
+test('the leaderboards open from the Scriptorium', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('[data-screen="title"]')).toBeVisible();
+  await page.keyboard.press('l');
+  await expect(page.locator('[data-screen="leaderboards"]')).toBeVisible();
+  await page.keyboard.press('4');
+  await expect(page.getByRole('tab', { name: /Heat/ })).toHaveAttribute('aria-selected', 'true');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('[data-screen="title"]')).toBeVisible();
+});
