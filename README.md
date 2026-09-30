@@ -1,140 +1,120 @@
 # Keycraft
 
-A roguelike typing game where your keyboard is the deck. Type words to fight typographic monsters, win power-ups, and install them onto individual keys, so your **E** burns, your **T** earns gold, and your **O** hits like glass. While you play, the game tracks your slowest keys and quietly works them into the words you get.
+A roguelike typing game where your keyboard is the deck. Type words to fight illuminated glyph-monsters, win boons
+from six muses, and bind powers to individual keys — so your **E** burns, your **S** freezes, and your **N** throws
+sparks. Every run quietly feeds you more of the keys you're slowest at, so you get faster while you play.
 
 ## Running it
 
+Requires Node 22+.
+
 ```bash
 npm install
-npm run dev      # http://localhost:5173
+npm run dev        # http://localhost:5173
 ```
 
-| Command         | What it does                                      |
-| --------------- | ------------------------------------------------- |
-| `npm run dev`   | Start the dev server                              |
-| `npm run build` | Typecheck and build to `dist/`                    |
-| `npm test`      | Run the unit and balance tests                    |
-| `npm run words` | Rebuild `src/data/words.json` from the word lists |
+| Command            | What it does                                                                     |
+| ------------------ | -------------------------------------------------------------------------------- |
+| `npm run dev`      | Start the web app                                                                |
+| `npm run build`    | Build the static site to `apps/web/build`                                        |
+| `npm test`         | Unit tests, replay determinism, and the balance bot                              |
+| `npm run test:e2e` | Playwright end-to-end tests                                                      |
+| `npm run check`    | Typecheck the app and the engine                                                 |
+| `npm run lint`     | ESLint                                                                           |
+| `npm run playtest` | A bot that plays the real game in a headless browser and screenshots each screen |
 
 ## How to play
 
-### The run
+New players start with a short **tutorial** that teaches everything below by doing it. You can replay it from the
+title screen.
 
-A run is **3 acts**. Each act follows the same path:
+### A run
 
-```
-⚔ fight → ⚔ fight → $ shop → ⚔ fight → ◆ elite → $ shop → ☠ boss
-```
+A run is **three acts**. In each act you pass through **seven rooms, then a boss**. After every room you choose your
+next one from two or three **doors**, and each door shows what's behind it:
 
-Your HP carries over between fights. Beating a boss heals 40% of your max HP. Clear all three acts to win.
+| Door          | What happens                                      |
+| ------------- | ------------------------------------------------- |
+| A muse's name | A fight. Win it and that muse offers you a boon.  |
+| Purse         | A fight with a big coin reward.                   |
+| Spring        | A fight, then heal 35% of your health.            |
+| Elite         | A hard fight guarding a relic.                    |
+| Shop          | Buy key powers, relics and healing.               |
+| Unknown       | An event: a choice, sometimes a typing challenge. |
 
-### Combat
+Your health carries between rooms. Beating a boss heals 40%.
 
-- Every enemy has a **word**. Start typing it and that enemy becomes your target.
-- Finish the word to hit the enemy. **Each letter is 1 damage** before mods and combo.
-- Once you've targeted an enemy, a wrong key does nothing to your progress, but it does count as a typo.
-- The bar under each enemy is its **attack timer**. When it fills, the enemy hits you. The number beside it is how hard.
-- When two enemies are on screen, their words always start with different letters, so the first key you press picks your target.
+### Fighting
+
+- Every enemy carries a **word**. The first letter you type locks onto that word; finish it to strike.
+- The bar under each enemy fills toward its next attack. The card **glows red one second before the hit**.
+- **Backspace** deletes a letter. **Tab** lets go of your target. **Esc** pauses.
+- Fights come in **waves**: the next wave arrives when the field is clear.
+- Enemies have **traits**, shown on their card: _Armored_ (short words deal half), _Shifting_ (its word changes),
+  _Splits_, _Thief_ (steals combo), _Healer_, _Enraged_, _Warden_ (shields allies), _Summoner_, _Quick_.
 
 ### Combo
 
-Every correct key adds to your combo. Every typo resets it to zero.
+Every correct key builds combo. A typo resets it. Half your combo carries into the next fight.
 
-| Combo | Damage |
-| ----- | ------ |
-| 0–9   | ×1     |
-| 10–24 | ×1.5   |
-| 25–49 | ×2     |
-| 50–99 | ×3     |
-| 100+  | ×4     |
+| Combo  | 0–9 | 10–24 | 25–49 | 50–99 | 100+ |
+| ------ | --- | ----- | ----- | ----- | ---- |
+| Damage | ×1  | ×1.5  | ×2    | ×3    | ×4   |
 
-Accuracy matters more than speed. Going a little slower and keeping your combo usually wins.
+### Muses, powers and blessings
 
-### Key mods
+Six muses offer boons after the fights behind their doors:
 
-After each fight you choose one of three mods, then **press the key you want to install it on**. Keys with mods glow on the on-screen keyboard, and their letters are colored in enemy words. Each key holds 2 mods. Installing a third pushes out the oldest.
+| Muse       | Key power                             | Blessings                      |
+| ---------- | ------------------------------------- | ------------------------------ |
+| **Ignis**  | Ember: letters set the target burning | Kindling, Wildfire, Flashpoint |
+| **Glacia** | Frost: letters push attacks back      | Cold Snap, Brittle, Permafrost |
+| **Volta**  | Spark: letters zap other enemies      | Arc, Static, Overcharge        |
+| **Aurum**  | Gold: letters earn coins              | Tithe, Midas, Windfall         |
+| **Resona** | Echo: letters deal more damage        | Reverb, Chorus, Crescendo      |
+| **Aegis**  | Ward: letters grant shield            | Bulwark, Riposte, Mending      |
 
-| Mod         | Effect (per letter in the finished word)                                                      |
-| ----------- | --------------------------------------------------------------------------------------------- |
-| ▲ **Ember** | Adds 2 Burn. Burn deals its value in damage every second, then drops by 1                     |
-| ◆ **Frost** | Pushes the target's attack back 0.7s                                                          |
-| ϟ **Spark** | Zaps another enemy for 3 (scaled by combo)                                                    |
-| ● **Gold**  | +1 coin                                                                                       |
-| ◎ **Echo**  | The letter counts double for damage                                                           |
-| ◇ **Glass** | The letter deals ×3. If you mistype when this key is next, the Glass **shatters** and is gone |
-| ■ **Ward**  | +1 Shield for this fight. Shield absorbs damage before HP                                     |
+- **Key powers** come in four rarities (Common, Rare, Epic, Heroic). You choose a power, then **press the key** that
+  should carry it. A key holds two powers; binding the same power again makes it one rarity stronger.
+- **Blessings** change the rules of your whole run.
+- Hold boons from two muses and a **duo boon** may appear, such as Steam (Ignis + Glacia) or Thunderclap (Resona +
+  Volta).
+- **Glass** is found only in shops: huge damage, but mistyping its key shatters it.
+- **Relics** come from elites, bosses and shops.
 
-**Tip:** common letters (e, t, a, o, i, n, s, r) trigger far more often. The game also gives you more words that contain your modded keys.
-
-### Relics
-
-Relics change the rules for the rest of the run. You get to choose one after elite and boss fights, and shops sell them too.
-
-| Relic        | Effect                                              |
-| ------------ | --------------------------------------------------- |
-| Twin Fangs   | Words with a double letter deal ×2                  |
-| Lipogram     | Words without the letter E deal +50%                |
-| Marathon     | Words of 8+ letters heal 2 HP                       |
-| Steady Hands | A typo halves your combo instead of resetting it    |
-| Whetstone    | +2 base damage on every word                        |
-| Hourglass    | Enemies attack 15% slower                           |
-| Interest     | After each fight, +1 coin per 5 held (max 5)        |
-| Fang Ink     | Every 25 combo heals 3 HP                           |
-| First Strike | Your first word each fight deals ×3                 |
-| Thorns       | When you're hit, deal 4 damage back to the attacker |
-
-### Shops
-
-Shops sell mods, relics and a Patch Kit (heals 15 HP). A reroll costs 3 coins, and each further reroll in the same shop costs 1 more.
+Press **B** between rooms (or open the pause menu) to see your whole build.
 
 ### Bosses
 
-Each run shuffles the three bosses across the acts:
+Each act has one of two bosses, each with phases that change the rules as it weakens:
 
-- **Hydra of Ands**: every hit grows a new head, up to 2 at a time.
-- **Mirror Scribe**: its words are written backwards, so type exactly what you see.
-- **Blackout**: its words fade after a moment and the keyboard goes dark, so you type from memory. A typo briefly reveals the word again.
+- **Act I:** Hydra of Ands (grows heads) or the Mirror Scribe (backwards words)
+- **Act II:** Blackout (words fade from view) or The Redactor (blots out letters you must work out)
+- **Act III:** The Grammarian (punctuation, then two-word phrases) or the Lexicon Wyrm (enormous words)
 
-### Starting keyboards
+### Oaths and Gentle pace
 
-Each starting keyboard begins the run with different mods. You unlock more by reaching milestones.
-
-| Keyboard    | Start                                     | Unlock                                      |
-| ----------- | ----------------------------------------- | ------------------------------------------- |
-| Apprentice  | Ember on E, Gold on A, 5 coins            | Available from the start                    |
-| Glassblower | Glass on E, T, O                          | Reach Act 3                                 |
-| Cryomancer  | Frost on S and R, Spark on N              | Beat an elite or boss without a single typo |
-| Tycoon      | Gold on E and T, 15 coins, Interest relic | Hold 60 coins at once                       |
-
-## Controls
-
-| Key           | Where               | Action                                                        |
-| ------------- | ------------------- | ------------------------------------------------------------- |
-| `a`–`z`       | Combat              | Type                                                          |
-| `Backspace`   | Combat              | Delete the last letter (with nothing typed, drop your target) |
-| `Tab` / `Esc` | Combat              | Drop your target so you can switch enemies                    |
-| `a`–`z`       | Installing a mod    | Put the mod on that key                                       |
-| `Esc`         | Installing a mod    | Throw the mod away                                            |
-| `1`–`7`       | Menu, rewards, shop | Pick a card (or click it)                                     |
-| `0`           | Shop                | Reroll                                                        |
-| `Enter`       | Everywhere else     | Start, continue, skip, or leave the shop                      |
-
-The game pauses automatically when the window loses focus. Click to resume.
+- **Oaths** make runs harder on purpose: faster enemies, tougher enemies, typos that cost health, a combo that breaks
+  if you pause, capital letters, punctuation, pricier shops. Each level adds **Heat**, which multiplies your score.
+- **Gentle pace** makes enemies slower and weaker while you're learning. Gentle runs don't count for leaderboards.
 
 ## Learning while you play
 
-- Every keystroke is timed. Keys that are slow or error-prone get a **weakness score**.
-- About **30% of enemy words** are picked to drill your weakest keys.
-- At the end of each run you get a **heatmap** of your keyboard (redder means weaker), plus your **nemesis pair**, the slowest two-letter combination you typed.
-- **Finger colors** (toggle on the menu) color each key by which finger should press it in touch typing. **F** and **J** are underlined as your home-row anchors.
-
-Your stats, unlocks and settings are saved in your browser's localStorage. No account is needed.
+- Every keystroke is timed. Keys that are slow or error-prone get a weakness score, and about 30% of enemy words are
+  picked to drill them.
+- After each run you see a **heatmap** of your keyboard and your hardest letter pair.
+- **Finger colors** show which finger should press each key, for QWERTY, Dvorak, Colemak and AZERTY.
 
 ## Project layout
 
 ```
-src/engine/   game rules: combat, mods & relics, run progression, word picker, stats
-src/ui/       screens: menu, combat, reward, shop, results, and the on-screen keyboard
-src/fx/       synthesized audio and hit particles
-tests/        unit tests and a bot that plays full runs to check balance
+packages/engine/   the game rules: deterministic, framework-free, fully tested
+  src/content/     enemies, bosses, events, oaths, word list
+apps/web/          the SvelteKit app (screens, design system, effects, sound)
+e2e/               Playwright tests
+scripts/           the playtest bot
+docs/              roadmap, design system, reviews
 ```
+
+Runs are **deterministic**: a run is its seed plus the list of actions you took, so any run can be replayed exactly.
+That's how save/resume works.
