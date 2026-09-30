@@ -20,10 +20,11 @@
     "playtest": "node scripts/playtest.mjs",
     "bundle:engine": "esbuild packages/engine/src/index.ts --bundle --format=esm --platform=neutral --outfile=supabase/functions/_shared/engine.js --legal-comments=none",
     "test:cloud": "vitest run --project cloud",
-    "supabase:start": "npm run bundle:engine && supabase start",
+    "supabase:start": "npm run bundle:engine && npx supabase start",
     "test:e2e:cloud": "CLOUD=1 playwright test e2e/cloud"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.63.0",
     "@supabase/supabase-js": "^2.117.2",

@@ -68,6 +68,7 @@
       {/if}
       {#if error}<p class="error" role="alert">{error}</p>{/if}
       <button class="guest" onclick={() => nav('/')} type="button"><kbd>Esc</kbd> Keep playing as a guest</button>
+      <button class="guest" onclick={() => nav('/privacy')} type="button">What we store: privacy notice</button>
     </div>
   </Frame>
 </div>

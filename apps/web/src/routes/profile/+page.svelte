@@ -239,7 +239,10 @@
     <Frame>
       <section class="card">
         <h2>Your data</h2>
-        <p>Download everything Keycraft holds about you: progress, stats, settings and history.</p>
+        <p>
+          Download everything Keycraft holds about you: progress, stats, settings and history. See what we store in the
+          <button class="link" onclick={() => nav('/privacy')} type="button">privacy notice</button>.
+        </p>
         <Button kind="quiet" onclick={exportData}>Download my data</Button>
         {#if account.user}
           <h3>Delete account</h3>
@@ -315,6 +318,15 @@
   }
   .muted {
     color: var(--moon-faint);
+  }
+  .link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--gold);
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit;
   }
   .note {
     font-size: var(--t-xs);

@@ -6,14 +6,7 @@ import ts from 'typescript-eslint';
 
 export default ts.config(
   {
-    ignores: [
-      '**/node_modules',
-      '**/build',
-      '**/.svelte-kit',
-      '**/dist',
-      'playtest-shots',
-      'supabase/functions/**',
-    ],
+    ignores: ['**/node_modules', '**/build', '**/.svelte-kit', '**/dist', 'playtest-shots', 'supabase/functions/**'],
   },
   js.configs.recommended,
   ...ts.configs.recommended,

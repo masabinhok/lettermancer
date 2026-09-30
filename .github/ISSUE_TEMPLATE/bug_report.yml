@@ -1,0 +1,43 @@
+name: Bug report
+description: Something in the game doesn't work the way it should.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to make it happen
+      description: The steps, as exactly as you can. A screenshot or recording helps a lot.
+      placeholder: |
+        1. Start a run with the Glassblower
+        2. Bind Frost to F
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Browser and OS
+      placeholder: Chrome 140 on Windows 11
+  - type: dropdown
+    id: account
+    attributes:
+      label: Were you signed in?
+      options:
+        - Guest
+        - Signed in
+        - Not sure
+  - type: textarea
+    id: save
+    attributes:
+      label: Run save (optional)
+      description: >-
+        For bugs mid-run, paste the value of `keycraft.run.v1` from your browser's localStorage (DevTools → Application).
+        It lets us replay your run exactly.
+      render: json

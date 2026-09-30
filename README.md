@@ -4,6 +4,8 @@ A roguelike typing game where your keyboard is the deck. Type words to fight ill
 from six muses, and bind powers to individual keys — so your **E** burns, your **S** freezes, and your **N** throws
 sparks. Every run quietly feeds you more of the keys you're slowest at, so you get faster while you play.
 
+![A fight in Keycraft: typing enemy words, with combo and key powers on the keyboard below](docs/media/keycraft.gif)
+
 ## Running it
 
 Requires Node 22+.
@@ -13,15 +15,18 @@ npm install
 npm run dev        # http://localhost:5173
 ```
 
-| Command            | What it does                                                                     |
-| ------------------ | -------------------------------------------------------------------------------- |
-| `npm run dev`      | Start the web app                                                                |
-| `npm run build`    | Build the static site to `apps/web/build`                                        |
-| `npm test`         | Unit tests, replay determinism, and the balance bot                              |
-| `npm run test:e2e` | Playwright end-to-end tests                                                      |
-| `npm run check`    | Typecheck the app and the engine                                                 |
-| `npm run lint`     | ESLint                                                                           |
-| `npm run playtest` | A bot that plays the real game in a headless browser and screenshots each screen |
+| Command              | What it does                                                                     |
+| -------------------- | -------------------------------------------------------------------------------- |
+| `npm run dev`        | Start the web app                                                                |
+| `npm run build`      | Build the static site to `apps/web/build`                                        |
+| `npm test`           | Unit tests, replay determinism, and the balance bot                              |
+| `npm run test:e2e`   | Playwright end-to-end tests                                                      |
+| `npm run check`      | Typecheck the app and the engine                                                 |
+| `npm run lint`       | ESLint                                                                           |
+| `npm run playtest`   | A bot that plays the real game in a headless browser and screenshots each screen |
+| `npm run test:cloud` | Row-level security and verification tests against a local Supabase               |
+
+Accounts and leaderboards are optional. To run them locally, see [docs/SELF_HOSTING.md](docs/SELF_HOSTING.md).
 
 ## How to play
 
@@ -128,6 +133,24 @@ Results show speed, raw speed, accuracy, consistency, a per-second chart, and th
 Practice earns a little Ink (capped daily) and keeps a daily streak. **Tab** restarts, **Esc** leaves, and the
 interface fades while you type.
 
+Press **ghost** in the bar to race a replay of your best run at the current test; its caret moves in green.
+
+## Accounts, shared runs and leaderboards
+
+Everything works offline as a guest. On a build with Supabase configured you can also sign in (email link, GitHub or
+Google) to keep progress on every device and join the leaderboards. Signing in folds your guest progress into the
+account, so nothing you earned offline is lost.
+
+- **Daily rite** (**D**): one seed and one keyboard for everyone, once a day, no upgrades.
+- **Weekly challenge** (**W**): a fixed set of Oaths for the week, your choice of keyboard, no upgrades. Your best
+  run counts.
+- **Leaderboards** (**L**): today's daily, this week's challenge, all-time score, the highest Heat won, and 15 s and
+  60 s practice tests. On the practice boards you can race any player's ghost.
+- **Share card** (**C** on the results screen): an image of your run with its score, speed and build.
+
+Every ranked run is replayed on the server by the same engine the browser uses. The server rejects runs with
+impossible timing, invalid actions, or bonuses that progress can't produce.
+
 ## Learning while you play
 
 - Every keystroke is timed. Keys that are slow or error-prone get a weakness score, and about 30% of enemy words are
@@ -141,10 +164,23 @@ interface fades while you type.
 packages/engine/   the game rules: deterministic, framework-free, fully tested
   src/content/     enemies, bosses, events, oaths, word list
 apps/web/          the SvelteKit app (screens, design system, effects, sound)
+supabase/          database schema with row-level security, and edge functions that verify runs
+tests/cloud/       tests against a local Supabase (RLS, verification, daily runs)
 e2e/               Playwright tests
 scripts/           the playtest bot
-docs/              roadmap, design system, reviews
+docs/              roadmap, architecture, guides, design system, reviews
 ```
 
 Runs are **deterministic**: a run is its seed plus the list of actions you took, so any run can be replayed exactly.
-That's how save/resume works.
+That's how save/resume, ghosts and server-side verification work. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## Contributing
+
+Contributions are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md). Adding content is mostly editing data;
+[docs/ADDING_CONTENT.md](docs/ADDING_CONTENT.md) walks through it. Please report security issues privately as
+described in [SECURITY.md](SECURITY.md).
+
+## License
+
+Code is under the [MIT License](LICENSE). Fonts, the word list and quotes keep their own licenses; see
+[docs/CREDITS.md](docs/CREDITS.md).
