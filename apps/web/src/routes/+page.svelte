@@ -1,43 +1,61 @@
+<!-- The Scriptorium: where you return between runs. -->
 <script lang="ts">
-  import { nav } from '$lib/nav';
   import {
-    accuracy,
+    archivistLine,
+    clampOaths,
     heat,
-    keyWeakness,
+    heatCap,
+    keepsakeLevel,
+    KEEPSAKES,
+    keyMastery,
     MODS,
-    nemesisBigram,
+    PROPHECIES,
+    SEALS_PER_LEAF,
     STARTER_IDS,
     STARTERS,
-    topWeakKeys,
+    tradeSeals,
     type StarterId,
   } from '@keycraft/engine';
+  import { onMount } from 'svelte';
+  import * as sfx from '$lib/fx/audio';
   import { Session } from '$lib/game/session.svelte';
+  import CodexOfHands from '$lib/hub/CodexOfHands.svelte';
+  import Codex from '$lib/hub/Codex.svelte';
+  import Currencies from '$lib/hub/Currencies.svelte';
+  import Keepsakes from '$lib/hub/Keepsakes.svelte';
+  import Prophecies from '$lib/hub/Prophecies.svelte';
+  import { nav } from '$lib/nav';
   import Oaths from '$lib/screens/Oaths.svelte';
   import Settings from '$lib/screens/Settings.svelte';
   import { profile } from '$lib/stores/profile.svelte';
   import Button from '$lib/ui/Button.svelte';
   import Frame from '$lib/ui/Frame.svelte';
-  import HeatLegend from '$lib/ui/HeatLegend.svelte';
   import Initial from '$lib/ui/Initial.svelte';
   import Keyboard from '$lib/ui/Keyboard.svelte';
 
+  type Panel = 'settings' | 'oaths' | 'hands' | 'keepsakes' | 'prophecies' | 'codex' | null;
+
   const meta = profile.meta;
   const hasSave = Session.hasSave();
-  let selected = $state<StarterId>(meta.unlocked.includes(meta.lastStarter) ? meta.lastStarter : 'apprentice');
-  let settingsOpen = $state(false);
-  let oathsOpen = $state(false);
-  let settings = $state<{ onKey(k: string): boolean }>();
-  const heatNow = $derived(heat(meta.oaths));
-
-  const weak = $derived(topWeakKeys(profile.stats, 3));
-  const nem = $derived(nemesisBigram(profile.stats));
-  const played = $derived(meta.runs > 0);
   const firstTime = !meta.prologueDone && meta.runs === 0;
+  let selected = $state<StarterId>(meta.unlocked.includes(meta.lastStarter) ? meta.lastStarter : 'apprentice');
+  let panel = $state<Panel>(null);
+  let panelRef = $state<{ onKey(k: string): boolean }>();
+  const line = archivistLine(meta);
 
-  function toggleGentle() {
-    meta.gentle = !meta.gentle;
-    profile.saveMeta();
-  }
+  const mastery = $derived(keyMastery(profile.stats));
+  const rankCounts = $derived([1, 2, 3].map((r) => Object.values(mastery).filter((m) => m >= r).length));
+  const heatNow = $derived(heat(clampOaths(meta)));
+  const fulfilled = $derived(Object.keys(meta.prophecies).length);
+  const carried = $derived(meta.equipped ? KEEPSAKES[meta.equipped] : null);
+
+  onMount(() => {
+    // The Archivist doesn't repeat himself.
+    if (line.id !== 'general' && !meta.heard.includes(line.id)) {
+      meta.heard.push(line.id);
+      profile.saveMeta();
+    }
+  });
 
   function start() {
     meta.lastStarter = selected;
@@ -45,22 +63,44 @@
     nav(`/run?starter=${selected}`);
   }
 
+  function toggleGentle() {
+    meta.gentle = !meta.gentle;
+    profile.saveMeta();
+  }
+
+  function trade() {
+    if (tradeSeals(meta)) {
+      profile.saveMeta();
+      sfx.coin();
+    } else sfx.miss();
+  }
+
+  const open = (p: Panel) => () => (panel = p);
+
   function onkeydown(e: KeyboardEvent) {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
-    if (settingsOpen || oathsOpen) {
-      if (settings?.onKey(e.key)) e.preventDefault();
+    if (panel) {
+      if (e.key === 'Escape') panel = null;
+      else if (!panelRef?.onKey(e.key)) return;
+      e.preventDefault();
       return;
     }
-    const i = Number(e.key) - 1;
-    if (e.key === 'Enter') {
+    const k = e.key.toLowerCase();
+    const i = Number(k) - 1;
+    if (k === 'enter') {
       if (hasSave) nav('/run?resume');
       else if (firstTime) nav('/prologue');
       else start();
-    } else if (e.key === 'n' && (hasSave || firstTime)) start();
-    else if (e.key === 't') nav('/prologue');
-    else if (e.key === 's') settingsOpen = true;
-    else if (e.key === 'o') oathsOpen = true;
-    else if (e.key === 'g') toggleGentle();
+    } else if (k === 'n' && (hasSave || firstTime)) start();
+    else if (k === 't') nav('/prologue');
+    else if (k === 's') panel = 'settings';
+    else if (k === 'o') panel = 'oaths';
+    else if (k === 'h') panel = 'hands';
+    else if (k === 'k') panel = 'keepsakes';
+    else if (k === 'p') panel = 'prophecies';
+    else if (k === 'c') panel = 'codex';
+    else if (k === 'g') toggleGentle();
+    else if (k === 'x') trade();
     else if (STARTER_IDS[i] && meta.unlocked.includes(STARTER_IDS[i])) selected = STARTER_IDS[i];
     else return;
     e.preventDefault();
@@ -70,169 +110,218 @@
 <svelte:window {onkeydown} />
 <svelte:head><title>Keycraft</title></svelte:head>
 
-<div class="title" data-screen="title">
-  <section class="main">
+<div class="hub" data-screen="title">
+  <header class="top">
     <h1 class="logo" aria-label="Keycraft">
-      <Initial glyph="K" size={132} field="#3b2160" />
-      <span class="rest" aria-hidden="true">eycraft</span>
+      <Initial glyph="K" size={60} field="#3b2160" />
+      <span aria-hidden="true">eycraft</span>
     </h1>
-    <p class="tagline">
-      A roguelike where your keyboard is the deck. Type to strike, bind powers to your keys, and get faster with every
-      run.
-    </p>
+    <Currencies ink={meta.ink} leaf={meta.leaf} seals={meta.seals} />
+    <nav class="util">
+      <Button kind="quiet" hotkey="T" onclick={() => nav('/prologue')}>Tutorial</Button>
+      <Button kind="quiet" hotkey="S" onclick={open('settings')}>Settings</Button>
+    </nav>
+  </header>
 
-    <div class="actions">
-      {#if hasSave}
-        <Button hotkey="Enter" onclick={() => nav('/run?resume')}>Continue your run</Button>
-        <Button kind="quiet" hotkey="N" onclick={start}>Start a new run</Button>
-      {:else if firstTime}
-        <Button hotkey="Enter" onclick={() => nav('/prologue')}>Learn to play</Button>
-        <Button kind="quiet" hotkey="N" onclick={start}>Skip to a run</Button>
-      {:else}
-        <Button hotkey="Enter" onclick={start}>Begin a run</Button>
-      {/if}
-      <Button kind="quiet" hotkey="O" onclick={() => (oathsOpen = true)}
-        >Oaths{heatNow ? ` (Heat ${heatNow})` : ''}</Button
-      >
-      <Button kind="quiet" hotkey="S" onclick={() => (settingsOpen = true)}>Settings</Button>
-      {#if !firstTime}<Button kind="quiet" hotkey="T" onclick={() => nav('/prologue')}>Tutorial</Button>{/if}
-    </div>
+  <main class="hall">
+    <section class="left">
+      <Frame ornate>
+        <div class="archivist">
+          <Initial glyph="A" size={72} field="#2c2a4a" ink="var(--moon)" />
+          <div>
+            <p class="who">The Archivist</p>
+            <p class="says">“{line.text}”</p>
+            {#if meta.seals >= SEALS_PER_LEAF}
+              <button class="trade" onclick={trade} type="button"
+                ><kbd>X</kbd> Trade {SEALS_PER_LEAF} Seals for a Gold Leaf</button
+              >
+            {/if}
+          </div>
+        </div>
+      </Frame>
 
-    <label class="gentle">
-      <input type="checkbox" checked={meta.gentle} onchange={toggleGentle} />
-      <span>Gentle pace <kbd>G</kbd></span>
-      <small>Slower, weaker enemies while you learn. Gentle runs don't count for leaderboards.</small>
-    </label>
-
-    <h2>Choose your keyboard</h2>
-    <div class="starters" role="radiogroup" aria-label="Starting keyboard">
-      {#each STARTER_IDS as id, i (id)}
-        {@const s = STARTERS[id]}
-        {@const locked = !meta.unlocked.includes(id)}
-        <button
-          class="starter"
-          class:selected={selected === id}
-          class:locked
-          role="radio"
-          aria-checked={selected === id}
-          disabled={locked}
-          onclick={() => (selected = id)}
-          type="button"
-        >
-          <kbd>{i + 1}</kbd>
-          <span class="name">{s.name}</span>
-          {#if locked}
-            <span class="desc">Locked. {s.unlock}.</span>
-          {:else}
-            <span class="desc">{s.desc}</span>
-            <span class="chips">
-              {#each Object.entries(s.keyMods) as [k, boons] (k)}
-                {#each boons as b, j (j)}
-                  <span class="chip" style:--c={MODS[b.mod].color}>{k.toUpperCase()} {MODS[b.mod].glyph}</span>
-                {/each}
-              {/each}
-            </span>
-          {/if}
-        </button>
-      {/each}
-    </div>
-  </section>
-
-  <aside>
-    <Frame>
-      <div class="hands">
-        <h2>Your hands</h2>
-        <Keyboard heat={keyWeakness(profile.stats)} layout={profile.settings.layout} size="mini" />
-        <HeatLegend />
-        {#if played}
-          <p>
-            {meta.runs} run{meta.runs === 1 ? '' : 's'}, {meta.wins} won. Lifetime accuracy {(
-              accuracy(profile.stats) * 100
-            ).toFixed(1)}%.
-          </p>
-          {#if weak.length}<p>
-              Your slowest keys are {weak.map((k) => k.toUpperCase()).join(', ')}. Runs will lean on them.
-            </p>{/if}
-          {#if nem}<p>Hardest pair so far: “{nem.bigram}”.</p>{/if}
+      <div class="begin">
+        {#if hasSave}
+          <Button hotkey="Enter" onclick={() => nav('/run?resume')}>Continue your run</Button>
+          <Button kind="quiet" hotkey="N" onclick={start}>Start a new run</Button>
+        {:else if firstTime}
+          <Button hotkey="Enter" onclick={() => nav('/prologue')}>Learn to play</Button>
+          <Button kind="quiet" hotkey="N" onclick={start}>Skip to a run</Button>
         {:else}
-          <p>Play a run and this keyboard fills in with how each key feels under your fingers.</p>
+          <Button hotkey="Enter" onclick={start}>Begin a run</Button>
         {/if}
       </div>
-    </Frame>
-  </aside>
+
+      <div class="setup">
+        <div class="starters" role="radiogroup" aria-label="Starting keyboard">
+          {#each STARTER_IDS as id, i (id)}
+            {@const s = STARTERS[id]}
+            {@const locked = !meta.unlocked.includes(id)}
+            <button
+              class="starter"
+              class:selected={selected === id}
+              class:locked
+              role="radio"
+              aria-checked={selected === id}
+              disabled={locked}
+              onclick={() => (selected = id)}
+              type="button"
+            >
+              <kbd>{i + 1}</kbd>
+              <span class="name">{s.name}</span>
+              {#if locked}
+                <span class="desc">Locked. {s.unlock}.</span>
+              {:else}
+                <span class="desc">{s.desc}</span>
+                <span class="chips">
+                  {#each Object.entries(s.keyMods) as [k, boons] (k)}
+                    {#each boons as b, j (j)}
+                      <span class="chip" style:--c={MODS[b.mod].color}>{k.toUpperCase()} {MODS[b.mod].glyph}</span>
+                    {/each}
+                  {/each}
+                </span>
+              {/if}
+            </button>
+          {/each}
+        </div>
+        <div class="options">
+          <button class="opt" onclick={open('keepsakes')} type="button">
+            <kbd>K</kbd>
+            {#if carried}Carrying the {carried.name} (level {keepsakeLevel(meta.keepsakeUses[meta.equipped!] ?? 0)})
+            {:else if meta.keepsakes.length}Choose a keepsake to carry{:else}No keepsakes yet{/if}
+          </button>
+          <button class="opt" onclick={open('oaths')} type="button">
+            <kbd>O</kbd> Oaths: {heatNow ? `Heat ${heatNow}` : 'none sworn'}
+          </button>
+          <label class="opt gentle">
+            <input type="checkbox" checked={meta.gentle} onchange={toggleGentle} />
+            <kbd>G</kbd> Gentle pace
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <aside class="right">
+      <div class="stations">
+        <button class="station" onclick={open('hands')} type="button">
+          <span class="g">☙</span><span class="n">Codex of Hands</span><span class="h">Permanent upgrades</span><kbd
+            >H</kbd
+          >
+        </button>
+        <button class="station" onclick={open('prophecies')} type="button">
+          <span class="g">✦</span><span class="n">Prophecies</span><span class="h"
+            >{fulfilled} of {PROPHECIES.length} fulfilled</span
+          ><kbd>P</kbd>
+        </button>
+        <button class="station" onclick={open('codex')} type="button">
+          <span class="g">❦</span><span class="n">Codex</span><span class="h">Foes, bosses and boons</span><kbd>C</kbd>
+        </button>
+      </div>
+      <Frame>
+        <div class="hands">
+          <h2>Your hands</h2>
+          <Keyboard {mastery} layout={profile.settings.layout} size="mini" />
+          <p class="legend">
+            <span class="m1">Bronze {rankCounts[0]}</span>
+            <span class="m2">Silver {rankCounts[1]}</span>
+            <span class="m3">Gold {rankCounts[2]}</span>
+          </p>
+          <p class="note">
+            {#if meta.runs === 0}Each key earns Bronze, Silver and Gold as it gets faster and cleaner.
+            {:else}{meta.runs} run{meta.runs === 1 ? '' : 's'}, {meta.wins} won. Best score {meta.bestScore.toLocaleString()}.{/if}
+          </p>
+        </div>
+      </Frame>
+    </aside>
+  </main>
 </div>
 
-{#if settingsOpen}<Settings bind:this={settings} onclose={() => (settingsOpen = false)} />{/if}
-{#if oathsOpen}<Oaths bind:this={settings} onclose={() => (oathsOpen = false)} />{/if}
+{#if panel === 'settings'}<Settings bind:this={panelRef} onclose={() => (panel = null)} />{/if}
+{#if panel === 'oaths'}<Oaths bind:this={panelRef} maxHeat={heatCap(meta)} onclose={() => (panel = null)} />{/if}
+{#if panel === 'hands'}<CodexOfHands bind:this={panelRef} onclose={() => (panel = null)} />{/if}
+{#if panel === 'keepsakes'}<Keepsakes bind:this={panelRef} onclose={() => (panel = null)} />{/if}
+{#if panel === 'prophecies'}<Prophecies bind:this={panelRef} onclose={() => (panel = null)} />{/if}
+{#if panel === 'codex'}<Codex bind:this={panelRef} onclose={() => (panel = null)} />{/if}
 
 <style>
-  .title {
+  .hub {
     height: 100%;
-    display: grid;
-    grid-template-columns: minmax(0, 760px) 360px;
-    justify-content: center;
-    align-items: center;
-    gap: var(--space-7);
-    padding: var(--space-6);
-    overflow: auto;
-  }
-  .main {
     display: flex;
     flex-direction: column;
-    gap: var(--space-5);
-    animation: arrive 1s var(--ease-out);
+    padding: var(--space-4) var(--space-6);
+    gap: var(--space-4);
+    overflow: auto;
   }
-  @keyframes arrive {
-    from {
-      opacity: 0;
-      filter: blur(6px);
-      transform: translateY(8px);
-    }
+  .top {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--space-6);
   }
   .logo {
     display: flex;
     align-items: flex-end;
-    gap: var(--space-3);
+    gap: var(--space-2);
   }
-  .rest {
-    font-size: var(--t-hero);
-    font-weight: 700;
+  .logo span {
+    font-size: 2.6rem;
     line-height: 0.85;
     letter-spacing: 0.03em;
-    color: var(--moon);
   }
-  .tagline {
-    max-width: 52ch;
-    font-size: var(--t-lg);
-    color: var(--moon-dim);
+  .top :global(.purse) {
+    justify-self: center;
   }
-  .gentle {
+  .util {
+    display: flex;
+    gap: var(--space-2);
+  }
+  .hall {
+    flex: 1;
     display: grid;
-    grid-template-columns: auto 1fr;
-    column-gap: var(--space-2);
-    align-items: center;
-    color: var(--moon);
-    cursor: pointer;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: var(--space-6);
+    align-items: start;
+    width: min(1240px, 100%);
+    margin: 0 auto;
   }
-  .gentle input {
-    accent-color: var(--witchfire);
-    width: 18px;
-    height: 18px;
+  .left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
   }
-  .gentle small {
-    grid-column: 2;
-    color: var(--moon-faint);
+  .archivist {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+    padding: var(--space-4) var(--space-5);
+  }
+  .who {
+    font-family: var(--f-display);
+    color: var(--gold);
     font-size: var(--t-sm);
   }
-  .actions {
+  .says {
+    font-size: var(--t-lg);
+    line-height: 1.45;
+    max-width: 60ch;
+    font-style: italic;
+  }
+  .trade {
+    margin-top: var(--space-2);
+    background: none;
+    border: 1px solid var(--rule);
+    padding: 4px 10px;
+    color: var(--moon-dim);
+    cursor: pointer;
+  }
+  .begin {
     display: flex;
     gap: var(--space-3);
-    flex-wrap: wrap;
   }
-  h2 {
-    font-size: var(--t-md);
-    color: var(--gold);
-    margin-top: var(--space-2);
+  .setup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
   }
   .starters {
     display: grid;
@@ -241,22 +330,15 @@
   }
   .starter {
     position: relative;
-    padding: var(--space-4) var(--space-3) var(--space-3);
+    padding: var(--space-3);
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    gap: var(--space-1);
     text-align: left;
     cursor: pointer;
     background: var(--ink);
     border: 1px solid var(--rule);
-    border-radius: 2px;
-    min-height: 150px;
-    transition:
-      border-color var(--dur),
-      transform var(--dur) var(--ease-out);
-  }
-  .starter:hover:not(:disabled) {
-    transform: translateY(-3px);
+    min-height: 128px;
   }
   .starter kbd {
     position: absolute;
@@ -274,10 +356,9 @@
   .name {
     font-family: var(--f-display);
     font-weight: 700;
-    color: var(--moon);
   }
   .desc {
-    font-size: var(--t-sm);
+    font-size: var(--t-xs);
     color: var(--moon-dim);
     line-height: 1.3;
   }
@@ -291,25 +372,112 @@
     font-size: var(--t-xs);
     font-weight: 700;
     color: var(--c);
-    padding: 1px 6px;
+    padding: 0 5px;
     border: 1px solid color-mix(in oklab, var(--c) 60%, transparent);
   }
-  .hands {
-    padding: var(--space-5);
+  .options {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+  .opt {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 6px 12px;
+    background: var(--ink);
+    border: 1px solid var(--rule);
+    color: var(--moon-dim);
+    font-size: var(--t-sm);
+    cursor: pointer;
+  }
+  .opt:hover {
+    border-color: var(--gold-deep);
+    color: var(--moon);
+  }
+  .gentle input {
+    accent-color: var(--witchfire);
+  }
+  .right {
     display: flex;
     flex-direction: column;
+    gap: var(--space-4);
+  }
+  .stations {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .station {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    grid-template-rows: auto auto;
+    column-gap: var(--space-3);
+    align-items: center;
+    text-align: left;
+    padding: var(--space-2) var(--space-3);
+    background: var(--ink);
+    border: 1px solid var(--rule);
+    cursor: pointer;
+  }
+  .station:hover,
+  .station:focus-visible {
+    border-color: var(--gold);
+  }
+  .station .g {
+    grid-row: span 2;
+    font-family: var(--f-glyph);
+    font-size: 1.5rem;
+    color: var(--gold-bright);
+    text-align: center;
+  }
+  .station .n {
+    font-family: var(--f-display);
+    font-weight: 700;
+  }
+  .station .h {
+    grid-column: 2;
+    font-size: var(--t-xs);
+    color: var(--moon-faint);
+  }
+  .station kbd {
+    grid-row: 1 / span 2;
+    grid-column: 3;
+  }
+  .hands {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: var(--space-3);
   }
   .hands h2 {
-    margin: 0;
+    font-size: var(--t-md);
+    color: var(--gold);
+    align-self: flex-start;
   }
-  .hands p {
+  .legend {
+    display: flex;
+    gap: var(--space-4);
+    font-size: var(--t-sm);
+  }
+  .m1 {
+    color: #b07a4a;
+  }
+  .m2 {
+    color: #c9d0dc;
+  }
+  .m3 {
+    color: var(--gold-bright);
+  }
+  .note {
     font-size: var(--t-sm);
     color: var(--moon-dim);
+    text-align: center;
   }
   @media (max-width: 1100px) {
-    .title {
-      grid-template-columns: minmax(0, 760px);
+    .hall {
+      grid-template-columns: 1fr;
     }
     .starters {
       grid-template-columns: repeat(2, 1fr);

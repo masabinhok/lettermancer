@@ -24,6 +24,9 @@ export interface RunTotals {
   fights: number;
   perfectFights: number;
   peakWpm: number;
+  /** most coins held at once */
+  maxCoins: number;
+  coinsSpent: number;
 }
 
 /** Permanent bonuses the player brings into a run (from meta progression). Plain numbers, so replays stay exact. */
@@ -41,6 +44,19 @@ export interface RunBonuses {
   inkBonus: number;
   /** first muse boon of the run is at least this rare */
   firstBoonRarity: 0 | 1 | 2 | 3;
+  /** keepsake effects */
+  startShield: number;
+  /** ms at the start of each fight before enemies begin their attacks */
+  graceMs: number;
+  /** multiplier on coins from fights */
+  coinMult: number;
+  healAfterFight: number;
+  /** a power bound to a key at the start of the run */
+  startBoon: {
+    key: string;
+    mod: 'ember' | 'frost' | 'spark' | 'gold' | 'echo' | 'glass' | 'ward';
+    rarity: 0 | 1 | 2 | 3;
+  } | null;
 }
 
 export const NO_BONUSES: RunBonuses = {
@@ -52,6 +68,11 @@ export const NO_BONUSES: RunBonuses = {
   secondWind: 0,
   inkBonus: 0,
   firstBoonRarity: 0,
+  startShield: 0,
+  graceMs: 0,
+  coinMult: 1,
+  healAfterFight: 0,
+  startBoon: null,
 };
 
 export interface Run {

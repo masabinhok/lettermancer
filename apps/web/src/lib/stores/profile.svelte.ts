@@ -1,21 +1,29 @@
 /**
  * The player's local profile: settings, meta progress, lifetime typing stats and run analytics.
- * Everything lives in localStorage until the player signs in (cloud sync layers on top later).
+ * Everything lives in localStorage; cloud sync layers on top when signed in.
  */
 import {
+  awardRun,
   applyUnlocks,
-  defaultMeta,
+  checkProphecies,
   emptyStats,
-  mergeStats,
   heat,
+  keyMastery,
+  mergeStats,
+  migrateMeta,
+  runScore,
+  totalCorrect,
+  type Award,
   type KeyboardMode,
   type Meta,
-  type Run,
-  type RunConfig,
+  type PracticeSummary,
+  type ProphecyDef,
+  type RunMachine,
   type RunReport,
   type StarterId,
   type Stats,
   type UnlockCheck,
+  type RunConfig,
 } from '@keycraft/engine';
 
 export type KeyboardLayout = 'qwerty' | 'dvorak' | 'colemak' | 'azerty';
@@ -46,7 +54,7 @@ export const defaultSettings = (): Settings => ({
   powerSymbols: false,
 });
 
-const KEYS = {
+export const STORE_KEYS = {
   settings: 'keycraft.settings.v1',
   meta: 'keycraft.meta.v1',
   stats: 'keycraft.stats.v1',
@@ -78,27 +86,45 @@ export interface StoredReport extends RunReport {
   mode: RunConfig['mode'];
   heat: number;
   gentle: boolean;
+  score: number;
 }
 
+type Listener = () => void;
+
 class Profile {
-  settings = $state<Settings>(readStore(KEYS.settings, defaultSettings));
-  meta = $state<Meta>(readStore(KEYS.meta, defaultMeta));
+  settings = $state<Settings>(readStore(STORE_KEYS.settings, defaultSettings));
+  meta = $state<Meta>(migrateMeta(readStore(STORE_KEYS.meta, () => ({}) as Meta)));
   /** lifetime per-key stats; replaced (not mutated) so readers update */
-  stats = $state.raw<Stats>(readStore(KEYS.stats, emptyStats));
-  analytics = $state.raw<StoredReport[]>(readArray<StoredReport>(KEYS.analytics));
+  stats = $state.raw<Stats>(readStore(STORE_KEYS.stats, emptyStats));
+  analytics = $state.raw<StoredReport[]>(readArray<StoredReport>(STORE_KEYS.analytics));
+  private listeners = new Set<Listener>();
+
+  /** Called after any change worth syncing to the cloud. */
+  onChange(fn: Listener): () => void {
+    this.listeners.add(fn);
+    return () => this.listeners.delete(fn);
+  }
+
+  private changed(): void {
+    for (const fn of this.listeners) fn();
+  }
 
   saveSettings(): void {
-    writeStore(KEYS.settings, this.settings);
+    writeStore(STORE_KEYS.settings, this.settings);
   }
 
   saveMeta(): void {
-    writeStore(KEYS.meta, this.meta);
+    writeStore(STORE_KEYS.meta, this.meta);
+    this.changed();
+  }
+
+  saveStats(): void {
+    writeStore(STORE_KEYS.stats, this.stats);
   }
 
   addStats(fight: Stats): void {
-    const next = mergeStats(structuredClone(this.stats), fight);
-    this.stats = next;
-    writeStore(KEYS.stats, next);
+    this.stats = mergeStats(structuredClone(this.stats), fight);
+    this.saveStats();
   }
 
   /** Apply milestone unlocks; returns newly unlocked starters. */
@@ -108,22 +134,43 @@ class Profile {
     return earned;
   }
 
-  recordRun(report: RunReport, config: RunConfig, run: Run): void {
-    const won = report.result === 'won';
-    this.meta.runs++;
-    if (won) this.meta.wins++;
-    this.meta.bestAct = Math.max(this.meta.bestAct, won ? 4 : run.act);
+  private snapshot() {
+    return { mastery: keyMastery(this.stats), totalKeys: totalCorrect(this.stats) };
+  }
+
+  /** Record a finished run and hand out Ink, Gold Leaf, keepsakes and prophecies. */
+  finishRun(m: RunMachine, abandoned = false): Award {
+    const report: RunReport = abandoned ? { ...m.report, result: 'lost', act: m.run.act, room: m.run.room } : m.report;
+    const score = runScore(m.run);
+    const award = awardRun(this.meta, { report, run: m.run, config: m.config, score }, this.snapshot());
     this.saveMeta();
     const entry: StoredReport = {
       ...report,
       date: new Date().toISOString(),
-      seed: config.seed,
-      mode: config.mode,
-      heat: heat(config.oaths),
-      gentle: config.gentle,
+      seed: m.config.seed,
+      mode: m.config.mode,
+      heat: heat(m.config.oaths),
+      gentle: m.config.gentle,
+      score,
     };
     this.analytics = [entry, ...this.analytics].slice(0, ANALYTICS_KEPT);
-    writeStore(KEYS.analytics, this.analytics);
+    writeStore(STORE_KEYS.analytics, this.analytics);
+    return award;
+  }
+
+  /** Check prophecies after a practice test (or any time stats change). */
+  checkProphecies(practice?: PracticeSummary): ProphecyDef[] {
+    const earned = checkProphecies(this.meta, { ...this.snapshot(), practice });
+    if (earned.length) this.saveMeta();
+    return earned;
+  }
+
+  /** Replace everything local with data from the cloud (used on first sign-in merge). */
+  replaceAll(data: { meta: Meta; stats: Stats }): void {
+    this.meta = migrateMeta(data.meta);
+    this.stats = data.stats;
+    writeStore(STORE_KEYS.meta, this.meta);
+    this.saveStats();
   }
 }
 

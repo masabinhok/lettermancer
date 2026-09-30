@@ -12,6 +12,7 @@
     fingerHints = false,
     dark = false,
     heat = null,
+    mastery = null,
     labels = null,
     pickColor = null,
     onpick,
@@ -23,6 +24,8 @@
     fingerHints?: boolean;
     dark?: boolean;
     heat?: Record<string, number> | null;
+    /** key mastery ranks 0-3, drawn as bronze, silver and gold */
+    mastery?: Record<string, number> | null;
     labels?: Record<string, string> | null;
     /** when set, letter keys are clickable to install a mod of this color */
     pickColor?: string | null;
@@ -72,6 +75,9 @@
           class:ok={flashes[k] === 'ok'}
           class:bad={flashes[k] === 'bad'}
           class:no-data={heat && letter && h === undefined}
+          class:m1={mastery?.[k] === 1}
+          class:m2={mastery?.[k] === 2}
+          class:m3={mastery?.[k] === 3}
           style:--glow={boons.length ? MODS[boons[boons.length - 1].mod].color : null}
           style:--heat={h ?? 0}
           onclick={pickColor && letter ? () => onpick?.(k) : undefined}
@@ -266,6 +272,21 @@
   }
   .heat .key.no-data .cap {
     opacity: 0.4;
+  }
+  .m1 {
+    border-color: #b07a4a;
+    box-shadow: inset 0 -3px 0 #b07a4a;
+  }
+  .m2 {
+    border-color: #c9d0dc;
+    box-shadow: inset 0 -3px 0 #c9d0dc;
+  }
+  .m3 {
+    border-color: var(--gold-bright);
+    box-shadow:
+      inset 0 -3px 0 var(--gold-bright),
+      0 0 12px -3px var(--gold);
+    color: var(--gold-bright);
   }
   .picking button.key {
     cursor: pointer;

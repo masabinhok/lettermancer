@@ -209,8 +209,11 @@ export function createCombat(waves: EnemySpec[][], ctx: CombatCtx, run?: Run): C
     over: null,
   };
   if (run && has(run, 'golden-aegis')) c.shield += Math.floor(run.coins / 10);
+  if (run) c.shield += run.bonuses.startShield;
   c.maxCombo = c.combo;
   spawnWave(c, run ?? DUMMY_RUN, waves[0] ?? [], ctx, null);
+  // Keepsake grace: enemies hold their first attack a little longer.
+  if (run?.bonuses.graceMs) for (const e of c.enemies) e.intent -= run.bonuses.graceMs;
   return c;
 }
 

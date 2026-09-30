@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import { STARTER_IDS, type StarterId } from '@keycraft/engine';
+  import { clampOaths, STARTER_IDS, type StarterId } from '@keycraft/engine';
   import { onMount } from 'svelte';
   import { startMusic, stopMusic } from '$lib/fx/audio';
   import { runBonuses } from '$lib/game/progression';
@@ -44,7 +44,7 @@
     begin(
       Session.start({
         starter,
-        oaths: profile.meta.oaths,
+        oaths: clampOaths(profile.meta),
         gentle: profile.meta.gentle,
         bonuses: runBonuses(profile.meta),
       }),

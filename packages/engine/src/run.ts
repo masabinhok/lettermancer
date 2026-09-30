@@ -7,6 +7,7 @@ import {
   BLESSING_IDS,
   BLESSINGS,
   eligibleDuos,
+  installMod,
   isDuo,
   MOD_IDS,
   MODS,
@@ -113,7 +114,10 @@ export function newRun(
     hp: maxHp,
     maxHp,
     coins: s.coins + bonuses.startCoins,
-    keyMods: structuredClone(s.keyMods),
+    keyMods: bonuses.startBoon
+      ? installMod(structuredClone(s.keyMods), bonuses.startBoon.key, bonuses.startBoon.mod, bonuses.startBoon.rarity)
+          .keyMods
+      : structuredClone(s.keyMods),
     relics: [...s.relics],
     blessings: [],
     oaths: { ...oaths },
@@ -126,7 +130,18 @@ export function newRun(
     secondWindLeft: bonuses.secondWind > 0,
     gentle,
     rerollsLeft: bonuses.rerolls,
-    totals: { correct: 0, errors: 0, activeMs: 0, maxCombo: 0, words: 0, fights: 0, perfectFights: 0, peakWpm: 0 },
+    totals: {
+      correct: 0,
+      errors: 0,
+      activeMs: 0,
+      maxCombo: 0,
+      words: 0,
+      fights: 0,
+      perfectFights: 0,
+      peakWpm: 0,
+      maxCoins: s.coins + bonuses.startCoins,
+      coinsSpent: 0,
+    },
     stats: emptyStats(),
     result: null,
   };
@@ -303,7 +318,7 @@ export function relicOffers(run: Run, rng: Rng, n: number): Offer[] {
 /** Coins paid out after every won fight. */
 export function fightCoins(run: Run, node: NodeKind, reward: DoorReward | null, rng: Rng): number {
   const base = node === 'boss' ? 15 : node === 'elite' ? 10 : randInt(rng, 4, 6);
-  return base + (reward?.kind === 'coins' ? 18 + run.act * 6 : 0);
+  return Math.round((base + (reward?.kind === 'coins' ? 18 + run.act * 6 : 0)) * run.bonuses.coinMult);
 }
 
 // ---------- shop ----------

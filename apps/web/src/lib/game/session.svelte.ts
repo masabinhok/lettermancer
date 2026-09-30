@@ -7,6 +7,7 @@ import {
   newRunConfig,
   RunMachine,
   type Action,
+  type Award,
   type MachineEvent,
   type OathLevels,
   type Run,
@@ -54,6 +55,8 @@ export class Session {
   intro = $state<Intro>(null);
   /** starters unlocked during this run */
   unlocked = $state<StarterId[]>([]);
+  /** what the finished run earned (set when the run ends) */
+  award = $state.raw<Award | null>(null);
   /** the last words enemies carried — the install screen reads letter use from these */
   recentWords: string[] = [];
 
@@ -224,8 +227,7 @@ export class Session {
 
   /** Give up the run. It is recorded as a loss. */
   abandon(): void {
-    const m = this.machine;
-    profile.recordRun({ ...m.report, result: 'lost', act: m.run.act, room: m.run.room }, m.config, m.run);
+    profile.finishRun(this.machine, true);
     clearSave();
   }
 
@@ -275,7 +277,7 @@ export class Session {
       } else if (e.t === 'bought' || e.t === 'installed') {
         this.gain(profile.unlock({ coins: run.coins }));
       } else if (e.t === 'run-end') {
-        profile.recordRun(this.machine.report, this.machine.config, run);
+        this.award = profile.finishRun(this.machine);
         clearSave();
       }
       for (const fn of this.listeners) fn(e);

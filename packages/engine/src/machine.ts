@@ -274,6 +274,13 @@ export class RunMachine {
   }
 
   dispatch(a: Action): MachineEvent[] {
+    const ev = this.dispatchInner(a);
+    const t = this.run.totals;
+    t.maxCoins = Math.max(t.maxCoins, this.run.coins);
+    return ev;
+  }
+
+  private dispatchInner(a: Action): MachineEvent[] {
     const ev: MachineEvent[] = [];
     const v = this.view;
     switch (a.t) {
@@ -318,6 +325,7 @@ export class RunMachine {
         if (it.cost > this.run.coins) throw new InvalidAction('not enough coins');
         this.actions.push(a);
         this.run.coins -= it.cost;
+        this.run.totals.coinsSpent += it.cost;
         it.sold = true;
         ev.push({ t: 'bought', item: it });
         this.report.picks.push({
@@ -385,6 +393,7 @@ export class RunMachine {
       if (cost > this.run.coins) throw new InvalidAction('not enough coins');
       this.actions.push(a);
       this.run.coins -= cost;
+      this.run.totals.coinsSpent += cost;
       this.shopView = { kind: 'shop', items: rollShop(this.run, this.rng.shop), rerolls: v.rerolls + 1 };
       this.view = this.shopView;
     } else if (v.kind === 'reward' && v.canReroll && this.run.rerollsLeft > 0) {
@@ -514,7 +523,8 @@ export class RunMachine {
       run.coins += summary.interest;
     }
     const healFrac = node === 'boss' ? BOSS_HEAL : v.reward?.kind === 'heal' ? HEAL_DOOR : 0;
-    const healAmount = Math.round(run.maxHp * healFrac) + (run.blessings.includes('mending') ? 3 : 0);
+    const healAmount =
+      Math.round(run.maxHp * healFrac) + (run.blessings.includes('mending') ? 3 : 0) + run.bonuses.healAfterFight;
     summary.healed = Math.min(run.maxHp - run.hp, healAmount);
     run.hp += summary.healed;
     if (node === 'boss') this.report.bossesBeaten.push(run.bosses[run.act - 1]);

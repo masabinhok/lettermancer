@@ -110,3 +110,37 @@ export function accuracy(s: Stats): number {
   }
   return n + err ? n / (n + err) : 1;
 }
+
+/** Key mastery ranks: 0 none, 1 bronze, 2 silver, 3 gold. */
+export type MasteryRank = 0 | 1 | 2 | 3;
+export const MASTERY_NAMES = ['Unranked', 'Bronze', 'Silver', 'Gold'] as const;
+/** [max average ms between keys, max error rate] to reach each rank; samples needed first. */
+export const MASTERY_RULES = {
+  samples: 30,
+  tiers: [
+    [380, 0.1],
+    [270, 0.05],
+    [190, 0.025],
+  ] as const,
+};
+
+/** Rank every letter by lifetime speed and accuracy. */
+export function keyMastery(s: Stats): Record<string, MasteryRank> {
+  const out: Record<string, MasteryRank> = {};
+  for (const k of 'abcdefghijklmnopqrstuvwxyz') {
+    const v = s.keys[k];
+    let rank: MasteryRank = 0;
+    if (v && v.n + v.err >= MASTERY_RULES.samples && v.latN > 0) {
+      const lat = v.lat / v.latN;
+      const err = v.err / (v.n + v.err);
+      MASTERY_RULES.tiers.forEach(([ms, e], i) => {
+        if (lat <= ms && err <= e) rank = (i + 1) as MasteryRank;
+      });
+    }
+    out[k] = rank;
+  }
+  return out;
+}
+
+/** Correct keystrokes across all time. */
+export const totalCorrect = (s: Stats): number => Object.values(s.keys).reduce((n, v) => n + v.n, 0);

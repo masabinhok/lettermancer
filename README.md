@@ -98,6 +98,22 @@ Each act has one of two bosses, each with phases that change the rules as it wea
   if you pause, capital letters, punctuation, pricier shops. Each level adds **Heat**, which multiplies your score.
 - **Gentle pace** makes enemies slower and weaker while you're learning. Gentle runs don't count for leaderboards.
 
+## Between runs: the Scriptorium
+
+You return to the Scriptorium after every run. The **Archivist** remembers how your last run went and has advice.
+
+- **Ink** comes from every run (more at higher Heat). Spend it in the **Codex of Hands** on small permanent
+  upgrades: a little more health, starting coins, starting combo, rerolls. Prices rise with each rank, so your
+  typing stays the main source of power.
+- **Gold Leaf** comes from beating bosses and winning under Oaths. It buys the rarest upgrades: an extra boon choice,
+  a guaranteed Rare first boon, and a Second Wind.
+- **Keepsakes** are found by reaching milestones. Carry one into each run; it levels up the more you carry it.
+- **Prophecies** are 60+ achievements for speed, accuracy, combos, bosses, builds, exploration and key mastery.
+  They pay **Seals**, which the Archivist trades for Gold Leaf.
+- The **Codex** fills in with every foe, boss and boon you meet.
+- **Key mastery**: every letter earns Bronze, Silver and Gold as you get faster and cleaner at it.
+- Your Oath limit rises as you win: you can carry two more Heat than the most you've won at.
+
 ## Learning while you play
 
 - Every keystroke is timed. Keys that are slow or error-prone get a weakness score, and about 30% of enemy words are

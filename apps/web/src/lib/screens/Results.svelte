@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { heat, keyWeakness, nemesisBigram, runScore, STARTERS, topWeakKeys } from '@keycraft/engine';
+  import { heat, KEEPSAKES, keyWeakness, nemesisBigram, runScore, STARTERS, topWeakKeys } from '@keycraft/engine';
   import { untrack } from 'svelte';
   import type { Session } from '../game/session.svelte';
   import { profile } from '../stores/profile.svelte';
@@ -90,6 +90,24 @@
       </p>
     </section>
   </div>
+
+  {#if session.award}
+    {@const a = session.award}
+    <section class="earned" aria-label="What you earned">
+      <p class="purse">
+        <span><b class="ink">✒ {a.ink}</b> Ink</span>
+        {#if a.leaf}<span><b class="leaf">❧ {a.leaf}</b> Gold Leaf</span>{/if}
+        {#if a.seals}<span><b class="seal">✪ {a.seals}</b> Seals</span>{/if}
+      </p>
+      {#each a.prophecies as p (p.id)}
+        <p class="prophecy"><b>✦ {p.name}</b> {p.desc}</p>
+      {/each}
+      {#each a.keepsakes as k (k)}
+        <p class="prophecy"><b>New keepsake: {KEEPSAKES[k].name}.</b> {KEEPSAKES[k].levels[0]}</p>
+      {/each}
+      {#if a.keepsakeLevel}<p class="prophecy"><b>Your keepsake reached level {a.keepsakeLevel}.</b></p>{/if}
+    </section>
+  {/if}
 
   {#if session.unlocked.length}
     <p class="unlock">
@@ -186,6 +204,37 @@
     text-align: center;
     color: var(--moon-dim);
     font-size: var(--t-sm);
+  }
+  .earned {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+  }
+  .purse {
+    display: flex;
+    gap: var(--space-5);
+    color: var(--moon-dim);
+  }
+  .purse b {
+    font-family: var(--f-display);
+    font-size: var(--t-lg);
+  }
+  .ink {
+    color: var(--echo);
+  }
+  .leaf {
+    color: var(--gold-bright);
+  }
+  .seal {
+    color: var(--rose);
+  }
+  .prophecy {
+    font-size: var(--t-sm);
+    color: var(--moon-dim);
+  }
+  .prophecy b {
+    color: var(--gold-bright);
   }
   .unlock {
     padding: var(--space-2) var(--space-4);

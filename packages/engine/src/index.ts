@@ -12,3 +12,5 @@ export * from './state';
 export * from './stats';
 export * from './words';
 export { default as WORDS } from './content/words.json';
+export * from './content/progression';
+export * from './content/prophecies';

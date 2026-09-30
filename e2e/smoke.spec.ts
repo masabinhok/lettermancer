@@ -92,3 +92,20 @@ test('choosing a muse door leads to that muse offering boons', async ({ page }) 
   }
   await expect(page.locator('[data-screen="reward"] h1')).toContainText(`${muse} offers a boon`);
 });
+
+test('the Scriptorium opens its stations from the keyboard', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('[data-screen="title"]')).toBeVisible();
+  await expect(page.getByText('The Archivist')).toBeVisible();
+  for (const [key, screen] of [
+    ['h', 'codex-of-hands'],
+    ['k', 'keepsakes'],
+    ['p', 'prophecies'],
+    ['c', 'codex'],
+  ]) {
+    await page.keyboard.press(key);
+    await expect(page.locator(`[data-screen="${screen}"]`)).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator(`[data-screen="${screen}"]`)).toHaveCount(0);
+  }
+});
