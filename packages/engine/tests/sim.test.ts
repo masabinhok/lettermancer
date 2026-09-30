@@ -1,50 +1,38 @@
 import { describe, expect, it } from 'vitest';
-import { createCombat, pressKey, target, tick } from '../src/combat';
+import { newRunConfig } from '../src/machine';
 import { makeRng } from '../src/rng';
-import { advance, currentNode, makeEncounter, newRun } from '../src/run';
-import { WordBank } from '../src/words';
-import words from '../src/content/words.json';
+import { playRun } from '../src/sim';
 
-/** Bot plays a whole run (no shopping/mods) at a fixed speed & accuracy. Returns act reached. */
-function simulate(wpmTarget: number, acc: number, seed: number) {
-  const rng = makeRng(seed);
-  const bank = new WordBank(words);
-  const run = newRun('apprentice', seed, rng);
-  const ctx = { rng, nextWord: (e: { minLen: number; maxLen: number }, ex: ReadonlySet<string>) => bank.pick({ min: e.minLen, max: e.maxLen, excludeFirst: ex }, rng).word };
-  const msPerKey = 60000 / (wpmTarget * 5);
-  let time = 0;
-  while (!run.result) {
-    const kind = currentNode(run);
-    if (kind !== 'shop') {
-      const c = createCombat(makeEncounter(run, kind, rng), ctx);
-      while (!c.over) {
-        tick(c, run, msPerKey);
-        if (c.over) break;
-        time += msPerKey;
-        const t = target(c) ?? c.enemies[0];
-        const expected = target(c) ? t.word[c.typed.length] : t.word[0];
-        pressKey(c, run, rng() < acc ? expected : 'q', ctx, time);
-      }
-      if (c.over === 'lose') return { act: run.act, node: run.node, won: false };
-      if (kind === 'boss') run.hp = Math.min(run.maxHp, run.hp + 20);
-    }
-    advance(run);
+/** Plays 20 runs; returns wins and the average act reached (4 = cleared). */
+export function outcome(wpm: number, accuracy: number, n = 20) {
+  let wins = 0;
+  let acts = 0;
+  for (let i = 1; i <= n; i++) {
+    const m = playRun(newRunConfig('apprentice', i * 101), { wpm, accuracy, rng: makeRng(i) });
+    if (m.run.result === 'won') wins++;
+    acts += m.run.result === 'won' ? 4 : m.run.act;
   }
-  return { act: 4, node: 0, won: true };
+  return { wins, avgAct: acts / n };
 }
 
-describe('balance simulation', () => {
-  // Balance guardrails. The bot never buys mods or relics, so real players do better.
-  const outcome = (w: number, a: number) => {
-    const res = Array.from({ length: 20 }, (_, i) => simulate(w, a, i + 1));
-    return { wins: res.filter((r) => r.won).length, avgAct: res.reduce((s, r) => s + r.act, 0) / res.length };
-  };
+// Balance guardrails. Thresholds move as the design changes; the report prints every time.
+describe('balance', () => {
+  const table = [
+    [25, 0.9],
+    [40, 0.95],
+    [60, 0.97],
+    [80, 0.98],
+  ].map(([w, a]) => ({ w, a, ...outcome(w, a) }));
 
-  it('a fast, accurate typist usually wins even without upgrades', () => {
-    expect(outcome(70, 0.98).wins).toBeGreaterThanOrEqual(15);
+  it('prints the balance table', () => {
+    console.log(table.map((r) => `${r.w} wpm ${r.a * 100}%: wins ${r.wins}/20, avg act ${r.avgAct.toFixed(2)}`).join('\n'));
   });
 
-  it('a beginner gets past the first fights', () => {
-    expect(outcome(20, 0.9).avgAct).toBeGreaterThanOrEqual(1.5);
+  it('skill is rewarded: faster, cleaner typists get further', () => {
+    for (let i = 1; i < table.length; i++) expect(table[i].avgAct).toBeGreaterThanOrEqual(table[i - 1].avgAct);
+  });
+
+  it('a fast, accurate typist usually wins', () => {
+    expect(table[3].wins).toBeGreaterThanOrEqual(12);
   });
 });

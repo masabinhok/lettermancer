@@ -26,3 +26,11 @@ export function shuffle<T>(rng: Rng, arr: T[]): T[] {
 
 /** Pick `n` distinct items. */
 export const sample = <T>(rng: Rng, arr: readonly T[], n: number): T[] => shuffle(rng, [...arr]).slice(0, n);
+
+/** Independent seed for a named random stream, so e.g. shop rolls don't shift word picks. */
+export function deriveSeed(seed: number, stream: number): number {
+  let h = (seed ^ Math.imul(stream + 1, 0x9e3779b1)) >>> 0;
+  h = Math.imul(h ^ (h >>> 16), 0x85ebca6b) >>> 0;
+  h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35) >>> 0;
+  return (h ^ (h >>> 16)) >>> 0;
+}
