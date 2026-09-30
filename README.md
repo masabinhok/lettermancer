@@ -114,6 +114,20 @@ You return to the Scriptorium after every run. The **Archivist** remembers how y
 - **Key mastery**: every letter earns Bronze, Silver and Gold as you get faster and cleaner at it.
 - Your Oath limit rises as you win: you can carry two more Heat than the most you've won at.
 
+## Practice desk
+
+Press **R** in the Scriptorium to practice outside of runs:
+
+- **Time** (15/30/60/120 s) and **Words** (10/25/50/100) tests, with optional punctuation and numbers.
+- **Quotes** from public-domain literature.
+- **Adaptive lessons** that start with six letters and unlock the next one only when you type the newest letter
+  quickly and cleanly.
+- **Trials**: tests with a bar to clear. They pay Gold Leaf, and most let you swear one more Heat of Oaths.
+
+Results show speed, raw speed, accuracy, consistency, a per-second chart, and the letters you slowed down on.
+Practice earns a little Ink (capped daily) and keeps a daily streak. **Tab** restarts, **Esc** leaves, and the
+interface fades while you type.
+
 ## Learning while you play
 
 - Every keystroke is timed. Keys that are slow or error-prone get a weakness score, and about 30% of enemy words are

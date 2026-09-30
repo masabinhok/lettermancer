@@ -109,3 +109,16 @@ test('the Scriptorium opens its stations from the keyboard', async ({ page }) =>
     await expect(page.locator(`[data-screen="${screen}"]`)).toHaveCount(0);
   }
 });
+
+test('a 10-word practice test gives a result with a speed chart', async ({ page }) => {
+  await page.goto('/practice');
+  await expect(page.locator('[data-screen="practice"]')).toBeVisible();
+  await page.getByRole('tab', { name: 'Words' }).click();
+  await page.getByRole('button', { name: '10', exact: true }).click();
+  for (let i = 0; i < 400 && !(await page.locator('.result').count()); i++) {
+    const k = await page.locator('.text .caret').textContent();
+    await page.keyboard.press(k!);
+  }
+  await expect(page.locator('.result .big')).toContainText('wpm');
+  await expect(page.locator('.result svg[role="img"]')).toBeVisible();
+});

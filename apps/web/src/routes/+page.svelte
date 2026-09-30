@@ -99,6 +99,7 @@
     else if (k === 'k') panel = 'keepsakes';
     else if (k === 'p') panel = 'prophecies';
     else if (k === 'c') panel = 'codex';
+    else if (k === 'r') nav('/practice');
     else if (k === 'g') toggleGentle();
     else if (k === 'x') trade();
     else if (STARTER_IDS[i] && meta.unlocked.includes(STARTER_IDS[i])) selected = STARTER_IDS[i];
@@ -212,6 +213,11 @@
           <span class="g">✦</span><span class="n">Prophecies</span><span class="h"
             >{fulfilled} of {PROPHECIES.length} fulfilled</span
           ><kbd>P</kbd>
+        </button>
+        <button class="station" onclick={() => nav('/practice')} type="button">
+          <span class="g">✎</span><span class="n">Practice desk</span><span class="h"
+            >{meta.practice.streak ? `${meta.practice.streak}-day streak` : 'Tests, lessons and trials'}</span
+          ><kbd>R</kbd>
         </button>
         <button class="station" onclick={open('codex')} type="button">
           <span class="g">❦</span><span class="n">Codex</span><span class="h">Foes, bosses and boons</span><kbd>C</kbd>

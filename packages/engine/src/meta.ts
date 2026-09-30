@@ -15,6 +15,8 @@ import {
   type UpgradeRanks,
 } from './content/progression';
 import { PROPHECIES, type PracticeSummary, type ProphecyDef } from './content/prophecies';
+import { TRIALS, type TrialDef } from './content/trials';
+import type { PracticeResult } from './practice';
 import type { Run, RunBonuses, StarterId } from './state';
 import type { MasteryRank } from './stats';
 
@@ -83,6 +85,8 @@ export interface Meta {
   practice: PracticeProgress;
   /** Archivist lines already heard */
   heard: string[];
+  /** ids of trials passed */
+  trialsPassed: string[];
 }
 
 export const defaultMeta = (): Meta => ({
@@ -109,6 +113,7 @@ export const defaultMeta = (): Meta => ({
   lastRun: null,
   practice: { streak: 0, lastDay: null, best: {}, inkToday: 0, inkDay: null, lessonLetters: 6 },
   heard: [],
+  trialsPassed: [],
 });
 
 /** Fill in fields added in later versions, so old saves keep working. */
@@ -151,8 +156,9 @@ export function applyUnlocks(meta: Meta, check: UnlockCheck): StarterId[] {
 
 // ---------- Oaths ----------
 
-/** How much Heat you may carry: two more than the most you have won at. */
-export const heatCap = (meta: Meta): number => meta.maxHeatWon + 2;
+/** How much Heat you may carry: two more than the most you have won at, plus one per Heat trial passed. */
+export const heatCap = (meta: Meta): number =>
+  meta.maxHeatWon + 2 + TRIALS.filter((t) => t.raisesHeat && meta.trialsPassed.includes(t.id)).length;
 
 /** Trim sworn Oaths down to the cap, highest levels last. */
 export function clampOaths(meta: Meta): OathLevels {
@@ -426,4 +432,63 @@ export function archivistLine(meta: Meta): { id: string; text: string } {
     'I have read every run you have written. The later pages are better.',
   ];
   return { id: 'general', text: general[meta.runs % general.length] };
+}
+
+// ---------- practice ----------
+
+export const PRACTICE_INK_PER_DAY = 60;
+
+export interface PracticeAward {
+  ink: number;
+  streak: number;
+  newBest: boolean;
+  trials: TrialDef[];
+}
+
+const dayBefore = (day: string) => {
+  const d = new Date(`${day}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().slice(0, 10);
+};
+
+/**
+ * Record a finished practice test: daily streak, personal best, capped Ink, and trials.
+ * `day` is the player's local date as YYYY-MM-DD. Mutates `meta`.
+ */
+export function recordPractice(
+  meta: Meta,
+  r: PracticeResult,
+  day: string,
+  trialId: string | null = null,
+): PracticeAward {
+  const p = meta.practice;
+  if (p.lastDay !== day) p.streak = p.lastDay === dayBefore(day) ? p.streak + 1 : 1;
+  p.lastDay = day;
+
+  const newBest = r.seconds >= 10 && r.wpm > (p.best[r.testId] ?? 0);
+  if (newBest) p.best[r.testId] = r.wpm;
+
+  if (p.inkDay !== day) {
+    p.inkDay = day;
+    p.inkToday = 0;
+  }
+  const earned = Math.round((r.seconds / 10) * Math.max(0.5, Math.min(2, r.wpm / 40)) * r.accuracy ** 2);
+  const ink = Math.max(0, Math.min(earned, PRACTICE_INK_PER_DAY - p.inkToday));
+  p.inkToday += ink;
+  meta.ink += ink;
+
+  const trials: TrialDef[] = [];
+  const t = trialId ? TRIALS.find((x) => x.id === trialId) : null;
+  if (
+    t &&
+    !meta.trialsPassed.includes(t.id) &&
+    r.testId === `${t.mode}-${t.amount}${t.punctuation ? '-punct' : ''}` &&
+    r.wpm >= t.minWpm &&
+    r.accuracy >= t.minAccuracy
+  ) {
+    meta.trialsPassed.push(t.id);
+    meta.leaf += t.leaf;
+    trials.push(t);
+  }
+  return { ink, streak: p.streak, newBest, trials };
 }
