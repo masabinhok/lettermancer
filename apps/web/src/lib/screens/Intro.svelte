@@ -1,6 +1,6 @@
 <!-- Title card before an act or a boss. The fight clock waits until the player is ready. -->
 <script lang="ts">
-  import { BOSSES } from '@keycraft/engine';
+  import { ACT_BASE, BOSSES } from '@keycraft/engine';
   import { FIELD } from '../game/look';
   import type { Session } from '../game/session.svelte';
   import Button from '../ui/Button.svelte';
@@ -10,10 +10,10 @@
   const intro = $derived(session.intro!);
   const boss = $derived(intro.kind === 'boss' ? BOSSES[session.machine.run.bosses[intro.act - 1]] : null);
 
-  const ACTS = [
-    { name: 'The Home Row', line: 'Short words, slow foes. Find your rhythm.' },
-    { name: 'The Glyph Wastes', line: 'Longer words. Enemies that strike sooner.' },
-    { name: 'The Unicode Abyss', line: 'The deepest ink. Every typo costs.' },
+  const LINES = [
+    'Short words and slow foes. Find your rhythm, and choose your muses.',
+    'Longer words, armored hides, and foes that steal your combo.',
+    'The deepest ink. Wardens, shifters and swarms. Every typo costs.',
   ];
   const numeral = (n: number) => ['I', 'II', 'III'][n - 1];
 
@@ -40,8 +40,8 @@
     <p class="line">{boss.desc}</p>
   {:else}
     <p class="kicker">Act {numeral(intro.act)}</p>
-    <h1>{ACTS[intro.act - 1].name}</h1>
-    <p class="line">{ACTS[intro.act - 1].line}</p>
+    <h1>{ACT_BASE[intro.act - 1].name}</h1>
+    <p class="line">{LINES[intro.act - 1]}</p>
   {/if}
   <Button hotkey="Enter" onclick={() => session.dismissIntro()}>Begin</Button>
 </div>

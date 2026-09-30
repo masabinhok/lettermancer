@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { keyWeakness, nemesisBigram, STARTERS, topWeakKeys } from '@keycraft/engine';
+  import { heat, keyWeakness, nemesisBigram, runScore, STARTERS, topWeakKeys } from '@keycraft/engine';
   import { untrack } from 'svelte';
   import type { Session } from '../game/session.svelte';
   import { profile } from '../stores/profile.svelte';
@@ -22,6 +22,8 @@
   const acc = t.correct + t.errors ? (t.correct / (t.correct + t.errors)) * 100 : 100;
   const weak = topWeakKeys(run.stats, 3);
   const nem = nemesisBigram(run.stats);
+  const score = runScore(run);
+  const runHeat = heat(run.oaths);
   const minutes = Math.floor(typingMs / 60000);
   const seconds = Math.round((typingMs % 60000) / 1000);
 
@@ -47,6 +49,10 @@
 
   <div class="columns">
     <dl class="stats">
+      <div class="score">
+        <dt>Score{runHeat ? ` at Heat ${runHeat}` : ''}{run.gentle ? ' (gentle pace)' : ''}</dt>
+        <dd>{score.toLocaleString()}</dd>
+      </div>
       <div>
         <dt>Average speed</dt>
         <dd>{Math.round(avgWpm)} <small>wpm</small></dd>
@@ -142,6 +148,13 @@
     grid-template-columns: repeat(2, auto);
     gap: var(--space-4) var(--space-6);
     margin: 0;
+  }
+  .score {
+    grid-column: span 2;
+  }
+  .score dd {
+    color: var(--gold-bright);
+    font-size: var(--t-3xl);
   }
   dt {
     font-size: var(--t-sm);

@@ -5,6 +5,8 @@ async function enterFight(page: Page) {
   await expect(page.locator('[data-screen="intro"]')).toBeVisible();
   await page.waitForTimeout(350); // the title card ignores an Enter pressed right away
   await page.keyboard.press('Enter');
+  await expect(page.locator('[data-screen="doors"]')).toBeVisible();
+  await page.keyboard.press('1'); // the first doors are always fights
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
 }
 
@@ -62,4 +64,31 @@ test('the pause menu opens your build', async ({ page }) => {
   await page.getByRole('button', { name: 'Your build' }).click();
   await expect(page.locator('[data-screen="build"]')).toBeVisible();
   await expect(page.locator('[data-screen="build"]')).toContainText('Ember');
+});
+
+test('choosing a muse door leads to that muse offering boons', async ({ page }) => {
+  await page.goto('/run?starter=apprentice');
+  await expect(page.locator('[data-screen="intro"]')).toBeVisible();
+  await page.waitForTimeout(350);
+  await page.keyboard.press('Enter');
+  const muse = (await page.locator('.door .title').first().textContent())!.trim();
+  await page.keyboard.press('1');
+  await expect(page.locator('[data-screen="combat"]')).toBeVisible();
+  // Type until the fight is won.
+  for (let i = 0; i < 400; i++) {
+    if (await page.locator('[data-screen="reward"]').count()) break;
+    const next = page.locator('.enemy.targeted .l.next');
+    const k = (await next.count())
+      ? await next.textContent()
+      : (
+          await page
+            .locator('.enemy .word')
+            .first()
+            .textContent()
+            .catch(() => '')
+        )?.trim()[0];
+    if (k) await page.keyboard.press(k);
+    else await page.waitForTimeout(50);
+  }
+  await expect(page.locator('[data-screen="reward"] h1')).toContainText(`${muse} offers a boon`);
 });

@@ -8,7 +8,11 @@ import {
   RunMachine,
   type Action,
   type MachineEvent,
+  type OathLevels,
+  type Run,
+  type RunBonuses,
   type RunConfig,
+  type RunMode,
   type StarterId,
   type View,
 } from '@keycraft/engine';
@@ -16,7 +20,7 @@ import { profile, readStore, writeStore } from '../stores/profile.svelte';
 import { combatSnapshot, type CombatSnap } from './snapshot';
 
 const SAVE_KEY = 'keycraft.run.v1';
-/** Autosave cadence during combat. */
+/** Autosave cadence while a clock is running. */
 const SAVE_EVERY_MS = 2000;
 const RECENT_WORDS = 40;
 
@@ -28,38 +32,52 @@ interface SavedRun {
 export type Intro = { kind: 'act'; act: number } | { kind: 'boss'; act: number } | null;
 export type Listener = (ev: MachineEvent) => void;
 
+export interface StartOptions {
+  starter: StarterId;
+  oaths?: OathLevels;
+  bonuses?: RunBonuses;
+  gentle?: boolean;
+  mode?: RunMode;
+  seed?: number;
+}
+
 export class Session {
   machine: RunMachine;
   /** re-assigned after every change so Svelte re-renders */
   view = $state.raw<View>(null!);
   snap = $state.raw<CombatSnap | null>(null);
+  /** a fresh shallow copy of the run after every change, so screens re-render */
+  run = $state.raw<Run>(null!);
   /** true while the window is unfocused or the pause menu is open */
   paused = $state(false);
-  /** an act/boss title card shown before combat starts; the clock holds until it is dismissed */
+  /** an act/boss title card; the clock holds until it is dismissed */
   intro = $state<Intro>(null);
   /** starters unlocked during this run */
   unlocked = $state<StarterId[]>([]);
-  /** the last words enemies carried, newest last — the install screen reads letter use from these */
+  /** the last words enemies carried — the install screen reads letter use from these */
   recentWords: string[] = [];
 
   // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a plain registry, never rendered
   private listeners = new Set<Listener>();
-  private combatStart = 0;
+  private clockStart = 0;
   private pausedAt: number | null = null;
   private lastSave = 0;
   private raf = 0;
 
-  constructor(machine: RunMachine) {
+  constructor(machine: RunMachine, fresh: boolean) {
     this.machine = machine;
     this.sync();
-    if (this.view.kind === 'combat') {
-      this.intro = { kind: this.isBossFight() ? 'boss' : 'act', act: machine.run.act };
-    }
+    if (fresh) this.intro = { kind: 'act', act: 1 };
   }
 
-  static start(starter: StarterId): Session {
-    const cfg = newRunConfig(starter, (Math.random() * 2 ** 32) >>> 0, keyWeakness(profile.stats));
-    const s = new Session(new RunMachine(cfg));
+  static start(o: StartOptions): Session {
+    const cfg = newRunConfig(o.starter, o.seed ?? (Math.random() * 2 ** 32) >>> 0, keyWeakness(profile.stats), {
+      oaths: o.oaths,
+      bonuses: o.bonuses,
+      gentle: o.gentle,
+      mode: o.mode,
+    });
+    const s = new Session(new RunMachine(cfg), true);
     s.persist();
     return s;
   }
@@ -71,10 +89,9 @@ export class Session {
     try {
       const m = RunMachine.replay(saved.config, saved.actions);
       if (m.view.kind === 'over') return null;
-      const s = new Session(m);
-      // Resuming mid-fight: start paused so the player isn't hit while getting ready.
-      if (m.view.kind === 'combat' && m.combat!.time > 0) {
-        s.intro = null;
+      const s = new Session(m, false);
+      // Mid-fight or mid-challenge: start paused so the player isn't hit while getting ready.
+      if (m.clock !== null) {
         s.startClock();
         s.pause();
       }
@@ -96,16 +113,16 @@ export class Session {
 
   // ---------- clock ----------
 
-  /** Combat time in ms, derived from the wall clock minus paused time. */
+  /** Time on the current fight or challenge clock, derived from the wall clock minus paused time. */
   private now(): number {
-    const c = this.machine.combat;
-    if (!c) return 0;
+    const clock = this.machine.clock;
+    if (clock === null) return 0;
     const t = this.pausedAt ?? performance.now();
-    return Math.max(c.time, Math.round(t - this.combatStart));
+    return Math.max(clock, Math.round(t - this.clockStart));
   }
 
   private clockRunning(): boolean {
-    return this.view.kind === 'combat' && !this.intro && !this.paused;
+    return this.machine.clock !== null && !this.intro && !this.paused;
   }
 
   mount(): void {
@@ -134,11 +151,11 @@ export class Session {
   unpause(): void {
     if (!this.paused) return;
     this.paused = false;
-    if (this.pausedAt !== null) this.combatStart += performance.now() - this.pausedAt;
+    if (this.pausedAt !== null) this.clockStart += performance.now() - this.pausedAt;
     this.pausedAt = null;
   }
 
-  /** Dismiss the act/boss title card and start the fight clock. */
+  /** Dismiss the act/boss title card. */
   dismissIntro(): void {
     if (!this.intro) return;
     this.intro = null;
@@ -146,16 +163,14 @@ export class Session {
   }
 
   startClock(): void {
-    const c = this.machine.combat;
-    this.combatStart = performance.now() - (c?.time ?? 0);
+    this.clockStart = performance.now() - (this.machine.clock ?? 0);
     if (this.paused) this.pausedAt = performance.now();
   }
 
   // ---------- player actions ----------
 
   key(k: string): void {
-    if (!this.clockRunning()) return;
-    this.dispatch({ t: 'key', k, at: this.now() });
+    if (this.clockRunning()) this.dispatch({ t: 'key', k, at: this.now() });
   }
 
   backspace(): void {
@@ -163,11 +178,22 @@ export class Session {
   }
 
   untarget(): void {
-    if (this.clockRunning()) this.dispatch({ t: 'untarget', at: this.now() });
+    if (this.clockRunning() && this.view.kind === 'combat') this.dispatch({ t: 'untarget', at: this.now() });
+  }
+
+  door(i: number): void {
+    this.dispatch({ t: 'door', i });
   }
 
   pick(i: number): void {
     this.dispatch({ t: 'pick', i });
+  }
+
+  option(i: number): boolean {
+    const v = this.view;
+    if (v.kind !== 'event' || v.outcome !== null || !v.options[i]?.enabled) return false;
+    this.dispatch({ t: 'option', i });
+    return true;
   }
 
   install(k: string | null): void {
@@ -185,8 +211,10 @@ export class Session {
 
   reroll(): boolean {
     const v = this.view;
-    if (v.kind !== 'shop' || this.machine.run.coins < 3 + v.rerolls) return false;
-    this.dispatch({ t: 'reroll' });
+    const run = this.machine.run;
+    if (v.kind === 'shop' && run.coins >= 3 + v.rerolls) this.dispatch({ t: 'reroll' });
+    else if (v.kind === 'reward' && v.canReroll && run.rerollsLeft > 0) this.dispatch({ t: 'reroll' });
+    else return false;
     return true;
   }
 
@@ -197,12 +225,7 @@ export class Session {
   /** Give up the run. It is recorded as a loss. */
   abandon(): void {
     const m = this.machine;
-    profile.recordRun(
-      { ...m.report, result: 'lost', act: m.run.act, node: m.run.node },
-      m.config.seed,
-      false,
-      m.run.act,
-    );
+    profile.recordRun({ ...m.report, result: 'lost', act: m.run.act, room: m.run.room }, m.config, m.run);
     clearSave();
   }
 
@@ -213,28 +236,24 @@ export class Session {
     const ev = this.machine.dispatch(a);
     this.handle(ev);
     this.sync();
-    // Entering a new fight: show a title card for acts and bosses, otherwise start the clock.
-    if (this.view.kind === 'combat' && before !== 'combat') {
-      if (ev.some((e) => e.t === 'new-act')) this.intro = { kind: 'act', act: this.machine.run.act };
-      else if (this.isBossFight()) this.intro = { kind: 'boss', act: this.machine.run.act };
-      else this.startClock();
-    }
+    const v = this.view;
+    if (ev.some((e) => e.t === 'new-act')) this.intro = { kind: 'act', act: this.machine.run.act };
+    else if (v.kind === 'combat' && before !== 'combat' && v.node === 'boss')
+      this.intro = { kind: 'boss', act: this.machine.run.act };
+    else if ((v.kind === 'combat' || v.kind === 'challenge') && before !== v.kind) this.startClock();
     if (a.t !== 'time' && a.t !== 'key' && a.t !== 'bs' && a.t !== 'untarget') this.persist();
-  }
-
-  private isBossFight(): boolean {
-    return this.view.kind === 'combat' && this.view.node === 'boss';
   }
 
   private sync(): void {
     const m = this.machine;
     for (const e of m.combat?.enemies ?? []) {
-      if (this.recentWords.at(-1) !== e.word && !this.recentWords.slice(-4).includes(e.word)) {
+      if (!this.recentWords.slice(-6).includes(e.word)) {
         this.recentWords.push(e.word);
         if (this.recentWords.length > RECENT_WORDS) this.recentWords.shift();
       }
     }
-    this.view = m.view.kind === 'combat' ? { ...m.view } : m.view;
+    this.view = m.view.kind === 'combat' || m.view.kind === 'challenge' ? { ...m.view } : m.view;
+    this.run = { ...m.run };
     this.snap = m.combat ? combatSnapshot(m.combat, m.run) : null;
   }
 
@@ -256,7 +275,7 @@ export class Session {
       } else if (e.t === 'bought' || e.t === 'installed') {
         this.gain(profile.unlock({ coins: run.coins }));
       } else if (e.t === 'run-end') {
-        profile.recordRun(this.machine.report, this.machine.config.seed, e.result === 'won', run.act);
+        profile.recordRun(this.machine.report, this.machine.config, run);
         clearSave();
       }
       for (const fn of this.listeners) fn(e);
@@ -271,13 +290,13 @@ export class Session {
     this.lastSave = performance.now();
     if (this.machine.view.kind === 'over') return;
     let at: number | undefined;
-    if (this.machine.combat && !this.intro) {
+    if (this.machine.clock !== null && !this.intro) {
       at = this.now();
       // Advance through the session first so any hits on the way reach the effects.
       this.dispatch({ t: 'time', at });
       const kind = this.machine.view.kind as View['kind'];
       if (kind === 'over') return;
-      if (kind !== 'combat') at = undefined;
+      if (this.machine.clock === null) at = undefined;
     }
     writeStore(SAVE_KEY, this.machine.save(at));
   }

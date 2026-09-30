@@ -1,3 +1,4 @@
+import type { OathLevels } from './content/oaths';
 import type { StarterId } from './state';
 
 export type KeyboardMode = 'full' | 'compact' | 'hidden';
@@ -11,6 +12,10 @@ export interface Meta {
   lastStarter: StarterId;
   /** finished (or skipped) the tutorial */
   prologueDone: boolean;
+  /** the Oaths the player has sworn for their next run */
+  oaths: OathLevels;
+  /** Gentle pace assist for the next run */
+  gentle: boolean;
 }
 
 export const defaultMeta = (): Meta => ({
@@ -20,6 +25,8 @@ export const defaultMeta = (): Meta => ({
   unlocked: ['apprentice'],
   lastStarter: 'apprentice',
   prologueDone: false,
+  oaths: {},
+  gentle: false,
 });
 
 export interface UnlockCheck {

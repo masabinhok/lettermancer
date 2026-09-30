@@ -4,11 +4,11 @@ import { makeRng } from '../src/rng';
 import { playRun } from '../src/sim';
 
 /** Plays 20 runs; returns wins and the average act reached (4 = cleared). */
-export function outcome(wpm: number, accuracy: number, n = 20) {
+export function outcome(wpm: number, accuracy: number, n = 20, gentle = false) {
   let wins = 0;
   let acts = 0;
   for (let i = 1; i <= n; i++) {
-    const m = playRun(newRunConfig('apprentice', i * 101), { wpm, accuracy, rng: makeRng(i) });
+    const m = playRun(newRunConfig('apprentice', i * 101, {}, { gentle }), { wpm, accuracy, rng: makeRng(i) });
     if (m.run.result === 'won') wins++;
     acts += m.run.result === 'won' ? 4 : m.run.act;
   }
@@ -35,6 +35,21 @@ describe('balance', () => {
   });
 
   it('a fast, accurate typist usually wins', () => {
-    expect(table[3].wins).toBeGreaterThanOrEqual(12);
+    expect(table[3].wins).toBeGreaterThanOrEqual(15);
+  });
+
+  it('a slow, sloppy typist rarely wins without upgrades', () => {
+    expect(table[0].wins).toBeLessThanOrEqual(3);
+  });
+
+  it('a 40 wpm typist wins some and loses some', () => {
+    expect(table[1].wins).toBeGreaterThanOrEqual(3);
+    expect(table[1].wins).toBeLessThanOrEqual(16);
+  });
+
+  it('gentle pace lets a beginner make real progress', () => {
+    const gentle = outcome(25, 0.9, 20, true);
+    console.log(`25 wpm gentle: wins ${gentle.wins}/20, avg act ${gentle.avgAct.toFixed(2)}`);
+    expect(gentle.avgAct).toBeGreaterThanOrEqual(2);
   });
 });

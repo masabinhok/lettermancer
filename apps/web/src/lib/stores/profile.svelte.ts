@@ -7,8 +7,11 @@ import {
   defaultMeta,
   emptyStats,
   mergeStats,
+  heat,
   type KeyboardMode,
   type Meta,
+  type Run,
+  type RunConfig,
   type RunReport,
   type StarterId,
   type Stats,
@@ -72,6 +75,9 @@ export function writeStore(key: string, value: unknown): void {
 export interface StoredReport extends RunReport {
   date: string;
   seed: number;
+  mode: RunConfig['mode'];
+  heat: number;
+  gentle: boolean;
 }
 
 class Profile {
@@ -102,12 +108,20 @@ class Profile {
     return earned;
   }
 
-  recordRun(report: RunReport, seed: number, won: boolean, act: number): void {
+  recordRun(report: RunReport, config: RunConfig, run: Run): void {
+    const won = report.result === 'won';
     this.meta.runs++;
     if (won) this.meta.wins++;
-    this.meta.bestAct = Math.max(this.meta.bestAct, won ? 4 : act);
+    this.meta.bestAct = Math.max(this.meta.bestAct, won ? 4 : run.act);
     this.saveMeta();
-    const entry: StoredReport = { ...report, date: new Date().toISOString(), seed };
+    const entry: StoredReport = {
+      ...report,
+      date: new Date().toISOString(),
+      seed: config.seed,
+      mode: config.mode,
+      heat: heat(config.oaths),
+      gentle: config.gentle,
+    };
     this.analytics = [entry, ...this.analytics].slice(0, ANALYTICS_KEPT);
     writeStore(KEYS.analytics, this.analytics);
   }

@@ -17,7 +17,7 @@
   let flashKind = $state<'hurt' | 'miss' | null>(null);
 
   const snap = $derived(session.snap!);
-  const run = $derived(session.machine.run);
+  const run = $derived(session.run);
   const settings = profile.settings;
   const isBlackout = $derived(snap.enemies.some((e) => e.rule === 'blackout'));
   const nextTier = $derived(COMBO_TIERS[snap.tier + 1]);
@@ -57,7 +57,11 @@
         break;
       case 'hit': {
         sfx.hit(ev.crit);
-        floatText(enemyEl(ev.enemyId), `${ev.dmg}${ev.crit ? '!' : ''}`, ev.crit ? 'ft-crit' : 'ft-dmg');
+        floatText(
+          enemyEl(ev.enemyId),
+          `${ev.dmg}${ev.crit ? '!' : ''}${ev.armored ? ' (armored)' : ''}`,
+          ev.crit ? 'ft-crit' : 'ft-dmg',
+        );
         burstAt(glyphEl(ev.enemyId), ev.crit ? '#f3d98c' : '#ddd7ea', ev.crit ? 34 : 16);
         const el = enemyEl(ev.enemyId);
         el?.animate(
@@ -117,6 +121,47 @@
         floatText(stage.querySelector('.keyboard'), `${ev.key.toUpperCase()}'s Glass shattered`, 'ft-bad');
         burstAt(stage.querySelector('.keyboard'), MODS.glass.color, 40, 300);
         break;
+      case 'zap':
+        sfx.zap();
+        floatText(enemyEl(ev.enemyId), `ϟ ${ev.dmg}`, 'ft-spark');
+        break;
+      case 'cold-snap':
+        floatText(comboEl, 'Cold snap', 'ft-frost');
+        for (const e of snap.enemies) burstAt(enemyEl(e.id)?.querySelector('.threat'), MODS.frost.color, 8, 120);
+        break;
+      case 'combo-drain':
+        floatText(comboEl, `combo stolen (${ev.lost})`, 'ft-bad');
+        break;
+      case 'enemy-heal':
+        floatText(enemyEl(ev.enemyId), `+${ev.amount}`, 'ft-heal');
+        motesAt(glyphEl(ev.enemyId), '#7fe0b0', 8);
+        break;
+      case 'enemy-shield':
+        floatText(enemyEl(ev.enemyId), `◈ ${ev.amount}`, 'ft-frost');
+        break;
+      case 'enemy-shield-break':
+        burstAt(enemyEl(ev.enemyId)?.querySelector('.hp'), MODS.frost.color, 16, 200);
+        break;
+      case 'word-shift':
+        sfx.select();
+        break;
+      case 'wave':
+        floatText(stage.querySelector('.field'), `Wave ${ev.wave}`, 'ft-combo');
+        break;
+      case 'phase':
+        sfx.tierUp(ev.phase + 1);
+        shake(stage, 'big');
+        floatText(enemyEl(ev.enemyId), 'It changes', 'ft-crit');
+        burstAt(glyphEl(ev.enemyId), '#e24b6e', 50, 400);
+        break;
+      case 'typo-hurt':
+        floatText(stage.querySelector('.hud .hp'), `−${ev.dmg}`, 'ft-hurt');
+        break;
+      case 'second-wind':
+        sfx.boon();
+        floatText(stage.querySelector('.hud .hp'), 'Second wind', 'ft-heal');
+        motesAt(stage.querySelector('.hud .hp'), '#7fe0b0', 30);
+        break;
       case 'fight-end':
         sfx.setIntensity(0);
         break;
@@ -149,7 +194,7 @@
     shield={snap.shield}
     coins={snap.coins}
     act={run.act}
-    node={run.node}
+    room={run.room}
     relics={run.relics}
     {onbuild}
   />

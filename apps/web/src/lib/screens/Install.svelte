@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { letterShare, MAX_MODS_PER_KEY, MODS, WORDS } from '@keycraft/engine';
+  import { letterShare, MAX_MODS_PER_KEY, MODS, RARITY_NAMES, WORDS } from '@keycraft/engine';
+  import { RARITY_COLOR } from '../game/look';
   import * as sfx from '../fx/audio';
   import { motesAt } from '../fx/particles';
   import type { Session } from '../game/session.svelte';
@@ -10,7 +11,7 @@
 
   let { session, onbuild }: { session: Session; onbuild?: () => void } = $props();
   const v = $derived(session.view.kind === 'install' ? session.view : null);
-  const run = $derived(session.machine.run);
+  const run = $derived(session.run);
   let wrap = $state<HTMLElement>();
 
   const share = letterShare(WORDS);
@@ -28,7 +29,7 @@
 
   function install(k: string) {
     if (!v) return;
-    motesAt(wrap?.querySelector(`[data-key="${k}"]`), MODS[v.mod].color, 24);
+    motesAt(wrap?.querySelector(`[data-key="${k}"]`), MODS[v.mod.mod].color, 24);
     sfx.boon();
     session.install(k);
   }
@@ -48,12 +49,21 @@
 </script>
 
 {#if v}
-  {@const m = MODS[v.mod]}
+  {@const m = MODS[v.mod.mod]}
+  {@const already = Object.entries(run.keyMods)
+    .filter(([, b]) => b.some((x) => x.mod === v.mod.mod))
+    .map(([k]) => k.toUpperCase())}
   <div class="screen" data-screen="install" bind:this={wrap}>
-    <Hud hp={run.hp} maxHp={run.maxHp} coins={run.coins} act={run.act} node={run.node} relics={run.relics} {onbuild} />
+    <Hud hp={run.hp} maxHp={run.maxHp} coins={run.coins} act={run.act} room={run.room} relics={run.relics} {onbuild} />
     <div class="body">
       <h1>Press the key that should carry <span style:color={m.color}>{m.glyph} {m.name}</span></h1>
-      <p class="desc">{m.desc}</p>
+      <p class="desc">
+        <span style:color={RARITY_COLOR[v.mod.rarity]}>{RARITY_NAMES[v.mod.rarity]}.</span>
+        {m.describe(v.mod.rarity)}
+      </p>
+      {#if already.length}<p class="desc">
+          Press {already.join(' or ')} to make that {m.name} one rarity stronger instead.
+        </p>{/if}
       <Keyboard
         keyMods={run.keyMods}
         layout={profile.settings.layout}
@@ -73,7 +83,7 @@
       {/if}
       <p class="tip">
         The percentage on each key is how often that letter appears in enemy words. A key holds {MAX_MODS_PER_KEY} powers;
-        a third replaces the oldest, and the same power twice stacks.
+        a third replaces the oldest.
       </p>
       <Button kind="quiet" hotkey="Esc" onclick={() => session.install(null)}>Discard</Button>
     </div>

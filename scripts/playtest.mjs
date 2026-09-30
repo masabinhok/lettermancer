@@ -49,7 +49,20 @@ while (Date.now() - t0 < MINUTES * 60_000) {
       seen.add(s);
     }
   }
-  if (s === 'title' || s === 'intro') {
+  if (s === 'doors') {
+    await wait(300);
+    await page.keyboard.press(String(1 + Math.floor(Math.random() * 2)));
+    await wait(400);
+  } else if (s === 'event') {
+    await wait(300);
+    const outcome = await page.evaluate(() => !!document.querySelector('.outcome'));
+    await page.keyboard.press(outcome ? 'Enter' : '1');
+    await wait(400);
+  } else if (s === 'challenge') {
+    const k = await page.evaluate(() => document.querySelector('.text .next')?.textContent);
+    if (k) await page.keyboard.press(k === '␣' ? ' ' : k);
+    await wait(msPerKey);
+  } else if (s === 'title' || s === 'intro') {
     await page.keyboard.press('Enter');
     await wait(500);
   } else if (s === 'results') {
@@ -59,7 +72,8 @@ while (Date.now() - t0 < MINUTES * 60_000) {
     await wait(200);
   } else if (s === 'reward') {
     await wait(400);
-    await page.keyboard.press('1');
+    const cards = await page.locator('[data-screen="reward"] .card').count();
+    await page.keyboard.press(cards ? '1' : 'Enter');
     await wait(400);
   } else if (s === 'install') {
     await wait(300);
@@ -98,7 +112,7 @@ while (Date.now() - t0 < MINUTES * 60_000) {
       await page.keyboard.press('q');
       await wait(msPerKey);
     }
-    await page.keyboard.press(k);
+    await page.keyboard.press(k === '␣' ? ' ' : k);
     await wait(msPerKey * (0.6 + Math.random() * 0.8));
   } else {
     await wait(200);

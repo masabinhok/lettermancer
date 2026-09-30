@@ -14,6 +14,7 @@
     sold = false,
     ornate = false,
     detail = null,
+    rarityColor = null,
     onselect,
   }: {
     hotkey: string;
@@ -27,6 +28,8 @@
     sold?: boolean;
     ornate?: boolean;
     detail?: string | null;
+    /** colors the kind line to show rarity */
+    rarityColor?: string | null;
     onselect: () => void;
   } = $props();
 </script>
@@ -47,7 +50,7 @@
     />{/if}
   <kbd class="hk">{hotkey}</kbd>
   <span class="sigil" aria-hidden="true">{glyph}</span>
-  <span class="kind">{kind}</span>
+  <span class="kind" style:color={rarityColor}>{kind}</span>
   <span class="name">{name}</span>
   <span class="desc">{desc}</span>
   {#if detail}<span class="detail">{detail}</span>{/if}

@@ -1,6 +1,6 @@
 <!-- Run status: health, shield, coins, where you are in the act, and your relics. -->
 <script lang="ts">
-  import { ACT_LAYOUT, RELICS, type NodeKind, type RelicId } from '@keycraft/engine';
+  import { RELICS, ROOMS_PER_ACT, type RelicId } from '@keycraft/engine';
   import Bar from './Bar.svelte';
 
   let {
@@ -9,7 +9,7 @@
     shield = 0,
     coins,
     act,
-    node,
+    room,
     relics,
     onbuild,
   }: {
@@ -18,13 +18,13 @@
     shield?: number;
     coins: number;
     act: number;
-    node: number;
+    /** rooms cleared this act; ROOMS_PER_ACT means the boss */
+    room: number;
     relics: RelicId[];
     onbuild?: () => void;
   } = $props();
 
-  const NODE_NAME: Record<NodeKind, string> = { fight: 'Fight', elite: 'Elite', shop: 'Shop', boss: 'Boss' };
-  const NODE_GLYPH: Record<NodeKind, string> = { fight: '⚔', elite: '◆', shop: '⚖', boss: '☠' };
+  const rooms = [...Array(ROOMS_PER_ACT + 1).keys()];
   const numeral = (n: number) => ['I', 'II', 'III', 'IV'][n - 1] ?? String(n);
 </script>
 
@@ -40,14 +40,14 @@
   <nav class="path" aria-label="Act progress">
     <span class="act">Act {numeral(act)}</span>
     <ol>
-      {#each ACT_LAYOUT as kind, i (i)}
-        <li class:done={i < node} class:here={i === node} class={kind} title={NODE_NAME[kind]}>
-          <span aria-hidden="true">{NODE_GLYPH[kind]}</span>
-          <span class="sr-only">{NODE_NAME[kind]}{i === node ? ' (you are here)' : ''}</span>
+      {#each rooms as i (i)}
+        {@const boss = i === ROOMS_PER_ACT}
+        <li class:done={i < room} class:here={i === room} class:boss>
+          <span aria-hidden="true">{boss ? '☠' : ''}</span>
         </li>
       {/each}
     </ol>
-    <span class="here-name">{NODE_NAME[ACT_LAYOUT[node]]}</span>
+    <span class="here-name">{room >= ROOMS_PER_ACT ? 'Boss' : `Room ${room + 1} of ${ROOMS_PER_ACT}`}</span>
   </nav>
 
   <div class="right">
@@ -118,8 +118,8 @@
     position: relative;
   }
   ol li {
-    width: 24px;
-    height: 24px;
+    width: 14px;
+    height: 14px;
     display: grid;
     place-items: center;
     font-size: 0.8rem;
@@ -139,12 +139,16 @@
     border-color: var(--gold-bright);
     box-shadow: 0 0 12px -2px var(--gold);
   }
+  ol li.boss {
+    width: 22px;
+    height: 22px;
+  }
   ol li.boss:not(.here) {
     border-color: color-mix(in oklab, var(--rose) 60%, var(--rule));
     color: var(--rose);
   }
   .here-name {
-    min-width: 3.5em;
+    min-width: 7.5em;
     color: var(--moon-dim);
     font-size: var(--t-sm);
   }

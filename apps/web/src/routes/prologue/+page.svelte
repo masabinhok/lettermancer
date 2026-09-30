@@ -172,7 +172,7 @@
           hotkey="E"
           glyph={MODS.ember.glyph}
           name={MODS.ember.name}
-          desc={MODS.ember.desc}
+          desc={MODS.ember.describe(0)}
           color={MODS.ember.color}
           kind="Your first power"
           onselect={() => onkeydown(new KeyboardEvent('keydown', { key: 'e' }))}

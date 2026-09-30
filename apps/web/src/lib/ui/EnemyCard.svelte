@@ -1,16 +1,17 @@
-<!-- One enemy: its illuminated initial, health, the word you must type, and when it will strike. -->
+<!-- One enemy: its illuminated initial, health, what it does, the word you must type, and when it strikes. -->
 <script lang="ts">
-  import { MODS } from '@keycraft/engine';
-  import { FIELD, letterColors } from '../game/look';
-  import { profile } from '../stores/profile.svelte';
+  import { BOSSES, MODS } from '@keycraft/engine';
+  import { FIELD, letterColors, TRAIT_INFO } from '../game/look';
   import type { EnemySnap } from '../game/snapshot';
+  import { profile } from '../stores/profile.svelte';
   import Bar from './Bar.svelte';
   import Initial from './Initial.svelte';
 
   let { e }: { e: EnemySnap } = $props();
-  const size = $derived(e.kind === 'boss' ? 112 : e.kind === 'elite' ? 92 : e.kind === 'head' ? 56 : 76);
-  const harmless = $derived(e.atk === 0 || e.msToHit > 60_000);
+  const size = $derived(e.kind === 'boss' ? 104 : e.kind === 'elite' ? 88 : e.kind === 'minion' ? 52 : 72);
   const secs = $derived(Math.ceil(e.msToHit / 100) / 10);
+  const harmless = $derived(e.atk === 0 || e.msToHit > 60_000);
+  const phases = $derived(e.rule ? BOSSES[e.rule].phases.length + 1 : 0);
 </script>
 
 <article
@@ -18,6 +19,7 @@
   class:targeted={e.targeted}
   class:windup={e.windup}
   class:danger={e.intent > 0.75}
+  class:shifting={e.shifting}
   data-enemy={e.id}
   aria-label="{e.name}, {e.hp} health, word {e.word}"
 >
@@ -30,27 +32,43 @@
       ink={e.windup ? 'var(--rose)' : undefined}
     />
   </div>
-  <h3 class="name">{e.name}</h3>
-  <div class="hp"><Bar value={e.hp} max={e.maxHp} tone="foe" height={14} label={String(e.hp)} /></div>
-  <div class="status">
-    {#if e.burn > 0}<span class="burn">▲ Burning {e.burn}</span>{/if}
+  <h3 class="name">
+    {e.name}
+    {#if phases > 1}<span class="phase" title="Phase {e.phase} of {phases}"
+        >{#each Array(phases) as _, i (i)}<i class:on={i < e.phase}></i>{/each}</span
+      >{/if}
+  </h3>
+  <div class="hp">
+    <Bar value={e.hp} max={e.maxHp} tone="foe" height={14} label={String(e.hp)} />
+    {#if e.shield > 0}<span class="eshield" title="Shield: absorbs damage first">◈ {e.shield}</span>{/if}
   </div>
+  {#if e.traits.length || e.burn > 0}
+    <ul class="traits">
+      {#each e.traits as t (t)}
+        <li title={TRAIT_INFO[t]?.desc}>{TRAIT_INFO[t]?.name ?? t}</li>
+      {/each}
+      {#if e.burn > 0}<li class="burn">▲ Burning {e.burn}</li>{/if}
+    </ul>
+  {/if}
 
   <p class="word" class:blacked={e.letters.some((l) => l.hidden)} aria-hidden="true">
     {#each e.letters as l, i (i)}
-      {@const c = letterColors(l.mods)}
+      {@const c = letterColors(l.boons)}
       <span
         class="l {l.state}"
         class:modded={!!c.fill}
-        class:stacked={l.mods.length > 1}
+        class:stacked={l.boons.length > 1}
+        class:masked={l.masked}
+        class:space={l.ch === ' '}
         style:--fill={c.fill}
         style:--under={c.under}
-        >{#if profile.settings.powerSymbols && l.mods.length && !l.hidden}<span class="sym"
-            >{l.mods.map((m) => MODS[m].glyph).join('')}</span
-          >{/if}{l.hidden ? '·' : l.ch}</span
+        >{#if profile.settings.powerSymbols && l.boons.length && !l.hidden && !l.masked}<span class="sym"
+            >{l.boons.map((b) => MODS[b.mod].glyph).join('')}</span
+          >{/if}{l.hidden ? '·' : l.masked ? '_' : l.ch === ' ' ? '␣' : l.ch}</span
       >
     {/each}
   </p>
+  {#if e.shifting}<p class="warn">Its word is about to change</p>{/if}
 
   <div class="threat">
     {#if harmless}
@@ -69,12 +87,12 @@
 <style>
   .enemy {
     position: relative;
-    width: 300px;
-    padding: var(--space-4) var(--space-4) var(--space-3);
+    width: 290px;
+    padding: var(--space-3) var(--space-4) var(--space-3);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-2);
+    gap: 6px;
     background: linear-gradient(180deg, rgba(44, 36, 66, 0.9), rgba(26, 20, 40, 0.9));
     border: 1px solid var(--rule);
     border-radius: 2px;
@@ -91,15 +109,15 @@
     }
   }
   .elite {
-    width: 340px;
+    width: 330px;
     border-color: var(--gold-deep);
   }
   .boss {
     width: 440px;
     border-color: color-mix(in oklab, var(--rose) 50%, var(--gold-deep));
   }
-  .head {
-    width: 220px;
+  .minion {
+    width: 200px;
   }
   .targeted {
     border-color: var(--moon);
@@ -133,47 +151,76 @@
     }
   }
   .name {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
     font-size: var(--t-sm);
     color: var(--moon-dim);
     margin-top: var(--space-2);
   }
+  .phase {
+    display: inline-flex;
+    gap: 3px;
+  }
+  .phase i {
+    width: 7px;
+    height: 7px;
+    transform: rotate(45deg);
+    border: 1px solid var(--rose);
+  }
+  .phase i.on {
+    background: var(--rose);
+  }
   .hp {
     width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
   }
-  .status {
-    min-height: 1.1em;
+  .eshield {
+    flex: none;
     font-size: var(--t-xs);
+    font-weight: 700;
+    color: var(--frost);
   }
-  .burn {
+  .traits {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .traits li {
+    font-size: var(--t-xs);
+    padding: 0 6px;
+    border: 1px solid var(--rule);
+    color: var(--moon-dim);
+    cursor: help;
+  }
+  .traits .burn {
     color: var(--ember);
+    border-color: color-mix(in oklab, var(--ember) 40%, transparent);
   }
   .word {
-    margin: var(--space-2) 0;
+    margin: var(--space-1) 0;
     font-family: var(--f-type);
     font-weight: 600;
-    font-size: 2.6rem;
+    font-size: 2.5rem;
     line-height: 1.2;
     letter-spacing: 0.01em;
     white-space: nowrap;
   }
   .boss .word {
-    font-size: 2.9rem;
+    font-size: 2.6rem;
   }
-  .head .word {
-    font-size: 2rem;
+  .minion .word {
+    font-size: 1.9rem;
   }
   .l {
     display: inline-block;
     position: relative;
-  }
-  .sym {
-    position: absolute;
-    left: 50%;
-    top: -0.55em;
-    transform: translateX(-50%);
-    font-size: 0.32em;
-    letter-spacing: 0;
-    color: var(--fill);
   }
   .l.modded {
     color: var(--fill);
@@ -191,6 +238,21 @@
   .l.stacked::after {
     height: 4px;
     background: linear-gradient(180deg, var(--fill) 0 50%, var(--under) 50%);
+  }
+  .l.masked {
+    color: var(--rose);
+  }
+  .l.space {
+    color: var(--moon-faint);
+  }
+  .sym {
+    position: absolute;
+    left: 50%;
+    top: -0.55em;
+    transform: translateX(-50%);
+    font-size: 0.32em;
+    letter-spacing: 0;
+    color: var(--fill);
   }
   .l.done {
     opacity: 0.5;
@@ -216,6 +278,19 @@
   }
   .blacked .l:not(.done) {
     color: var(--moon-faint);
+  }
+  .shifting .word {
+    animation: flicker 0.2s infinite alternate;
+  }
+  @keyframes flicker {
+    to {
+      opacity: 0.55;
+    }
+  }
+  .warn {
+    font-size: var(--t-xs);
+    color: var(--spark);
+    margin-top: -4px;
   }
   .threat {
     width: 100%;

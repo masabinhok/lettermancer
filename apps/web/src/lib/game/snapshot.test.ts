@@ -5,6 +5,7 @@ import { combatSnapshot, WINDUP_MS } from './snapshot';
 describe('combatSnapshot', () => {
   it('marks typed, next and remaining letters and previews damage', () => {
     const m = new RunMachine(newRunConfig('apprentice', 3));
+    m.dispatch({ t: 'door', i: 0 });
     const word = m.combat!.enemies[0].word;
     m.dispatch({ t: 'key', k: word[0], at: 200 });
     const s = combatSnapshot(m.combat!, m.run);
@@ -18,6 +19,7 @@ describe('combatSnapshot', () => {
 
   it('flags the wind-up in the last second before a hit', () => {
     const m = new RunMachine(newRunConfig('apprentice', 3));
+    m.dispatch({ t: 'door', i: 0 });
     const e = m.combat!.enemies[0];
     m.dispatch({ t: 'time', at: e.intentMs - WINDUP_MS - 100 });
     expect(combatSnapshot(m.combat!, m.run).enemies[0].windup).toBe(false);

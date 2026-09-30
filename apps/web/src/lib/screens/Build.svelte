@@ -1,23 +1,34 @@
-<!-- Your whole build at a glance: every key's powers and every relic, with what they do. -->
+<!-- Your whole build at a glance: every key's powers, every blessing and relic, with what they do. -->
 <script lang="ts">
-  import { MODS, RELICS, type KeyMods, type ModId, type RelicId } from '@keycraft/engine';
+  import {
+    BLESSINGS,
+    isDuo,
+    MODS,
+    MUSES,
+    RARITY_NAMES,
+    RELICS,
+    type BlessingId,
+    type KeyMods,
+    type RelicId,
+  } from '@keycraft/engine';
+  import { RARITY_COLOR } from '../game/look';
   import { profile } from '../stores/profile.svelte';
   import Button from '../ui/Button.svelte';
   import Frame from '../ui/Frame.svelte';
   import Keyboard from '../ui/Keyboard.svelte';
 
-  let { keyMods, relics, onclose }: { keyMods: KeyMods; relics: RelicId[]; onclose: () => void } = $props();
+  let {
+    keyMods,
+    relics,
+    blessings = [],
+    onclose,
+  }: { keyMods: KeyMods; relics: RelicId[]; blessings?: BlessingId[]; onclose: () => void } = $props();
 
   const keys = $derived(
     Object.entries(keyMods)
       .filter(([, m]) => m.length)
       .sort(([a], [b]) => a.localeCompare(b)),
   );
-  const count = (mods: ModId[]) => {
-    const c: Partial<Record<ModId, number>> = {};
-    for (const m of mods) c[m] = (c[m] ?? 0) + 1;
-    return Object.entries(c) as [ModId, number][];
-  };
 
   export function onKey(k: string): boolean {
     if (k === 'Escape' || k === 'b' || k === 'Enter') {
@@ -38,14 +49,15 @@
           <h3>Key powers</h3>
           {#if keys.length}
             <ul>
-              {#each keys as [k, mods] (k)}
+              {#each keys as [k, boons] (k)}
                 <li>
                   <kbd>{k.toUpperCase()}</kbd>
                   <span>
-                    {#each count(mods) as [m, n] (m)}
+                    {#each boons as b, i (i)}
                       <span class="power"
-                        ><b style:color={MODS[m].color}>{MODS[m].glyph} {MODS[m].name}{n > 1 ? ` ×${n}` : ''}</b>
-                        {MODS[m].desc}</span
+                        ><b style:color={MODS[b.mod].color}>{MODS[b.mod].glyph} {MODS[b.mod].name}</b>
+                        <em style:color={RARITY_COLOR[b.rarity]}>{RARITY_NAMES[b.rarity]}</em>
+                        {MODS[b.mod].describe(b.rarity)}</span
                       >
                     {/each}
                   </span>
@@ -53,11 +65,33 @@
               {/each}
             </ul>
           {:else}
-            <p class="empty">No powers yet. Win a fight to bind one to a key.</p>
+            <p class="empty">No powers yet. Win a fight behind a muse's door to bind one to a key.</p>
           {/if}
         </section>
         <section>
-          <h3>Relics</h3>
+          <h3>Blessings</h3>
+          {#if blessings.length}
+            <ul>
+              {#each blessings as id (id)}
+                {@const bl = BLESSINGS[id]}
+                <li>
+                  <span class="rglyph" style:color={MUSES[bl.muses[0]].color}>{bl.glyph}</span>
+                  <span
+                    ><b>{bl.name}</b>
+                    <em
+                      >{isDuo(id)
+                        ? `Duo of ${bl.muses.map((m) => MUSES[m].name).join(' and ')}`
+                        : MUSES[bl.muses[0]].name}</em
+                    >
+                    {bl.desc}</span
+                  >
+                </li>
+              {/each}
+            </ul>
+          {:else}
+            <p class="empty">No blessings yet. Muses offer them alongside their key power.</p>
+          {/if}
+          <h3 class="gap">Relics</h3>
           {#if relics.length}
             <ul>
               {#each relics as r (r)}
@@ -88,7 +122,7 @@
     overflow: auto;
   }
   .inner {
-    width: min(900px, 94vw);
+    width: min(980px, 94vw);
     max-height: 92vh;
     overflow: auto;
     padding: var(--space-5) var(--space-6);
@@ -112,6 +146,9 @@
     color: var(--gold);
     margin-bottom: var(--space-2);
   }
+  h3.gap {
+    margin-top: var(--space-4);
+  }
   ul {
     list-style: none;
     margin: 0;
@@ -134,6 +171,12 @@
   b {
     color: var(--moon);
     font-weight: 700;
+  }
+  em {
+    font-style: normal;
+    font-size: var(--t-xs);
+    margin: 0 4px;
+    color: var(--moon-faint);
   }
   .rglyph {
     font-family: var(--f-glyph);

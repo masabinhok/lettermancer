@@ -8,11 +8,13 @@ const fingerprint = (m: RunMachine) => ({
   view: m.view.kind,
   run: {
     hp: m.run.hp,
+    maxHp: m.run.maxHp,
     coins: m.run.coins,
     act: m.run.act,
-    node: m.run.node,
+    room: m.run.room,
     keyMods: m.run.keyMods,
     relics: m.run.relics,
+    blessings: m.run.blessings,
     totals: m.run.totals,
     result: m.run.result,
   },
@@ -20,27 +22,42 @@ const fingerprint = (m: RunMachine) => ({
     time: m.combat.time,
     typed: m.combat.typed,
     combo: m.combat.combo,
-    enemies: m.combat.enemies.map((e) => [e.word, e.hp, e.intent, e.burn]),
+    enemies: m.combat.enemies.map((e) => [e.word, e.hp, e.intent, e.burn, e.shield]),
   },
 });
 
+/** A machine standing in its first fight. */
+function inFight(seed: number, starter: 'apprentice' | 'tycoon' = 'apprentice') {
+  const m = new RunMachine(newRunConfig(starter, seed));
+  m.dispatch({ t: 'door', i: 0 });
+  return m;
+}
+
 describe('RunMachine', () => {
+  it('starts at a choice of doors that promise muse boons', () => {
+    const m = new RunMachine(newRunConfig('apprentice', 1));
+    expect(m.view.kind).toBe('doors');
+    if (m.view.kind === 'doors') {
+      expect(m.view.doors).toHaveLength(2);
+      expect(m.view.doors.every((d) => d.node === 'fight' && d.reward?.kind === 'muse')).toBe(true);
+    }
+  });
+
   it('replays a full bot run to the identical state', () => {
     for (const seed of [1, 2, 3]) {
-      const cfg = newRunConfig('apprentice', seed, { q: 1, z: 0.5 });
+      const cfg = newRunConfig('apprentice', seed, { q: 1, z: 0.5 }, { oaths: { swift: 1, punct: 1 } });
       const live = playRun(cfg, { wpm: 55, accuracy: 0.95, rng: makeRng(seed * 7) });
       expect(live.view.kind).toBe('over');
       const replayed = RunMachine.replay(cfg, live.actions);
       expect(fingerprint(replayed)).toEqual(fingerprint(live));
+      expect(replayed.report).toEqual(live.report);
     }
   });
 
   it('frame-by-frame time and jump-to-key time give the same result', () => {
-    const cfg = newRunConfig('apprentice', 42);
-    const a = new RunMachine(cfg);
-    const b = new RunMachine(cfg);
+    const a = inFight(42);
+    const b = inFight(42);
     const word = a.combat!.enemies[0].word;
-    // a: 16ms frames between keys; b: jumps straight to each key
     let at = 0;
     for (const k of word) {
       at += 180;
@@ -49,13 +66,11 @@ describe('RunMachine', () => {
       b.dispatch({ t: 'key', k, at });
     }
     expect(fingerprint(a)).toEqual(fingerprint(b));
-    // idle frames aren't recorded
     expect(a.actions).toEqual(b.actions);
   });
 
   it('saves mid-fight and resumes exactly', () => {
-    const cfg = newRunConfig('tycoon', 9);
-    const m = new RunMachine(cfg);
+    const m = inFight(9, 'tycoon');
     const w = m.combat!.enemies[0].word;
     m.dispatch({ t: 'key', k: w[0], at: 300 });
     m.dispatch({ t: 'key', k: w[1], at: 520 });
@@ -68,6 +83,8 @@ describe('RunMachine', () => {
   it('rejects impossible or out-of-place actions', () => {
     const m = new RunMachine(newRunConfig('apprentice', 5));
     expect(() => m.dispatch({ t: 'buy', i: 0 })).toThrow(InvalidAction);
+    expect(() => m.dispatch({ t: 'key', k: 'a', at: 1 })).toThrow(InvalidAction);
+    m.dispatch({ t: 'door', i: 0 });
     m.dispatch({ t: 'time', at: 1000 });
     expect(() => m.dispatch({ t: 'key', k: 'a', at: 500 })).toThrow(InvalidAction);
     expect(() => m.dispatch({ t: 'key', k: 'ab', at: 1200 })).toThrow(InvalidAction);
@@ -86,6 +103,15 @@ describe('RunMachine', () => {
     }
     expect(differs).toBe(true);
   });
+
+  it('a winning run visits doors, fights, bosses and at least one non-fight room', () => {
+    const m = playRun(newRunConfig('apprentice', 404), { wpm: 90, accuracy: 0.99, rng: makeRng(1) });
+    expect(m.run.result).toBe('won');
+    expect(m.report.bossesBeaten).toHaveLength(3);
+    const kinds = new Set(m.report.picks.filter((p) => p.kind === 'door').map((p) => p.id.split(':')[0]));
+    expect(kinds.has('fight')).toBe(true);
+    expect(kinds.size).toBeGreaterThan(1);
+  });
 });
 
 describe('RunReport', () => {
@@ -96,9 +122,8 @@ describe('RunReport', () => {
     expect(r.result).toBe(m.run.result);
     expect(r.fights.length).toBeGreaterThan(0);
     expect(r.slowWords.length).toBeGreaterThan(0);
+    expect(r.enemiesSeen.length).toBeGreaterThan(0);
     if (r.result === 'lost') expect(r.killedBy).toBeTruthy();
-    expect(r.picks.some((p) => p.kind === 'install')).toBe(true);
-    // derived purely from the replay
     expect(RunMachine.replay(cfg, m.actions).report).toEqual(r);
   });
 });

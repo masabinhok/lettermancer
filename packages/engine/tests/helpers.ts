@@ -24,5 +24,6 @@ export const spec = (over: Partial<EnemySpec> = {}): EnemySpec => ({
   intentMs: 5000,
   minLen: 3,
   maxLen: 5,
+  traits: [],
   ...over,
 });

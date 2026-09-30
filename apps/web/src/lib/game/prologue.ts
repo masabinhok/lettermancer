@@ -42,6 +42,7 @@ const foe = (name: string, glyph: string, hp: number, over: Partial<EnemySpec> =
   intentMs: 1e9,
   minLen: 3,
   maxLen: 6,
+  traits: [],
   ...over,
 });
 
@@ -131,14 +132,14 @@ export class PrologueFight {
   start(step: PrologueStep): void {
     this.queue = [...(step.words ?? [])];
     this.run.hp = this.run.maxHp;
-    this.combat = step.enemies ? createCombat(structuredClone(step.enemies), this.ctx) : null;
+    this.combat = step.enemies ? createCombat([structuredClone(step.enemies)], this.ctx, this.run) : null;
   }
 
   advance(to: number): CombatEvent[] {
     const c = this.combat;
     const ev: CombatEvent[] = [];
     if (!c) return ev;
-    while (!c.over && c.time + STEP_MS <= to) ev.push(...tick(c, this.run, STEP_MS));
+    while (!c.over && c.time + STEP_MS <= to) ev.push(...tick(c, this.run, STEP_MS, this.ctx));
     return ev;
   }
 

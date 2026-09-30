@@ -2,6 +2,7 @@
   import { nav } from '$lib/nav';
   import {
     accuracy,
+    heat,
     keyWeakness,
     MODS,
     nemesisBigram,
@@ -11,6 +12,7 @@
     type StarterId,
   } from '@keycraft/engine';
   import { Session } from '$lib/game/session.svelte';
+  import Oaths from '$lib/screens/Oaths.svelte';
   import Settings from '$lib/screens/Settings.svelte';
   import { profile } from '$lib/stores/profile.svelte';
   import Button from '$lib/ui/Button.svelte';
@@ -23,12 +25,19 @@
   const hasSave = Session.hasSave();
   let selected = $state<StarterId>(meta.unlocked.includes(meta.lastStarter) ? meta.lastStarter : 'apprentice');
   let settingsOpen = $state(false);
+  let oathsOpen = $state(false);
   let settings = $state<{ onKey(k: string): boolean }>();
+  const heatNow = $derived(heat(meta.oaths));
 
   const weak = $derived(topWeakKeys(profile.stats, 3));
   const nem = $derived(nemesisBigram(profile.stats));
   const played = $derived(meta.runs > 0);
   const firstTime = !meta.prologueDone && meta.runs === 0;
+
+  function toggleGentle() {
+    meta.gentle = !meta.gentle;
+    profile.saveMeta();
+  }
 
   function start() {
     meta.lastStarter = selected;
@@ -38,7 +47,7 @@
 
   function onkeydown(e: KeyboardEvent) {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
-    if (settingsOpen) {
+    if (settingsOpen || oathsOpen) {
       if (settings?.onKey(e.key)) e.preventDefault();
       return;
     }
@@ -50,6 +59,8 @@
     } else if (e.key === 'n' && (hasSave || firstTime)) start();
     else if (e.key === 't') nav('/prologue');
     else if (e.key === 's') settingsOpen = true;
+    else if (e.key === 'o') oathsOpen = true;
+    else if (e.key === 'g') toggleGentle();
     else if (STARTER_IDS[i] && meta.unlocked.includes(STARTER_IDS[i])) selected = STARTER_IDS[i];
     else return;
     e.preventDefault();
@@ -80,9 +91,18 @@
       {:else}
         <Button hotkey="Enter" onclick={start}>Begin a run</Button>
       {/if}
+      <Button kind="quiet" hotkey="O" onclick={() => (oathsOpen = true)}
+        >Oaths{heatNow ? ` (Heat ${heatNow})` : ''}</Button
+      >
       <Button kind="quiet" hotkey="S" onclick={() => (settingsOpen = true)}>Settings</Button>
       {#if !firstTime}<Button kind="quiet" hotkey="T" onclick={() => nav('/prologue')}>Tutorial</Button>{/if}
     </div>
+
+    <label class="gentle">
+      <input type="checkbox" checked={meta.gentle} onchange={toggleGentle} />
+      <span>Gentle pace <kbd>G</kbd></span>
+      <small>Slower, weaker enemies while you learn. Gentle runs don't count for leaderboards.</small>
+    </label>
 
     <h2>Choose your keyboard</h2>
     <div class="starters" role="radiogroup" aria-label="Starting keyboard">
@@ -106,9 +126,9 @@
           {:else}
             <span class="desc">{s.desc}</span>
             <span class="chips">
-              {#each Object.entries(s.keyMods) as [k, mods] (k)}
-                {#each mods as m, j (j)}
-                  <span class="chip" style:--c={MODS[m].color}>{k.toUpperCase()} {MODS[m].glyph}</span>
+              {#each Object.entries(s.keyMods) as [k, boons] (k)}
+                {#each boons as b, j (j)}
+                  <span class="chip" style:--c={MODS[b.mod].color}>{k.toUpperCase()} {MODS[b.mod].glyph}</span>
                 {/each}
               {/each}
             </span>
@@ -143,6 +163,7 @@
 </div>
 
 {#if settingsOpen}<Settings bind:this={settings} onclose={() => (settingsOpen = false)} />{/if}
+{#if oathsOpen}<Oaths bind:this={settings} onclose={() => (oathsOpen = false)} />{/if}
 
 <style>
   .title {
@@ -184,6 +205,24 @@
     max-width: 52ch;
     font-size: var(--t-lg);
     color: var(--moon-dim);
+  }
+  .gentle {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: var(--space-2);
+    align-items: center;
+    color: var(--moon);
+    cursor: pointer;
+  }
+  .gentle input {
+    accent-color: var(--witchfire);
+    width: 18px;
+    height: 18px;
+  }
+  .gentle small {
+    grid-column: 2;
+    color: var(--moon-faint);
+    font-size: var(--t-sm);
   }
   .actions {
     display: flex;

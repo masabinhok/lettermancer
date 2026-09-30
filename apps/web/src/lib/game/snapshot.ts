@@ -2,10 +2,21 @@
  * Plain, immutable render data built from the live combat each frame.
  * Keeping this pure makes the combat screen trivially reactive and easy to test.
  */
-import { comboTier, COMBO_TIERS, resolveWord, type Combat, type Enemy, type ModId, type Run } from '@keycraft/engine';
+import {
+  blackoutVisibleMs,
+  comboTier,
+  COMBO_TIERS,
+  intentRate,
+  resolveWord,
+  SHIFT_WARN_MS,
+  TRAIT_EVERY,
+  type Combat,
+  type Enemy,
+  type KeyBoon,
+  type Run,
+  type Trait,
+} from '@keycraft/engine';
 
-/** Blackout words vanish this long after appearing. */
-export const BLACKOUT_VISIBLE_MS = 1400;
 /** How long before an attack lands the enemy visibly winds up. */
 export const WINDUP_MS = 1000;
 
@@ -14,8 +25,10 @@ export type LetterState = 'done' | 'next' | 'rest';
 export interface LetterSnap {
   ch: string;
   state: LetterState;
-  mods: ModId[];
+  boons: KeyBoon[];
   hidden: boolean;
+  /** blotted out by The Redactor */
+  masked: boolean;
 }
 
 export interface EnemySnap {
@@ -24,6 +37,11 @@ export interface EnemySnap {
   name: string;
   glyph: string;
   rule: Enemy['rule'];
+  traits: Trait[];
+  phase: number;
+  shield: number;
+  /** a shifter is about to change its word */
+  shifting: boolean;
   hp: number;
   maxHp: number;
   atk: number;
@@ -58,11 +76,11 @@ export interface CombatSnap {
 }
 
 export function combatSnapshot(c: Combat, run: Run): CombatSnap {
-  const rate = run.relics.includes('hourglass') ? 0.85 : 1;
+  const rate = intentRate(run);
   const t = c.enemies.find((e) => e.id === c.targetId);
   const enemies = c.enemies.map((e): EnemySnap => {
     const typed = e === t ? c.typed.length : 0;
-    const hidden = e.rule === 'blackout' && c.time - e.shownAt > BLACKOUT_VISIBLE_MS;
+    const hidden = e.rule === 'blackout' && c.time - e.shownAt > blackoutVisibleMs(e);
     const msToHit = Math.max(0, (e.intentMs - e.intent) / rate);
     return {
       id: e.id,
@@ -70,6 +88,10 @@ export function combatSnapshot(c: Combat, run: Run): CombatSnap {
       name: e.name,
       glyph: e.glyph,
       rule: e.rule,
+      traits: e.traits,
+      phase: e.phase,
+      shield: e.shield,
+      shifting: e.traits.includes('shifter') && c.time - e.shownAt > TRAIT_EVERY.shifter! - SHIFT_WARN_MS,
       hp: e.hp,
       maxHp: e.maxHp,
       atk: e.atk,
@@ -78,8 +100,9 @@ export function combatSnapshot(c: Combat, run: Run): CombatSnap {
       letters: [...e.word].map((ch, i) => ({
         ch,
         state: i < typed ? 'done' : i === typed && e === t ? 'next' : 'rest',
-        mods: run.keyMods[ch] ?? [],
+        boons: run.keyMods[ch.toLowerCase()] ?? [],
         hidden: hidden && i >= typed,
+        masked: e.masked.includes(i) && i >= typed,
       })),
       intent: Math.max(0, Math.min(1, e.intent / e.intentMs)),
       msToHit,
@@ -87,7 +110,7 @@ export function combatSnapshot(c: Combat, run: Run): CombatSnap {
       targeted: e === t,
     };
   });
-  const { tier, mult } = comboTier(c.combo);
+  const { tier, mult } = comboTier(c.combo, run.blessings);
   const prevAt = COMBO_TIERS[tier].at;
   const nextAt = COMBO_TIERS[tier + 1]?.at;
   return {
@@ -95,7 +118,7 @@ export function combatSnapshot(c: Combat, run: Run): CombatSnap {
     enemies,
     typed: c.typed,
     targetId: c.targetId,
-    nextKey: t ? (t.word[c.typed.length] ?? null) : null,
+    nextKey: t ? (t.word[c.typed.length]?.toLowerCase() ?? null) : null,
     combo: c.combo,
     tier,
     mult,
@@ -106,7 +129,15 @@ export function combatSnapshot(c: Combat, run: Run): CombatSnap {
     coins: run.coins,
     // Combo grows by one per remaining letter, so preview with the combo you'd finish on.
     preview: t
-      ? resolveWord(t.word, run.keyMods, run.relics, c.combo + (t.word.length - c.typed.length), !c.firstWordDone).dmg
+      ? resolveWord(t.word, {
+          keyMods: run.keyMods,
+          relics: run.relics,
+          blessings: run.blessings,
+          combo: c.combo + (t.word.length - c.typed.length),
+          firstWord: !c.firstWordDone,
+          coins: run.coins,
+          streak: c.streak,
+        }).dmg
       : null,
     over: c.over,
   };

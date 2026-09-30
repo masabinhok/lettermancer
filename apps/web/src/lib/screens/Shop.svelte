@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { MODS, RELICS, REROLL_BASE } from '@keycraft/engine';
+  import { MODS, RARITY_NAMES, RELICS, REROLL_BASE } from '@keycraft/engine';
+  import { RARITY_COLOR } from '../game/look';
   import * as sfx from '../fx/audio';
   import { floatText } from '../fx/particles';
   import type { Session } from '../game/session.svelte';
@@ -9,7 +10,7 @@
 
   let { session, onbuild }: { session: Session; onbuild?: () => void } = $props();
   const v = $derived(session.view.kind === 'shop' ? session.view : null);
-  const run = $derived(session.machine.run);
+  const run = $derived(session.run);
   const rerollCost = $derived(REROLL_BASE + (v?.rerolls ?? 0));
   let root = $state<HTMLElement>();
 
@@ -49,7 +50,7 @@
 
 {#if v}
   <div class="screen" data-screen="shop" bind:this={root}>
-    <Hud hp={run.hp} maxHp={run.maxHp} coins={run.coins} act={run.act} node={run.node} relics={run.relics} {onbuild} />
+    <Hud hp={run.hp} maxHp={run.maxHp} coins={run.coins} act={run.act} room={run.room} relics={run.relics} {onbuild} />
     <div class="body">
       <header>
         <h1>The Type Foundry</h1>
@@ -68,9 +69,10 @@
                       hotkey={String(i + 1)}
                       glyph={MODS[it.mod].glyph}
                       name={MODS[it.mod].name}
-                      desc={MODS[it.mod].desc}
+                      desc={MODS[it.mod].describe(it.rarity)}
                       color={MODS[it.mod].color}
-                      kind="Key power"
+                      kind="{RARITY_NAMES[it.rarity]} key power"
+                      rarityColor={RARITY_COLOR[it.rarity]}
                       cost={it.cost}
                       sold={it.sold}
                       affordable={it.cost <= run.coins}

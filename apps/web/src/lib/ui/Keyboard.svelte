@@ -1,6 +1,6 @@
 <!-- The on-screen keyboard: shows your mods, the next key, finger colors, heatmaps and install picking. -->
 <script lang="ts">
-  import { MODS, type KeyMods } from '@keycraft/engine';
+  import { MODS, RARITY_NAMES, type KeyMods } from '@keycraft/engine';
   import { fingerForColumn, HOME_COLUMNS, LAYOUTS } from '../game/layouts';
   import type { KeyboardLayout } from '../stores/profile.svelte';
 
@@ -58,7 +58,7 @@
   {#each rows as row, r (r)}
     <div class="row r{r}">
       {#each [...row] as k, col (k)}
-        {@const mods = keyMods[k] ?? []}
+        {@const boons = keyMods[k] ?? []}
         {@const letter = isLetter(k)}
         {@const h = heat?.[k]}
         <svelte:element
@@ -67,12 +67,12 @@
           data-key={k}
           class:punct={!letter}
           class:next={next === k}
-          class:modded={mods.length > 0}
+          class:modded={boons.length > 0}
           class:home={r === 1 && HOME_COLUMNS.includes(col)}
           class:ok={flashes[k] === 'ok'}
           class:bad={flashes[k] === 'bad'}
           class:no-data={heat && letter && h === undefined}
-          style:--glow={mods.length ? MODS[mods[mods.length - 1]].color : null}
+          style:--glow={boons.length ? MODS[boons[boons.length - 1].mod].color : null}
           style:--heat={h ?? 0}
           onclick={pickColor && letter ? () => onpick?.(k) : undefined}
           aria-label={pickColor && letter ? `Install on ${k.toUpperCase()}` : undefined}
@@ -80,10 +80,12 @@
           role={pickColor && letter ? undefined : 'presentation'}
         >
           <span class="cap">{k}</span>
-          {#if mods.length}
+          {#if boons.length}
             <span class="pips">
-              {#each mods as m, i (i)}<span class="pip" style:color={MODS[m].color} title={MODS[m].name}
-                  >{MODS[m].glyph}</span
+              {#each boons as b, i (i)}<span
+                  class="pip r{b.rarity}"
+                  style:color={MODS[b.mod].color}
+                  title="{RARITY_NAMES[b.rarity]} {MODS[b.mod].name}">{MODS[b.mod].glyph}</span
                 >{/each}
             </span>
           {/if}
@@ -167,6 +169,14 @@
     gap: 1px;
     font-size: calc(var(--k) * 0.22);
     line-height: 1;
+  }
+  .pip.r1,
+  .pip.r2,
+  .pip.r3 {
+    text-shadow: 0 0 6px currentColor;
+  }
+  .pip.r3 {
+    font-weight: 700;
   }
   .mini .pips {
     display: none;
