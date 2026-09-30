@@ -1,109 +1,108 @@
-// Usage: node scripts/playtest.mjs <label> <wpm> <typoRate> [buy]   (dev server must be running)
-// Plays Keycraft in headless Chromium like a human: reads words off the DOM, types with delays & typos.
+// Plays Keycraft in headless Chromium like a person: reads words off the screen and types them
+// with human-ish timing and typos, screenshotting each screen the first time it appears.
+//
+// Usage: node scripts/playtest.mjs <label> <wpm> <typoRate> [buy]
+//   env URL (default http://localhost:5173), OUT (default playtest-shots/), MINUTES (default 12)
+import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';
+
+const [label = 'run', wpmArg = '50', typoArg = '0.03', mode] = process.argv.slice(2);
+const wpm = Number(wpmArg);
+const typo = Number(typoArg);
+const shopBuy = mode === 'buy';
 const OUT = process.env.OUT ?? 'playtest-shots/';
-await import('node:fs').then((fs) => fs.mkdirSync(OUT, { recursive: true }));
-const [label, wpm, typo, shopBuy] = [process.argv[2], +process.argv[3], +process.argv[4], process.argv[5] === 'buy'];
+const URL = process.env.URL ?? 'http://localhost:5173';
+const MINUTES = Number(process.env.MINUTES ?? 12);
+mkdirSync(OUT, { recursive: true });
+
 const msPerKey = 60000 / (wpm * 5);
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
 const errors = [];
 page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
 page.on('pageerror', (e) => errors.push(String(e)));
-await page.goto(process.env.URL ?? 'http://localhost:5173');
-await page.waitForTimeout(800);
+await page.goto(URL);
+await page.waitForSelector('[data-screen]');
+
 let shot = 0;
-const snap = async (name) => page.screenshot({ path: `${OUT}${label}-${String(shot++).padStart(2, '0')}-${name}.png` });
-const screen = () => page.evaluate(() => document.querySelector('.screen')?.className.replace('screen ', '') ?? 'none');
+const snap = (name) => page.screenshot({ path: `${OUT}${label}-${String(shot++).padStart(2, '0')}-${name}.png` });
+const screen = () =>
+  page.evaluate(() => {
+    const all = [...document.querySelectorAll('[data-screen]')].map((e) => e.getAttribute('data-screen'));
+    return all.includes('pause') ? 'pause' : (all[0] ?? 'none');
+  });
 const seen = new Set();
 const log = [];
 const t0 = Date.now();
-let lastScreen = '';
-while (Date.now() - t0 < 12 * 60_000) {
+let last = '';
+const hp = () => page.evaluate(() => document.querySelector('.hud .hp span')?.textContent ?? '');
+const wait = (ms) => page.waitForTimeout(ms);
+
+while (Date.now() - t0 < MINUTES * 60_000) {
   const s = await screen();
-  if (s !== lastScreen) {
-    log.push(
-      `${((Date.now() - t0) / 1000).toFixed(0)}s ${s} ${await page.evaluate(() => document.querySelector('.hp-text')?.textContent ?? '')}`,
-    );
-    lastScreen = s;
-    const key = s.split(' ')[0];
-    if (!seen.has(key) || key === 'results' || key === 'banner') {
-      await page.waitForTimeout(300);
-      await snap(key);
-      seen.add(key);
+  if (s !== last) {
+    log.push(`${((Date.now() - t0) / 1000).toFixed(0)}s ${s} ${await hp()}`);
+    last = s;
+    if (!seen.has(s) || s === 'results') {
+      await wait(450);
+      await snap(s);
+      seen.add(s);
     }
   }
-  if (s.startsWith('menu') || s.startsWith('banner')) {
+  if (s === 'title' || s === 'intro') {
     await page.keyboard.press('Enter');
-    await page.waitForTimeout(400);
-    continue;
-  }
-  if (s.startsWith('results')) {
-    await snap('results-final');
+    await wait(500);
+  } else if (s === 'results') {
     break;
-  }
-  if (s.startsWith('reward')) {
-    await page.waitForTimeout(500);
+  } else if (s === 'pause') {
+    await page.keyboard.press('Escape');
+    await wait(200);
+  } else if (s === 'reward') {
+    await wait(400);
     await page.keyboard.press('1');
-    await page.waitForTimeout(400);
-    if (await page.$('.installer')) {
-      if (!seen.has('install')) {
-        await snap('install');
-        seen.add('install');
-      }
-      await page.keyboard.press('e');
-      await page.waitForTimeout(700);
-    } else {
-      await page.keyboard.press('1');
-      await page.waitForTimeout(400);
-      if (await page.$('.installer')) {
-        await page.keyboard.press('t');
-        await page.waitForTimeout(700);
-      }
-    }
-    continue;
-  }
-  if (s.startsWith('shop')) {
+    await wait(400);
+  } else if (s === 'install') {
+    await wait(300);
+    await page.keyboard.press(['e', 't', 'a', 'o', 'i', 'n', 's', 'r'][Math.floor(Math.random() * 8)]);
+    await wait(500);
+  } else if (s === 'shop') {
     if (shopBuy) {
       for (const k of ['7', '5', '1']) {
         await page.keyboard.press(k);
-        await page.waitForTimeout(300);
-        if (await page.$('.installer')) {
+        await wait(300);
+        if ((await screen()) === 'install') {
           await page.keyboard.press('a');
-          await page.waitForTimeout(700);
+          await wait(500);
         }
       }
     }
     await page.keyboard.press('Enter');
-    await page.waitForTimeout(400);
-    continue;
-  }
-  if (s.startsWith('combat')) {
-    // mid-combat snapshot once, after a few seconds
-    if (!seen.has('combat-mid') && Date.now() - t0 > 8000) {
+    await wait(400);
+  } else if (s === 'combat') {
+    if (!seen.has('combat-mid') && Date.now() - t0 > 9000) {
       await snap('combat-mid');
       seen.add('combat-mid');
     }
-    const st = await page.evaluate(() => {
+    const k = await page.evaluate(() => {
       const t = document.querySelector('.enemy.targeted .word');
-      if (t) return { next: t.querySelector('.l.next')?.textContent };
-      const w = [...document.querySelectorAll('.enemy:not(.dying) .word')].map((w) => w.textContent);
-      return { first: w.find((x) => x && x[0] !== '_')?.[0] };
+      if (t) return t.querySelector('.l.next')?.textContent;
+      return [...document.querySelectorAll('.enemy .word')]
+        .map((w) => w.textContent.trim())
+        .find((x) => x && x[0] !== '·')?.[0];
     });
-    const k = st.next ?? st.first;
-    if (!k || k === '_') {
-      await page.waitForTimeout(100);
+    if (!k || k === '·') {
+      await wait(100);
       continue;
     }
     if (Math.random() < typo) {
       await page.keyboard.press('q');
-      await page.waitForTimeout(msPerKey);
+      await wait(msPerKey);
     }
     await page.keyboard.press(k);
-    await page.waitForTimeout(msPerKey * (0.6 + Math.random() * 0.8));
-    continue;
+    await wait(msPerKey * (0.6 + Math.random() * 0.8));
+  } else {
+    await wait(200);
   }
-  await page.waitForTimeout(200);
 }
 console.log(log.join('\n'));
 console.log('ERRORS:', errors.length ? errors.join('\n') : 'none');

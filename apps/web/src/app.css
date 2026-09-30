@@ -1,0 +1,267 @@
+@import '@fontsource-variable/cinzel';
+@import '@fontsource/alegreya-sans/400.css';
+@import '@fontsource/alegreya-sans/500.css';
+@import '@fontsource/alegreya-sans/700.css';
+@import '@fontsource/alegreya-sans/400-italic.css';
+@import '@fontsource-variable/jetbrains-mono';
+@import '@fontsource/cormorant-garamond/600.css';
+
+/*
+ * Keycraft design tokens — "an illuminated manuscript at night".
+ * Gold is reserved for ornament and rewards. Muse colors mark the keys they empower.
+ */
+:root {
+  --night: #130f1d;
+  --night-deep: #0c0914;
+  --ink: #221b33;
+  --ink-2: #2c2442;
+  --rule: #3d3358;
+  --moon: #ddd7ea;
+  --moon-dim: #a79fbd;
+  --moon-faint: #6f6788;
+  --gold: #d9b45b;
+  --gold-bright: #f3d98c;
+  --gold-deep: #8a6a2a;
+  --witchfire: #7fe0b0;
+  --rose: #e24b6e;
+
+  /* muse / mod colors */
+  --ember: #f2743a;
+  --frost: #7ccbf5;
+  --spark: #f4dc6b;
+  --aurum: #e9c46a;
+  --echo: #b79cf2;
+  --glass: #eaf2ff;
+  --ward: #7fe0b0;
+
+  --f-display: 'Cinzel Variable', 'Cinzel', serif;
+  --f-text: 'Alegreya Sans', system-ui, sans-serif;
+  --f-type: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+  --f-glyph: 'Cormorant Garamond', 'Cinzel Variable', Georgia, serif;
+
+  /* type scale (1.25) */
+  --t-xs: 0.8rem;
+  --t-sm: 0.9rem;
+  --t-md: 1.05rem;
+  --t-lg: 1.3rem;
+  --t-xl: 1.65rem;
+  --t-2xl: 2.1rem;
+  --t-3xl: 2.75rem;
+  --t-hero: clamp(3rem, 8vw, 5.5rem);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --radius-sm: 4px;
+  --radius: 8px;
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur: 220ms;
+
+  --font-scale: 1;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: calc(16px * var(--font-scale));
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--night);
+  color: var(--moon);
+  font-family: var(--f-text);
+  font-size: var(--t-md);
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(92, 64, 150, 0.35), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 50% 115%, rgba(127, 224, 176, 0.06), transparent 70%), var(--night);
+}
+
+/* Vellum grain — very faint, so panels feel like material rather than flat fills. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin: 0;
+  line-height: 1.1;
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 3px;
+}
+
+kbd {
+  font-family: var(--f-type);
+  font-size: 0.85em;
+  padding: 1px 6px;
+  border: 1px solid var(--rule);
+  border-bottom-width: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--ink);
+  color: var(--moon);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+:root[data-reduced-motion='true'] *,
+:root[data-reduced-motion='true'] *::before,
+:root[data-reduced-motion='true'] *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important;
+}
+
+/* ---------- effects ---------- */
+.shake-small {
+  animation: shake 0.18s linear;
+  --amp: 3px;
+}
+.shake-big {
+  animation: shake 0.32s linear;
+  --amp: 8px;
+}
+@keyframes shake {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(calc(var(--amp) * -1), 2px);
+  }
+  40% {
+    transform: translate(var(--amp), -2px);
+  }
+  60% {
+    transform: translate(calc(var(--amp) * -0.6), 1px);
+  }
+  80% {
+    transform: translate(calc(var(--amp) * 0.6), -1px);
+  }
+}
+
+.float-text {
+  position: fixed;
+  z-index: 90;
+  pointer-events: none;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  transform: translate(-50%, 0);
+  animation: float-up 1.05s var(--ease-out) forwards;
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.7),
+    0 0 16px rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+}
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 10px) scale(0.6);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -6px) scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -64px) scale(1);
+  }
+}
+.ft-dmg {
+  color: var(--moon);
+}
+.ft-crit {
+  color: var(--gold-bright);
+  font-size: 2.2rem;
+}
+.ft-burn {
+  color: var(--ember);
+  font-size: 1.05rem;
+}
+.ft-spark {
+  color: var(--spark);
+}
+.ft-frost {
+  color: var(--frost);
+  font-size: 1.05rem;
+}
+.ft-hurt {
+  color: var(--rose);
+  font-size: 1.8rem;
+}
+.ft-heal,
+.ft-shield {
+  color: var(--witchfire);
+  font-size: 1.1rem;
+}
+.ft-coin {
+  color: var(--aurum);
+  font-size: 1.05rem;
+}
+.ft-bad {
+  color: var(--rose);
+  font-family: var(--f-text);
+  font-size: 1rem;
+}
+.ft-combo {
+  color: var(--gold-bright);
+  font-size: 2.6rem;
+}
