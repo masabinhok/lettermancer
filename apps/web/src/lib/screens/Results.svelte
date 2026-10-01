@@ -31,6 +31,7 @@
   const minutes = Math.floor(typingMs / 60000);
 
   let shared = $state<string | null>(null);
+  let body = $state<HTMLElement>();
   const card = () =>
     drawShareCard(session.machine, {
       avgWpm,
@@ -62,133 +63,159 @@
     if (k === 'Enter') onagain();
     else if (k === 'Escape') onhome();
     else if (k === 'c') void share();
-    else return false;
+    else if (k === 'ArrowDown' || k === 'ArrowUp' || k === 'PageDown' || k === 'PageUp') {
+      const step = k.startsWith('Page') ? body!.clientHeight * 0.8 : 60;
+      body?.scrollBy({ top: k.endsWith('Up') ? -step : step, behavior: 'smooth' });
+    } else return false;
     return true;
   }
 </script>
 
 <div class="results" data-screen="results">
-  <header>
-    {#if modeName}<p class="mode">{modeName}</p>{/if}
-    <h1 class:won>{won ? 'Victory' : 'Fallen'}</h1>
-    <p>
-      {#if won}
-        Every glyph bows to your keyboard.
-      {:else}
-        {report.killedBy ? `${report.killedBy} ended your run` : 'Your run ended'} in Act {run.act}. The keys remember.
-      {/if}
-    </p>
-  </header>
-
-  <div class="columns">
-    <dl class="stats">
-      <div class="score">
-        <dt>Score{runHeat ? ` at Heat ${runHeat}` : ''}{run.gentle ? ' (gentle pace)' : ''}</dt>
-        <dd>{score.toLocaleString()}</dd>
-      </div>
-      <div>
-        <dt>Average speed</dt>
-        <dd>{Math.round(avgWpm)} <small>wpm</small></dd>
-      </div>
-      <div>
-        <dt>Fastest fight</dt>
-        <dd>{Math.round(t.peakWpm)} <small>wpm</small></dd>
-      </div>
-      <div>
-        <dt>Accuracy</dt>
-        <dd>{acc.toFixed(1)}<small>%</small></dd>
-      </div>
-      <div>
-        <dt>Best combo</dt>
-        <dd>{t.maxCombo}</dd>
-      </div>
-      <div>
-        <dt>Words</dt>
-        <dd>{t.words}</dd>
-      </div>
-      <div>
-        <dt>Time in combat</dt>
-        <dd>{minutes}:{String(seconds).padStart(2, '0')}</dd>
-      </div>
-    </dl>
-
-    <section class="insight">
-      <h2>This run's heatmap</h2>
-      <Keyboard heat={keyWeakness(run.stats)} layout={profile.settings.layout} size="compact" />
-      <HeatLegend />
-      <p class="notes">
-        {#if weak.length}Your slowest keys were {weak.map((k) => k.toUpperCase()).join(', ')}; you'll meet them more
-          often next run.{/if}
-        {#if nem}Your hardest pair was “{nem.bigram}” at {Math.round(nem.ms)} ms.{/if}
+  <div class="body" bind:this={body}>
+    <header>
+      {#if modeName}<p class="mode">{modeName}</p>{/if}
+      <h1 class:won>{won ? 'Victory' : 'Fallen'}</h1>
+      <p>
+        {#if won}
+          Every glyph bows to your keyboard.
+        {:else}
+          {report.killedBy ? `${report.killedBy} ended your run` : 'Your run ended'} in Act {run.act}. The keys
+          remember.
+        {/if}
       </p>
-    </section>
+    </header>
+
+    <div class="columns">
+      <dl class="stats">
+        <div class="score">
+          <dt>Score{runHeat ? ` at Heat ${runHeat}` : ''}{run.gentle ? ' (gentle pace)' : ''}</dt>
+          <dd>{score.toLocaleString()}</dd>
+        </div>
+        <div>
+          <dt>Average speed</dt>
+          <dd>{Math.round(avgWpm)} <small>wpm</small></dd>
+        </div>
+        <div>
+          <dt>Fastest fight</dt>
+          <dd>{Math.round(t.peakWpm)} <small>wpm</small></dd>
+        </div>
+        <div>
+          <dt>Accuracy</dt>
+          <dd>{acc.toFixed(1)}<small>%</small></dd>
+        </div>
+        <div>
+          <dt>Best combo</dt>
+          <dd>{t.maxCombo}</dd>
+        </div>
+        <div>
+          <dt>Words</dt>
+          <dd>{t.words}</dd>
+        </div>
+        <div>
+          <dt>Time in combat</dt>
+          <dd>{minutes}:{String(seconds).padStart(2, '0')}</dd>
+        </div>
+      </dl>
+
+      <section class="insight">
+        <h2>This run's heatmap</h2>
+        <Keyboard heat={keyWeakness(run.stats)} layout={profile.settings.layout} size="compact" />
+        <HeatLegend />
+        <p class="notes">
+          {#if weak.length}Your slowest keys were {weak.map((k) => k.toUpperCase()).join(', ')}; you'll meet them more
+            often next run.{/if}
+          {#if nem}Your hardest pair was “{nem.bigram}” at {Math.round(nem.ms)} ms.{/if}
+        </p>
+      </section>
+    </div>
+
+    {#if session.award}
+      {@const a = session.award}
+      <section class="earned" aria-label="What you earned">
+        <p class="purse">
+          <span><b class="ink">✒ {a.ink}</b> Ink</span>
+          {#if a.leaf}<span><b class="leaf">❧ {a.leaf}</b> Gold Leaf</span>{/if}
+          {#if a.seals}<span><b class="seal">✪ {a.seals}</b> Seals</span>{/if}
+        </p>
+        {#if a.prophecies.length || a.keepsakes.length || a.keepsakeLevel}
+          <ul class="rewards">
+            {#each a.prophecies as p (p.id)}
+              <li><b>✦ {p.name}</b><span>{p.desc}</span></li>
+            {/each}
+            {#each a.keepsakes as k (k)}
+              <li class="keepsake"><b>New keepsake: {KEEPSAKES[k].name}</b><span>{KEEPSAKES[k].levels[0]}</span></li>
+            {/each}
+            {#if a.keepsakeLevel}<li class="keepsake">
+                <b>Keepsake level {a.keepsakeLevel}</b><span>It grows stronger.</span>
+              </li>{/if}
+          </ul>
+        {/if}
+      </section>
+    {/if}
+
+    {#if session.submission}
+      {@const s = session.submission}
+      <p class="ranked">
+        {#if s === 'sending'}Checking your run with the server…
+        {:else if s.ok}
+          {@const all = s.standings['all-time']}
+          {#if all}Verified. {all.improved
+              ? 'A new personal best'
+              : `Your best is ${all.best.toLocaleString()}`}{all.rank ? `, rank ${all.rank} of all time` : ''}.{/if}
+          {#each Object.entries(s.standings).filter(([b]) => b !== 'all-time') as [b, st] (b)}
+            {boardName(b)}: rank {st.rank}{st.improved ? '' : ` (your best there is ${st.best.toLocaleString()})`}.
+          {/each}
+        {:else}{s.reason}{/if}
+      </p>
+    {/if}
+
+    {#if session.unlocked.length}
+      <p class="unlock">
+        New keyboard{session.unlocked.length > 1 ? 's' : ''} unlocked: {session.unlocked
+          .map((id) => STARTERS[id].name)
+          .join(', ')}
+      </p>
+    {/if}
   </div>
 
-  {#if session.award}
-    {@const a = session.award}
-    <section class="earned" aria-label="What you earned">
-      <p class="purse">
-        <span><b class="ink">✒ {a.ink}</b> Ink</span>
-        {#if a.leaf}<span><b class="leaf">❧ {a.leaf}</b> Gold Leaf</span>{/if}
-        {#if a.seals}<span><b class="seal">✪ {a.seals}</b> Seals</span>{/if}
+  <footer class="actions">
+    {#if shared}
+      <p class="shared" role="status">
+        {shared}
+        {#if shared.startsWith('Copied')}<button class="save" onclick={save} type="button">Save as image</button>{/if}
       </p>
-      {#each a.prophecies as p (p.id)}
-        <p class="prophecy"><b>✦ {p.name}</b> {p.desc}</p>
-      {/each}
-      {#each a.keepsakes as k (k)}
-        <p class="prophecy"><b>New keepsake: {KEEPSAKES[k].name}.</b> {KEEPSAKES[k].levels[0]}</p>
-      {/each}
-      {#if a.keepsakeLevel}<p class="prophecy"><b>Your keepsake reached level {a.keepsakeLevel}.</b></p>{/if}
-    </section>
-  {/if}
-
-  {#if session.submission}
-    {@const s = session.submission}
-    <p class="ranked">
-      {#if s === 'sending'}Checking your run with the server…
-      {:else if s.ok}
-        {@const all = s.standings['all-time']}
-        {#if all}Verified. {all.improved ? 'A new personal best' : `Your best is ${all.best.toLocaleString()}`}{all.rank
-            ? `, rank ${all.rank} of all time`
-            : ''}.{/if}
-        {#each Object.entries(s.standings).filter(([b]) => b !== 'all-time') as [b, st] (b)}
-          {boardName(b)}: rank {st.rank}{st.improved ? '' : ` (your best there is ${st.best.toLocaleString()})`}.
-        {/each}
-      {:else}{s.reason}{/if}
-    </p>
-  {/if}
-
-  {#if session.unlocked.length}
-    <p class="unlock">
-      New keyboard{session.unlocked.length > 1 ? 's' : ''} unlocked: {session.unlocked
-        .map((id) => STARTERS[id].name)
-        .join(', ')}
-    </p>
-  {/if}
-
-  <div class="actions">
+    {/if}
     <Button kind="quiet" hotkey="Esc" onclick={onhome}>Title screen</Button>
     <Button kind="quiet" hotkey="C" onclick={share}>Share card</Button>
     <Button hotkey="Enter" onclick={onagain}>{mode === 'weekly' ? 'Try the week again' : 'Start another run'}</Button>
-  </div>
-  {#if shared}
-    <p class="shared" role="status">
-      {shared}
-      {#if shared.startsWith('Copied')}<button class="save" onclick={save} type="button">Save as image</button>{/if}
-    </p>
-  {/if}
+  </footer>
 </div>
 
 <style>
+  /* The body scrolls when a run earns a lot; the buttons stay pinned to the bottom edge. */
   .results {
     height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-5);
-    padding: var(--space-5);
     animation: rise 0.6s var(--ease-out);
+  }
+  .body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-5) var(--space-4);
+  }
+  /* Centered when it fits, top-aligned (and scrollable) when it doesn't. */
+  .body > :first-child {
+    margin-top: auto;
+  }
+  .body > :last-child {
+    margin-bottom: auto;
   }
   @keyframes rise {
     from {
@@ -218,7 +245,8 @@
     cursor: pointer;
   }
   h1 {
-    font-size: var(--t-hero);
+    font-size: clamp(2.6rem, 9vh, var(--t-hero));
+    line-height: 1;
     color: var(--rose);
   }
   h1.won {
@@ -303,12 +331,34 @@
   .seal {
     color: var(--rose);
   }
-  .prophecy {
-    font-size: var(--t-sm);
-    color: var(--moon-dim);
+  .rewards {
+    list-style: none;
+    margin: var(--space-2) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 300px));
+    gap: var(--space-2);
   }
-  .prophecy b {
+  .rewards li {
+    display: flex;
+    flex-direction: column;
+    padding: 6px 12px;
+    background: var(--ink);
+    border: 1px solid var(--rule);
+    border-left: 2px solid var(--gold);
+    font-size: var(--t-sm);
+    line-height: 1.3;
+  }
+  .rewards li.keepsake {
+    border-left-color: var(--witchfire);
+  }
+  .rewards b {
     color: var(--gold-bright);
+    font-weight: 700;
+  }
+  .rewards span {
+    color: var(--moon-dim);
+    font-size: var(--t-xs);
   }
   .ranked {
     font-size: var(--t-sm);
@@ -320,8 +370,24 @@
     color: var(--gold-bright);
   }
   .actions {
+    flex-shrink: 0;
     display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
     gap: var(--space-4);
+    padding: var(--space-3) var(--space-5);
+    border-top: 1px solid var(--rule);
+    background: color-mix(in oklab, var(--night-deep) 85%, transparent);
+  }
+  .actions .shared {
+    flex-basis: 100%;
+    text-align: center;
+  }
+  @media (max-width: 700px) {
+    .rewards {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
   @media (max-width: 900px) {
     .columns {

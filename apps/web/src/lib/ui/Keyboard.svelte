@@ -127,10 +127,11 @@
     display: flex;
     gap: var(--gap);
   }
-  .r1 {
+  /* Row stagger. Scoped to .row: pips also carry r1-r3 classes, for their rarity. */
+  .row.r1 {
     margin-left: calc(var(--k) * 0.45);
   }
-  .r2 {
+  .row.r2 {
     margin-left: calc(var(--k) * 1.2);
   }
   .key {

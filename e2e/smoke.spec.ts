@@ -172,3 +172,54 @@ test('progress saved under the old name carries over', async ({ page }) => {
   await expect(page.locator('[data-screen="title"]')).toBeVisible();
   await expect(page.locator('.purse')).toContainText('77');
 });
+
+test('power pips sit on their own keys, whatever their rarity', async ({ page }) => {
+  // A run that starts with an Epic Frost on S (as a keepsake would give), next to the Apprentice's Ember on E.
+  await page.addInitScript(() => {
+    if (localStorage.getItem('lettermancer.run.v1')) return;
+    const bonuses = {
+      maxHp: 0,
+      startCoins: 0,
+      startCombo: 0,
+      extraChoices: 0,
+      rerolls: 0,
+      secondWind: 0,
+      inkBonus: 0,
+      firstBoonRarity: 0,
+      startShield: 0,
+      graceMs: 0,
+      coinMult: 1,
+      healAfterFight: 0,
+      startBoon: { key: 's', mod: 'frost', rarity: 2 },
+    };
+    const config = {
+      rules: 2,
+      seed: 7,
+      starter: 'apprentice',
+      weak: {},
+      oaths: {},
+      bonuses,
+      mode: 'standard',
+      gentle: false,
+    };
+    localStorage.setItem('lettermancer.meta.v1', JSON.stringify({ prologueDone: true, runs: 1 }));
+    localStorage.setItem('lettermancer.run.v1', JSON.stringify({ config, actions: [] }));
+  });
+  await page.goto('/run?resume');
+  await expect(page.locator('[data-screen="doors"]')).toBeVisible();
+  await page.keyboard.press('1');
+  await expect(page.locator('[data-screen="combat"]')).toBeVisible();
+  const misplaced = await page.evaluate(() =>
+    [...document.querySelectorAll('.key')].flatMap((key) => {
+      const k = key.getBoundingClientRect();
+      return [...key.querySelectorAll('.pip')]
+        .filter((pip) => {
+          const p = pip.getBoundingClientRect();
+          return p.left < k.left || p.right > k.right;
+        })
+        .map(() => key.getAttribute('data-key'));
+    }),
+  );
+  expect(await page.locator('[data-key="s"] .pip').count()).toBe(1);
+  expect(misplaced).toEqual([]);
+});
