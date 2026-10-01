@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EVENTS, MUSES } from '@keycraft/engine';
+  import { EVENTS, MUSES } from '@lettermancer/engine';
   import * as sfx from '../fx/audio';
   import type { Session } from '../game/session.svelte';
   import Button from '../ui/Button.svelte';

@@ -1,10 +1,10 @@
-# Keycraft
+# Lettermancer
 
 A roguelike typing game where your keyboard is the deck. Type words to fight illuminated glyph-monsters, win boons
 from six muses, and bind powers to individual keys — so your **E** burns, your **S** freezes, and your **N** throws
 sparks. Every run quietly feeds you more of the keys you're slowest at, so you get faster while you play.
 
-![A fight in Keycraft: typing enemy words, with combo and key powers on the keyboard below](docs/media/keycraft.gif)
+![A fight in Lettermancer: typing enemy words, with combo and key powers on the keyboard below](docs/media/lettermancer.gif)
 
 ## Running it
 

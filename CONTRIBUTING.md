@@ -1,6 +1,6 @@
-# Contributing to Keycraft
+# Contributing to Lettermancer
 
-Thanks for helping. Keycraft is a typing roguelike built by a small community. This guide covers how to get it
+Thanks for helping. Lettermancer is a typing roguelike built by a small community. This guide covers how to get it
 running, what a good change looks like, and how reviews work.
 
 ## Getting set up

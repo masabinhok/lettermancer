@@ -17,7 +17,7 @@
 <style>
   .purse {
     display: flex;
-    gap: var(--space-5);
+    gap: var(--space-4);
     list-style: none;
     margin: 0;
     padding: 0;
@@ -28,6 +28,7 @@
     display: flex;
     align-items: baseline;
     gap: 6px;
+    white-space: nowrap;
     cursor: help;
   }
   b {

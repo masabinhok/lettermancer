@@ -2,7 +2,7 @@
  * The share card: a 1200×630 image of a finished run (result, score, speed and build) to post anywhere.
  * Drawn on a canvas with the game's own fonts and colors, so it needs no server.
  */
-import { heat, MODS, RELICS, runScore, STARTERS, type RunMachine } from '@keycraft/engine';
+import { heat, MODS, RELICS, runScore, STARTERS, type RunMachine } from '@lettermancer/engine';
 
 const W = 1200;
 const H = 630;
@@ -56,7 +56,7 @@ export async function drawShareCard(machine: RunMachine, facts: CardFacts): Prom
   g.textBaseline = 'alphabetic';
   g.fillStyle = C.gold;
   g.font = `700 30px ${DISPLAY}`;
-  g.fillText('KEYCRAFT', 70, 88);
+  g.fillText('LETTERMANCER', 70, 88);
   g.fillStyle = C.dim;
   g.font = `22px ${TEXT}`;
   const sub = [facts.mode, facts.player].filter(Boolean).join(' · ');

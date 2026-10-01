@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { BLESSINGS, isDuo, MODS, MUSES, RARITY_NAMES, RELICS, type Offer } from '@keycraft/engine';
+  import { BLESSINGS, isDuo, MODS, MUSES, RARITY_NAMES, RELICS, type Offer } from '@lettermancer/engine';
   import * as sfx from '../fx/audio';
   import { RARITY_COLOR } from '../game/look';
   import type { Session } from '../game/session.svelte';

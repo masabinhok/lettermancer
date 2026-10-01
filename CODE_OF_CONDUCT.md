@@ -1,6 +1,6 @@
 # Code of Conduct
 
-Keycraft is a game about getting better at something, one keystroke at a time. We want this project to feel the same
+Lettermancer is a game about getting better at something, one keystroke at a time. We want this project to feel the same
 way for everyone who works on it: welcoming to beginners and patient with mistakes.
 
 ## What we expect

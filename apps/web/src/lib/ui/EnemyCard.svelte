@@ -1,6 +1,6 @@
 <!-- One enemy: its illuminated initial, health, what it does, the word you must type, and when it strikes. -->
 <script lang="ts">
-  import { BOSSES, MODS } from '@keycraft/engine';
+  import { BOSSES, MODS } from '@lettermancer/engine';
   import { FIELD, letterColors, TRAIT_INFO } from '../game/look';
   import type { EnemySnap } from '../game/snapshot';
   import { profile } from '../stores/profile.svelte';

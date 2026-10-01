@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import { clampOaths, dailyLabel, sharedRunConfig, STARTER_IDS, type StarterId } from '@keycraft/engine';
+  import { clampOaths, dailyLabel, sharedRunConfig, STARTER_IDS, type StarterId } from '@lettermancer/engine';
   import { onMount } from 'svelte';
   import { account } from '$lib/cloud/account.svelte';
   import { startMusic, stopMusic } from '$lib/fx/audio';
@@ -153,7 +153,7 @@
 </script>
 
 <svelte:window {onkeydown} />
-<svelte:head><title>Keycraft</title></svelte:head>
+<svelte:head><title>Lettermancer</title></svelte:head>
 
 {#if refused}
   <div class="refused" data-screen="refused">

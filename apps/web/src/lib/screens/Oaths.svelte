@@ -1,6 +1,6 @@
 <!-- Swear Oaths to make runs harder. Heat (the sum of Oath levels) raises your score and rewards. -->
 <script lang="ts">
-  import { heat, MAX_HEAT, OATH_IDS, OATHS, type OathId } from '@keycraft/engine';
+  import { heat, MAX_HEAT, OATH_IDS, OATHS, type OathId } from '@lettermancer/engine';
   import { profile } from '../stores/profile.svelte';
   import Button from '../ui/Button.svelte';
   import Frame from '../ui/Frame.svelte';

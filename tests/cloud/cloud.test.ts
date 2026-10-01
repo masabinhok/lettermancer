@@ -11,7 +11,7 @@ import {
   pressPractice,
   sharedRunConfig,
   type Action,
-} from '@keycraft/engine';
+} from '@lettermancer/engine';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 const URL = process.env.SUPABASE_URL ?? 'http://127.0.0.1:54321';
@@ -22,7 +22,7 @@ const NAME = `quill_${Date.now() % 1_000_000}`;
 
 async function newPlayer(): Promise<{ db: SupabaseClient; id: string; token: string }> {
   const db = createClient(URL, ANON, { auth: { persistSession: false } });
-  const email = `p${Date.now()}${Math.floor(Math.random() * 1e6)}@keycraft.test`;
+  const email = `p${Date.now()}${Math.floor(Math.random() * 1e6)}@lettermancer.test`;
   const { data, error } = await db.auth.signUp({ email, password: 'test-password-123' });
   if (error) throw error;
   return { db, id: data.user!.id, token: data.session!.access_token };

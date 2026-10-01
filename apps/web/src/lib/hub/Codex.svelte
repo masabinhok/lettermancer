@@ -1,6 +1,6 @@
 <!-- The Codex: every foe, boss and boon you've met, filling in as you play. -->
 <script lang="ts">
-  import { BLESSING_IDS, BLESSINGS, BOSSES, ELITES, isDuo, MOD_IDS, MODS, MUSES, ROSTER } from '@keycraft/engine';
+  import { BLESSING_IDS, BLESSINGS, BOSSES, ELITES, isDuo, MOD_IDS, MODS, MUSES, ROSTER } from '@lettermancer/engine';
   import { TRAIT_INFO } from '../game/look';
   import { profile } from '../stores/profile.svelte';
   import Panel from '../ui/Panel.svelte';

@@ -19,14 +19,14 @@ import {
   type PracticeInput,
   type RunConfig,
   type Stats,
-} from '@keycraft/engine';
+} from '@lettermancer/engine';
 import type { User } from '@supabase/supabase-js';
 import { profile, readStore, writeStore, type Settings } from '../stores/profile.svelte';
 import { functionsUrl, supabase } from './client';
 
-const LINK_KEY = 'keycraft.cloud.v1';
-const OUTBOX_KEY = 'keycraft.outbox.v1';
-const DAILY_KEY = 'keycraft.daily.v1';
+const LINK_KEY = 'lettermancer.cloud.v1';
+const OUTBOX_KEY = 'lettermancer.outbox.v1';
+const DAILY_KEY = 'lettermancer.daily.v1';
 const PUSH_DELAY_MS = 2000;
 
 interface Link {

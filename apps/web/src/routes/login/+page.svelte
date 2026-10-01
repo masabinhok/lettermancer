@@ -33,14 +33,14 @@
 </script>
 
 <svelte:window {onkeydown} />
-<svelte:head><title>Sign in · Keycraft</title></svelte:head>
+<svelte:head><title>Sign in · Lettermancer</title></svelte:head>
 
 <div class="page" data-screen="login">
   <Frame ornate>
     <div class="inner">
       <h1>Sign in</h1>
       {#if !cloudEnabled}
-        <p>Accounts aren't set up on this copy of Keycraft. Your progress is saved in this browser.</p>
+        <p>Accounts aren't set up on this copy of Lettermancer. Your progress is saved in this browser.</p>
       {:else if sent}
         <p>Check <b>{email}</b> for a sign-in link. You can close this tab once you've used it.</p>
         {#if import.meta.env.DEV}<p class="dev">

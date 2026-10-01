@@ -1,6 +1,6 @@
 <!-- Run status: health, shield, coins, where you are in the act, and your relics. -->
 <script lang="ts">
-  import { RELICS, ROOMS_PER_ACT, type RelicId } from '@keycraft/engine';
+  import { RELICS, ROOMS_PER_ACT, type RelicId } from '@lettermancer/engine';
   import Bar from './Bar.svelte';
 
   let {

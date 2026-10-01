@@ -1,6 +1,6 @@
 # Self-hosting
 
-Keycraft works as a plain static site. Accounts, sync and leaderboards are optional and need a Supabase project,
+Lettermancer works as a plain static site. Accounts, sync and leaderboards are optional and need a Supabase project,
 either local through the Supabase CLI or hosted.
 
 ## 1. Offline only (no accounts)

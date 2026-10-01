@@ -1,6 +1,6 @@
 <!-- A typing challenge inside an event: copy the text exactly, sometimes against the clock. -->
 <script lang="ts">
-  import type { MachineEvent } from '@keycraft/engine';
+  import type { MachineEvent } from '@lettermancer/engine';
   import { onMount } from 'svelte';
   import * as sfx from '../fx/audio';
   import { shake } from '../fx/particles';

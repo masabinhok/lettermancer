@@ -1,4 +1,4 @@
-<!-- What Keycraft stores, where, and how to take it back. -->
+<!-- What Lettermancer stores, where, and how to take it back. -->
 <script lang="ts">
   import { nav } from '$lib/nav';
   import Frame from '$lib/ui/Frame.svelte';
@@ -9,7 +9,7 @@
 </script>
 
 <svelte:window {onkeydown} />
-<svelte:head><title>Privacy · Keycraft</title></svelte:head>
+<svelte:head><title>Privacy · Lettermancer</title></svelte:head>
 
 <div class="page" data-screen="privacy">
   <header>
@@ -20,7 +20,7 @@
   <Frame>
     <article>
       <p class="lead">
-        Keycraft collects as little as it can. There are no ads, no trackers and no analytics. Fonts and sounds are
+        Lettermancer collects as little as it can. There are no ads, no trackers and no analytics. Fonts and sounds are
         served with the game, so no third party sees you play.
       </p>
 

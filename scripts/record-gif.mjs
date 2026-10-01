@@ -1,5 +1,5 @@
 // Records a short fight for the README: opens a run, types enemy words at a steady pace, and turns the
-// video into docs/media/keycraft.gif with ffmpeg.
+// video into docs/media/lettermancer.gif with ffmpeg.
 //
 // Usage: node scripts/record-gif.mjs   (env URL, default http://localhost:4173 — run `npm run preview` first)
 import { execFileSync } from 'node:child_process';
@@ -10,7 +10,7 @@ import { chromium } from 'playwright';
 
 const URL = process.env.URL ?? 'http://localhost:4173';
 const SECONDS = 14;
-const dir = mkdtempSync(join(tmpdir(), 'keycraft-gif-'));
+const dir = mkdtempSync(join(tmpdir(), 'lettermancer-gif-'));
 const browser = await chromium.launch();
 const ctx = await browser.newContext({
   viewport: { width: 1280, height: 720 },
@@ -18,7 +18,9 @@ const ctx = await browser.newContext({
 });
 const page = await ctx.newPage();
 await page.goto(URL);
-await page.evaluate(() => localStorage.setItem('keycraft.meta.v1', JSON.stringify({ prologueDone: true, runs: 1 })));
+await page.evaluate(() =>
+  localStorage.setItem('lettermancer.meta.v1', JSON.stringify({ prologueDone: true, runs: 1 })),
+);
 await page.goto(`${URL}/run?starter=apprentice`);
 await page.waitForSelector('[data-screen="intro"]');
 await page.waitForTimeout(1200);
@@ -54,6 +56,6 @@ execFileSync('ffmpeg', [
   video,
   '-vf',
   'fps=10,scale=720:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=64:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle',
-  'docs/media/keycraft.gif',
+  'docs/media/lettermancer.gif',
 ]);
-console.log('wrote docs/media/keycraft.gif');
+console.log('wrote docs/media/lettermancer.gif');

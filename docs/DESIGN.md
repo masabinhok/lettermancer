@@ -1,4 +1,4 @@
-# Keycraft design system
+# Lettermancer design system
 
 **Concept: an illuminated manuscript at night.** The game is about letters, so its signature element is the
 _historiated initial_: every enemy (and the logo) is a glyph set inside a gold-ruled square on a colored field with

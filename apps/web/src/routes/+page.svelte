@@ -21,7 +21,7 @@
     weeklyOaths,
     type OathId,
     type StarterId,
-  } from '@keycraft/engine';
+  } from '@lettermancer/engine';
   import { onMount } from 'svelte';
   import { account } from '$lib/cloud/account.svelte';
   import { cloudEnabled } from '$lib/cloud/client';
@@ -140,13 +140,13 @@
 </script>
 
 <svelte:window {onkeydown} />
-<svelte:head><title>Keycraft</title></svelte:head>
+<svelte:head><title>Lettermancer</title></svelte:head>
 
 <div class="hub" data-screen="title">
   <header class="top">
-    <h1 class="logo" aria-label="Keycraft">
-      <Initial glyph="K" size={60} field="#3b2160" />
-      <span aria-hidden="true">eycraft</span>
+    <h1 class="logo" aria-label="Lettermancer">
+      <Initial glyph="L" size={60} field="#3b2160" />
+      <span aria-hidden="true">ettermancer</span>
     </h1>
     <Currencies ink={meta.ink} leaf={meta.leaf} seals={meta.seals} />
     <nav class="util">
@@ -329,7 +329,7 @@
     gap: var(--space-2);
   }
   .logo span {
-    font-size: 2.6rem;
+    font-size: 2.3rem;
     line-height: 0.85;
     letter-spacing: 0.03em;
   }
@@ -339,6 +339,7 @@
   .util {
     display: flex;
     gap: var(--space-2);
+    white-space: nowrap;
   }
   .hall {
     flex: 1;

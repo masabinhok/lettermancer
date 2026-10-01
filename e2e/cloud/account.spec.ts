@@ -21,12 +21,12 @@ async function magicLink(email: string): Promise<string> {
 }
 
 test('sign in with a magic link, choose a name, and sync progress', async ({ page }) => {
-  const email = `e2e${Date.now()}@keycraft.test`;
+  const email = `e2e${Date.now()}@lettermancer.test`;
   await page.goto('/');
   // Guest progress that should follow the player into their account.
   await page.evaluate(() => {
-    const meta = JSON.parse(localStorage.getItem('keycraft.meta.v1') ?? '{}');
-    localStorage.setItem('keycraft.meta.v1', JSON.stringify({ ...meta, prologueDone: true, ink: 42 }));
+    const meta = JSON.parse(localStorage.getItem('lettermancer.meta.v1') ?? '{}');
+    localStorage.setItem('lettermancer.meta.v1', JSON.stringify({ ...meta, prologueDone: true, ink: 42 }));
   });
   await page.goto('/login');
   await page.getByLabel('Email').fill(email);

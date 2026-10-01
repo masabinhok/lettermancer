@@ -3,7 +3,7 @@
   with typos marked. One shared axis (both are wpm). Hover for the exact numbers.
 -->
 <script lang="ts">
-  import type { SecondSample } from '@keycraft/engine';
+  import type { SecondSample } from '@lettermancer/engine';
 
   let { series }: { series: SecondSample[] } = $props();
 

@@ -1,8 +1,8 @@
-# Keycraft roadmap
+# Lettermancer roadmap
 
 ## Context
 
-Keycraft v0.1 (github.com/masabinhok/keycraft, private) works and is fun, but it plays like a prototype:
+Lettermancer v0.1 (github.com/masabinhok/lettermancer, private) works and is fun, but it plays like a prototype:
 
 - Players don't get enough guidance, and the screens are cluttered.
 - The fonts don't hang together, and there is almost nothing that carries over between runs.

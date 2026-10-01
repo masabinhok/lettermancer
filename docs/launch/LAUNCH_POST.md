@@ -1,11 +1,11 @@
 # Launch post (draft)
 
-**Title:** Keycraft: a typing roguelike where your keyboard is the deck (open source)
+**Title:** Lettermancer: a typing roguelike where your keyboard is the deck (open source)
 
 I've been building a game about getting faster at typing without it feeling like drills. It's out now, free in the
 browser, and the source is MIT-licensed.
 
-**The idea:** in a deckbuilder you collect cards. In Keycraft you collect powers for _keys_. Bind Ember to your E and
+**The idea:** in a deckbuilder you collect cards. In Lettermancer you collect powers for _keys_. Bind Ember to your E and
 every E you type sets the enemy burning. Put Frost on S and your S pushes attacks back. Enemies carry words, and
 finishing a word is how you strike. Over three acts you build a keyboard that plays like nobody else's.
 
@@ -26,6 +26,6 @@ noticing.
 so save/resume, ghosts and anti-cheat all come from one replay function. Content (enemies, boons, relics,
 achievements) is plain data, and the good-first-issue label has plenty of small things to pick up.
 
-Play: <link> · Code: https://github.com/masabinhok/keycraft
+Play: <link> · Code: https://github.com/masabinhok/lettermancer
 
 I'd love to hear which key you built your run around.

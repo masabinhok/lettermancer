@@ -1,6 +1,6 @@
 <!-- Your profile: account, sync, history, and your data. -->
 <script lang="ts">
-  import { keyMastery, PROPHECIES } from '@keycraft/engine';
+  import { keyMastery, PROPHECIES } from '@lettermancer/engine';
   import { account } from '$lib/cloud/account.svelte';
   import { cloudEnabled, supabase } from '$lib/cloud/client';
   import { nav } from '$lib/nav';
@@ -68,7 +68,7 @@
     const blob = await account.exportData();
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `keycraft-data-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `lettermancer-data-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
   }
@@ -88,7 +88,7 @@
 </script>
 
 <svelte:window {onkeydown} />
-<svelte:head><title>Profile · Keycraft</title></svelte:head>
+<svelte:head><title>Profile · Lettermancer</title></svelte:head>
 
 <div class="page" data-screen="profile">
   <header>
@@ -240,7 +240,8 @@
       <section class="card">
         <h2>Your data</h2>
         <p>
-          Download everything Keycraft holds about you: progress, stats, settings and history. See what we store in the
+          Download everything Lettermancer holds about you: progress, stats, settings and history. See what we store in
+          the
           <button class="link" onclick={() => nav('/privacy')} type="button">privacy notice</button>.
         </p>
         <Button kind="quiet" onclick={exportData}>Download my data</Button>

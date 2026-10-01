@@ -1,4 +1,4 @@
-import { newRunConfig, RunMachine } from '@keycraft/engine';
+import { newRunConfig, RunMachine } from '@lettermancer/engine';
 import { describe, expect, it } from 'vitest';
 import { combatSnapshot, WINDUP_MS } from './snapshot';
 

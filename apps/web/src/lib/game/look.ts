@@ -1,4 +1,4 @@
-import { MODS, type KeyBoon } from '@keycraft/engine';
+import { MODS, type KeyBoon } from '@lettermancer/engine';
 
 /** Field color behind each enemy's illuminated initial, by enemy kind. */
 export const FIELD = {

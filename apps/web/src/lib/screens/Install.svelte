@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { letterShare, MAX_MODS_PER_KEY, MODS, RARITY_NAMES, WORDS } from '@keycraft/engine';
+  import { letterShare, MAX_MODS_PER_KEY, MODS, RARITY_NAMES, WORDS } from '@lettermancer/engine';
   import { RARITY_COLOR } from '../game/look';
   import * as sfx from '../fx/audio';
   import { motesAt } from '../fx/particles';

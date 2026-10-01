@@ -1,6 +1,6 @@
-# Keycraft 1.0
+# Lettermancer 1.0
 
-Keycraft is a typing roguelike where your keyboard is the deck. Type words to fight glyph-monsters, win boons from
+Lettermancer is a typing roguelike where your keyboard is the deck. Type words to fight glyph-monsters, win boons from
 six muses, and bind powers to individual keys. Every run quietly feeds you more of the keys you're slowest at.
 
 1.0 is the first public release, and the source is now open under the MIT license.

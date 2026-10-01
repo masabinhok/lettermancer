@@ -16,12 +16,12 @@ import {
   type RunMode,
   type StarterId,
   type View,
-} from '@keycraft/engine';
+} from '@lettermancer/engine';
 import { account, type SubmitResult } from '../cloud/account.svelte';
 import { profile, readStore, writeStore } from '../stores/profile.svelte';
 import { combatSnapshot, type CombatSnap } from './snapshot';
 
-const SAVE_KEY = 'keycraft.run.v1';
+const SAVE_KEY = 'lettermancer.run.v1';
 /** Autosave cadence while a clock is running. */
 const SAVE_EVERY_MS = 2000;
 const RECENT_WORDS = 40;

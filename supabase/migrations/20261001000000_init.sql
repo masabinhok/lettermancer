@@ -1,4 +1,4 @@
--- Keycraft schema. Every table has row-level security. Players read and write only their own rows;
+-- Lettermancer schema. Every table has row-level security. Players read and write only their own rows;
 -- anything that affects leaderboards is written only by edge functions using the service role.
 
 -- ---------- profiles ----------

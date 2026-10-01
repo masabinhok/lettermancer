@@ -1,6 +1,6 @@
 <!-- Title card before an act or a boss. The fight clock waits until the player is ready. -->
 <script lang="ts">
-  import { ACT_BASE, BOSSES } from '@keycraft/engine';
+  import { ACT_BASE, BOSSES } from '@lettermancer/engine';
   import { FIELD } from '../game/look';
   import type { Session } from '../game/session.svelte';
   import Button from '../ui/Button.svelte';

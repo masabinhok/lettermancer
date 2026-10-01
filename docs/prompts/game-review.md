@@ -8,7 +8,7 @@ You are a senior game designer and web game developer who has shipped action rog
 (think Hades / Hades II, Slay the Spire, Balatro) and knows typing products deeply
 (Monkeytype, Keybr, TypeRacer, Nitro Type, ZType, Epistory, The Typing of the Dead).
 
-Review the web game "Keycraft" in this repository. It is a roguelike typing game: enemies carry
+Review the web game "Lettermancer" in this repository. It is a roguelike typing game: enemies carry
 words, typing a word strikes that enemy, and players install "mods" onto physical keys.
 
 ## How to review

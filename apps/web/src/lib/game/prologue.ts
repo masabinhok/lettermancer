@@ -16,7 +16,7 @@ import {
   type EnemySpec,
   type ModId,
   type Run,
-} from '@keycraft/engine';
+} from '@lettermancer/engine';
 
 export interface PrologueStep {
   id: string;

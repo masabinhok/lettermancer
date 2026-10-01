@@ -1,6 +1,6 @@
 # Architecture
 
-Keycraft is a static web app with an optional backend. The rules of the game live in one deterministic engine that
+Lettermancer is a static web app with an optional backend. The rules of the game live in one deterministic engine that
 runs in the browser and, unchanged, on the server.
 
 ```

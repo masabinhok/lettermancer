@@ -24,7 +24,7 @@ import {
   type Stats,
   type UnlockCheck,
   type RunConfig,
-} from '@keycraft/engine';
+} from '@lettermancer/engine';
 
 export type KeyboardLayout = 'qwerty' | 'dvorak' | 'colemak' | 'azerty';
 
@@ -55,13 +55,31 @@ export const defaultSettings = (): Settings => ({
 });
 
 export const STORE_KEYS = {
-  settings: 'keycraft.settings.v1',
-  meta: 'keycraft.meta.v1',
-  stats: 'keycraft.stats.v1',
-  analytics: 'keycraft.analytics.v1',
+  settings: 'lettermancer.settings.v1',
+  meta: 'lettermancer.meta.v1',
+  stats: 'lettermancer.stats.v1',
+  analytics: 'lettermancer.analytics.v1',
 } as const;
 
 const ANALYTICS_KEPT = 50;
+
+/**
+ * The game was called Keycraft before launch. Carry anything saved under the old name across once,
+ * so nobody's progress, settings or run in progress is lost. Runs before anything reads storage.
+ */
+function migrateOldName(): void {
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const old = localStorage.key(i);
+      if (!old?.startsWith('keycraft.')) continue;
+      const key = `lettermancer.${old.slice('keycraft.'.length)}`;
+      if (localStorage.getItem(key) === null) localStorage.setItem(key, localStorage.getItem(old)!);
+    }
+  } catch {
+    // Storage unavailable: nothing to carry over.
+  }
+}
+migrateOldName();
 
 export function readStore<T extends object>(key: string, fallback: () => T): T {
   try {

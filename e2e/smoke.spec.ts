@@ -161,3 +161,14 @@ test('the leaderboards open from the Scriptorium', async ({ page }) => {
   await page.keyboard.press('Escape');
   await expect(page.locator('[data-screen="title"]')).toBeVisible();
 });
+
+test('progress saved under the old name carries over', async ({ page }) => {
+  // A returning player: storage holds only the old keys when the new build first loads.
+  await page.addInitScript(() => {
+    if (localStorage.getItem('lettermancer.meta.v1') === null)
+      localStorage.setItem('keycraft.meta.v1', JSON.stringify({ prologueDone: true, runs: 2, ink: 77 }));
+  });
+  await page.goto('/');
+  await expect(page.locator('[data-screen="title"]')).toBeVisible();
+  await expect(page.locator('.purse')).toContainText('77');
+});

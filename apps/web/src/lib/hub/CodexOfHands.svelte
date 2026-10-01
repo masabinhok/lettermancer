@@ -1,6 +1,6 @@
 <!-- Permanent upgrades, bought with Ink and Gold Leaf. -->
 <script lang="ts">
-  import { nextCost, rankOf, UPGRADE_IDS, UPGRADES, buyUpgrade, type UpgradeId } from '@keycraft/engine';
+  import { nextCost, rankOf, UPGRADE_IDS, UPGRADES, buyUpgrade, type UpgradeId } from '@lettermancer/engine';
   import * as sfx from '../fx/audio';
   import { profile } from '../stores/profile.svelte';
   import Panel from '../ui/Panel.svelte';

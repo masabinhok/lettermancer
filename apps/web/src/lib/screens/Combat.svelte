@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { COMBO_TIERS, MODS, type MachineEvent } from '@keycraft/engine';
+  import { COMBO_TIERS, MODS, type MachineEvent } from '@lettermancer/engine';
   import { onMount } from 'svelte';
   import * as sfx from '../fx/audio';
   import { burstAt, floatText, motesAt, shake } from '../fx/particles';

@@ -10,7 +10,7 @@
     type BlessingId,
     type KeyMods,
     type RelicId,
-  } from '@keycraft/engine';
+  } from '@lettermancer/engine';
   import { RARITY_COLOR } from '../game/look';
   import { profile } from '../stores/profile.svelte';
   import Button from '../ui/Button.svelte';

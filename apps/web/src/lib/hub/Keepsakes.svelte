@@ -1,6 +1,12 @@
 <!-- Keepsakes: carry one into each run. They grow stronger the more runs you carry them. -->
 <script lang="ts">
-  import { KEEPSAKE_IDS, KEEPSAKE_RUNS_PER_LEVEL, KEEPSAKES, keepsakeLevel, type KeepsakeId } from '@keycraft/engine';
+  import {
+    KEEPSAKE_IDS,
+    KEEPSAKE_RUNS_PER_LEVEL,
+    KEEPSAKES,
+    keepsakeLevel,
+    type KeepsakeId,
+  } from '@lettermancer/engine';
   import * as sfx from '../fx/audio';
   import { profile } from '../stores/profile.svelte';
   import Panel from '../ui/Panel.svelte';

@@ -1,4 +1,4 @@
-// Plays Keycraft in headless Chromium like a person: reads words off the screen and types them
+// Plays Lettermancer in headless Chromium like a person: reads words off the screen and types them
 // with human-ish timing and typos, screenshotting each screen the first time it appears.
 //
 // Usage: node scripts/playtest.mjs <label> <wpm> <typoRate> [buy]

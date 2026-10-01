@@ -1,6 +1,6 @@
 <!-- Prophecies: achievements, grouped, with what's left to fulfil. -->
 <script lang="ts">
-  import { PROPHECIES, type ProphecyCategory } from '@keycraft/engine';
+  import { PROPHECIES, type ProphecyCategory } from '@lettermancer/engine';
   import { profile } from '../stores/profile.svelte';
   import Panel from '../ui/Panel.svelte';
 

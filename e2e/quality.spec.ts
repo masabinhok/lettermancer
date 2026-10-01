@@ -9,7 +9,9 @@ const SCREENS = ['/', '/leaderboards', '/practice', '/profile', '/login', '/priv
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
-  await page.evaluate(() => localStorage.setItem('keycraft.meta.v1', JSON.stringify({ prologueDone: true, runs: 1 })));
+  await page.evaluate(() =>
+    localStorage.setItem('lettermancer.meta.v1', JSON.stringify({ prologueDone: true, runs: 1 })),
+  );
 });
 
 for (const path of SCREENS) {

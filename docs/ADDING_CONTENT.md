@@ -1,6 +1,6 @@
 # Adding content
 
-Most of Keycraft's content is data in `packages/engine/src`. Adding an enemy, boon, relic or prophecy usually means
+Most of Lettermancer's content is data in `packages/engine/src`. Adding an enemy, boon, relic or prophecy usually means
 adding one entry, and sometimes one rule where the engine applies it. The web app reads everything from the engine,
 so new content shows up in the Codex, shops and build screen without UI changes.
 

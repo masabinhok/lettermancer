@@ -1,5 +1,5 @@
 {
-  "name": "@keycraft/web",
+  "name": "@lettermancer/web",
   "version": "0.2.0",
   "private": true,
   "type": "module",
@@ -14,7 +14,7 @@
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@fontsource/alegreya-sans": "^5.3.0",
     "@fontsource/cormorant-garamond": "^5.3.0",
-    "@keycraft/engine": "*",
+    "@lettermancer/engine": "*",
     "@supabase/supabase-js": "^2.117.2"
   },
   "devDependencies": {

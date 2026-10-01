@@ -1,4 +1,4 @@
-// Shared helpers for Keycraft edge functions: CORS, JSON replies, and the signed-in user.
+// Shared helpers for Lettermancer edge functions: CORS, JSON replies, and the signed-in user.
 import { createClient, type SupabaseClient, type User } from 'npm:@supabase/supabase-js@2';
 
 export const cors = {

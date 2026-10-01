@@ -1,5 +1,5 @@
 {
-  "name": "keycraft",
+  "name": "lettermancer",
   "private": true,
   "version": "0.2.0",
   "type": "module",
@@ -8,12 +8,12 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "npm run dev -w @keycraft/web",
-    "build": "npm run build -w @keycraft/web",
-    "preview": "npm run preview -w @keycraft/web --",
+    "dev": "npm run dev -w @lettermancer/web",
+    "build": "npm run build -w @lettermancer/web",
+    "preview": "npm run preview -w @lettermancer/web --",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "check": "npm run check -w @keycraft/web && tsc -p packages/engine --noEmit",
+    "check": "npm run check -w @lettermancer/web && tsc -p packages/engine --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

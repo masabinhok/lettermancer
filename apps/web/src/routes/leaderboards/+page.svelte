@@ -1,6 +1,6 @@
 <!-- Leaderboards: verified runs and practice tests, ranked. -->
 <script lang="ts">
-  import { dailyLabel, STARTERS, weeklyLabel, type StarterId } from '@keycraft/engine';
+  import { dailyLabel, STARTERS, weeklyLabel, type StarterId } from '@lettermancer/engine';
   import { account, type BoardRow } from '$lib/cloud/account.svelte';
   import { cloudEnabled } from '$lib/cloud/client';
   import { nav } from '$lib/nav';
@@ -59,7 +59,7 @@
 </script>
 
 <svelte:window {onkeydown} />
-<svelte:head><title>Leaderboards · Keycraft</title></svelte:head>
+<svelte:head><title>Leaderboards · Lettermancer</title></svelte:head>
 
 <div class="page" data-screen="leaderboards">
   <header>

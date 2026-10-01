@@ -1,6 +1,6 @@
 <!-- Choose the next room. Each door says what waits behind it: a fight and its reward, a shop, or an event. -->
 <script lang="ts">
-  import { MODS, MUSES, ROOMS_PER_ACT, type Door } from '@keycraft/engine';
+  import { MODS, MUSES, ROOMS_PER_ACT, type Door } from '@lettermancer/engine';
   import * as sfx from '../fx/audio';
   import type { Session } from '../game/session.svelte';
   import Hud from '../ui/Hud.svelte';

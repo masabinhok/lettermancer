@@ -15,7 +15,7 @@ import {
   type KeyBoon,
   type Run,
   type Trait,
-} from '@keycraft/engine';
+} from '@lettermancer/engine';
 
 /** How long before an attack lands the enemy visibly winds up. */
 export const WINDUP_MS = 1000;

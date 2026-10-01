@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { heat, KEEPSAKES, keyWeakness, nemesisBigram, runScore, STARTERS, topWeakKeys } from '@keycraft/engine';
+  import { heat, KEEPSAKES, keyWeakness, nemesisBigram, runScore, STARTERS, topWeakKeys } from '@lettermancer/engine';
   import { untrack } from 'svelte';
   import { account } from '../cloud/account.svelte';
   import type { Session } from '../game/session.svelte';
@@ -38,7 +38,7 @@
       mode: modeName ? `${modeName} · ${new Date().toISOString().slice(0, 10)}` : null,
       player: account.username,
     });
-  const fileName = `keycraft-${won ? 'victory' : 'run'}-${score}.png`;
+  const fileName = `lettermancer-${won ? 'victory' : 'run'}-${score}.png`;
 
   async function share() {
     shared = 'Drawing…';

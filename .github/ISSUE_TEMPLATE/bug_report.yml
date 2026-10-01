@@ -38,6 +38,6 @@ body:
     attributes:
       label: Run save (optional)
       description: >-
-        For bugs mid-run, paste the value of `keycraft.run.v1` from your browser's localStorage (DevTools → Application).
+        For bugs mid-run, paste the value of `lettermancer.run.v1` from your browser's localStorage (DevTools → Application).
         It lets us replay your run exactly.
       render: json

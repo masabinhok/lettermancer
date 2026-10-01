@@ -1,7 +1,7 @@
 # Credits and third-party licenses
 
-Keycraft's code is MIT-licensed (see [LICENSE](../LICENSE)). Everything the game ships besides its own code is listed
-here with its license. All of these licenses allow Keycraft to be open source and redistributed.
+Lettermancer's code is MIT-licensed (see [LICENSE](../LICENSE)). Everything the game ships besides its own code is listed
+here with its license. All of these licenses allow Lettermancer to be open source and redistributed.
 
 | What                    | Source                                                         | License                        |
 | ----------------------- | -------------------------------------------------------------- | ------------------------------ |
@@ -11,8 +11,8 @@ here with its license. All of these licenses allow Keycraft to be open source an
 | JetBrains Mono (typing) | JetBrains, via `@fontsource-variable/jetbrains-mono`           | SIL Open Font License 1.1      |
 | English word list       | `wordlist-english` by Jackson Ray Hamilton, derived from SCOWL | MIT; SCOWL's permissive notice |
 | Practice quotes         | Works in the public domain (sources shown with each quote)     | Public domain                  |
-| Sound and music         | Synthesized at runtime with the Web Audio API; no audio files  | Part of Keycraft (MIT)         |
-| Art (glyphs, ornaments) | Drawn in CSS and SVG in this repository                        | Part of Keycraft (MIT)         |
+| Sound and music         | Synthesized at runtime with the Web Audio API; no audio files  | Part of Lettermancer (MIT)     |
+| Art (glyphs, ornaments) | Drawn in CSS and SVG in this repository                        | Part of Lettermancer (MIT)     |
 
 The filtered word list lives in `packages/engine/src/content/words.json`. It comes from SCOWL (Copyright 2000-2016 by
 Kevin Atkinson, and the other copyright holders it names). SCOWL's notice asks for its copyright and permission text

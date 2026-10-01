@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { COMBO_TIERS, installMod, MODS, type CombatEvent } from '@keycraft/engine';
+  import { COMBO_TIERS, installMod, MODS, type CombatEvent } from '@lettermancer/engine';
   import { onMount } from 'svelte';
   import * as sfx from '$lib/fx/audio';
   import { burstAt, floatText, motesAt, shake } from '$lib/fx/particles';
@@ -145,7 +145,7 @@
 </script>
 
 <svelte:window {onkeydown} />
-<svelte:head><title>Learn to play · Keycraft</title></svelte:head>
+<svelte:head><title>Learn to play · Lettermancer</title></svelte:head>
 
 <div class="prologue" data-screen="prologue" bind:this={stage}>
   <Frame ornate class="coach">

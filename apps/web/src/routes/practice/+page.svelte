@@ -23,7 +23,7 @@
     type PracticeState,
     type ProphecyDef,
     type TrialDef,
-  } from '@keycraft/engine';
+  } from '@lettermancer/engine';
   import { onMount, tick } from 'svelte';
   import { account, type SubmitResult } from '$lib/cloud/account.svelte';
   import * as sfx from '$lib/fx/audio';
@@ -59,7 +59,7 @@
 
   // ---------- ghosts ----------
   // Your best recording of each test, kept on this device, and any ghost you chose to race from a leaderboard.
-  const GHOST_KEY = 'keycraft.ghosts.v1';
+  const GHOST_KEY = 'lettermancer.ghosts.v1';
   interface Recording {
     config: PracticeConfig;
     inputs: { k: string; at: number }[];
@@ -287,7 +287,7 @@
 </script>
 
 <svelte:window {onkeydown} />
-<svelte:head><title>Practice · Keycraft</title></svelte:head>
+<svelte:head><title>Practice · Lettermancer</title></svelte:head>
 
 <div class="practice" class:focus={typing} data-screen="practice">
   <header class="bar">

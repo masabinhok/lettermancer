@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MODS, RARITY_NAMES, RELICS, REROLL_BASE } from '@keycraft/engine';
+  import { MODS, RARITY_NAMES, RELICS, REROLL_BASE } from '@lettermancer/engine';
   import { RARITY_COLOR } from '../game/look';
   import * as sfx from '../fx/audio';
   import { floatText } from '../fx/particles';

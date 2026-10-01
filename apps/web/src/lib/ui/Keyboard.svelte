@@ -1,6 +1,6 @@
 <!-- The on-screen keyboard: shows your mods, the next key, finger colors, heatmaps and install picking. -->
 <script lang="ts">
-  import { MODS, RARITY_NAMES, type KeyMods } from '@keycraft/engine';
+  import { MODS, RARITY_NAMES, type KeyMods } from '@lettermancer/engine';
   import { fingerForColumn, HOME_COLUMNS, LAYOUTS } from '../game/layouts';
   import type { KeyboardLayout } from '../stores/profile.svelte';
 

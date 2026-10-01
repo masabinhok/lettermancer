@@ -1,9 +1,9 @@
 {
-  "name": "@keycraft/engine",
+  "name": "@lettermancer/engine",
   "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "Keycraft game rules: pure, deterministic, and framework-free.",
+  "description": "Lettermancer game rules: pure, deterministic, and framework-free.",
   "exports": {
     ".": "./src/index.ts"
   },
