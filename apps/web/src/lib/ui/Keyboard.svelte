@@ -103,9 +103,10 @@
 </div>
 
 <style>
+  /* Sized in rem so the keyboard grows with the text on big screens. */
   .keyboard {
-    --k: 48px;
-    --gap: 6px;
+    --k: 2.82rem;
+    --gap: 0.35rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -113,15 +114,15 @@
     user-select: none;
   }
   .large {
-    --k: 58px;
+    --k: 3.4rem;
   }
   .compact {
-    --k: 36px;
-    --gap: 4px;
+    --k: 2.12rem;
+    --gap: 0.24rem;
   }
   .mini {
-    --k: 28px;
-    --gap: 3px;
+    --k: 1.65rem;
+    --gap: 0.18rem;
   }
   .row {
     display: flex;

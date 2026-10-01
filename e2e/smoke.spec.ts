@@ -1,12 +1,19 @@
 import { expect, test, type Page } from '@playwright/test';
 
+/** Doors rise one by one; once they're all up, the first press looks closer and Enter steps through. */
+async function goThroughDoor(page: Page, n = 1) {
+  await expect(page.locator('[data-screen="doors"] .hint')).toContainText('look closer');
+  await page.keyboard.press(String(n));
+  await page.keyboard.press('Enter');
+}
+
 async function enterFight(page: Page) {
   await page.goto('/run?starter=apprentice');
   await expect(page.locator('[data-screen="intro"]')).toBeVisible();
   await page.waitForTimeout(350); // the title card ignores an Enter pressed right away
   await page.keyboard.press('Enter');
   await expect(page.locator('[data-screen="doors"]')).toBeVisible();
-  await page.keyboard.press('1'); // the first doors are always fights
+  await goThroughDoor(page); // the first doors are always fights
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
 }
 
@@ -72,7 +79,7 @@ test('choosing a muse door leads to that muse offering boons', async ({ page }) 
   await page.waitForTimeout(350);
   await page.keyboard.press('Enter');
   const muse = (await page.locator('.door .title').first().textContent())!.trim();
-  await page.keyboard.press('1');
+  await goThroughDoor(page);
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
   // Type until the fight is won.
   for (let i = 0; i < 400; i++) {
@@ -90,7 +97,12 @@ test('choosing a muse door leads to that muse offering boons', async ({ page }) 
     if (k) await page.keyboard.press(k);
     else await page.waitForTimeout(50);
   }
-  await expect(page.locator('[data-screen="reward"] h1')).toContainText(`${muse} offers a boon`);
+  await expect(page.locator('[data-screen="reward"] h1')).toHaveText(muse);
+  // Offers slide in, then the first one can be taken.
+  await expect(page.locator('[data-screen="reward"] .plaque.shown')).toHaveCount(3);
+  await expect(page.locator('[data-screen="reward"] .actions.shown')).toBeVisible();
+  await page.keyboard.press('1');
+  await expect(page.locator('[data-screen="install"], [data-screen="doors"]').first()).toBeVisible();
 });
 
 test('the Scriptorium opens its stations from the keyboard', async ({ page }) => {
@@ -207,7 +219,7 @@ test('power pips sit on their own keys, whatever their rarity', async ({ page })
   });
   await page.goto('/run?resume');
   await expect(page.locator('[data-screen="doors"]')).toBeVisible();
-  await page.keyboard.press('1');
+  await goThroughDoor(page);
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
   const misplaced = await page.evaluate(() =>
     [...document.querySelectorAll('.key')].flatMap((key) => {

@@ -25,9 +25,10 @@ await page.goto(`${URL}/run?starter=apprentice`);
 await page.waitForSelector('[data-screen="intro"]');
 await page.waitForTimeout(1200);
 await page.keyboard.press('Enter');
-await page.waitForSelector('[data-screen="doors"]');
-await page.waitForTimeout(900);
+await page.waitForSelector('[data-screen="doors"] .hint');
 await page.keyboard.press('1');
+await page.waitForTimeout(500);
+await page.keyboard.press('Enter');
 await page.waitForSelector('[data-screen="combat"]');
 
 const end = Date.now() + SECONDS * 1000;

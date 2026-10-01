@@ -277,7 +277,7 @@
   .field {
     flex: 1;
     min-height: 0;
-    width: min(1180px, 100%);
+    width: min(69rem, 100%);
     display: flex;
     justify-content: center;
     align-items: center;

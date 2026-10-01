@@ -87,7 +87,7 @@
 <style>
   .enemy {
     position: relative;
-    width: 290px;
+    width: 17rem;
     padding: var(--space-3) var(--space-4) var(--space-3);
     display: flex;
     flex-direction: column;
@@ -109,15 +109,15 @@
     }
   }
   .elite {
-    width: 330px;
+    width: 19.4rem;
     border-color: var(--gold-deep);
   }
   .boss {
-    width: 440px;
+    width: 25.9rem;
     border-color: color-mix(in oklab, var(--rose) 50%, var(--gold-deep));
   }
   .minion {
-    width: 200px;
+    width: 11.8rem;
   }
   .targeted {
     border-color: var(--moon);

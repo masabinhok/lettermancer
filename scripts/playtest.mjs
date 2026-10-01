@@ -22,6 +22,11 @@ const errors = [];
 page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
 page.on('pageerror', (e) => errors.push(String(e)));
 await page.goto(URL);
+// Play as a returning player: skip the tutorial, which the bot doesn't know how to play.
+await page.evaluate(() =>
+  localStorage.setItem('lettermancer.meta.v1', JSON.stringify({ prologueDone: true, runs: 1 })),
+);
+await page.reload();
 await page.waitForSelector('[data-screen]');
 
 let shot = 0;
@@ -50,9 +55,12 @@ while (Date.now() - t0 < MINUTES * 60_000) {
     }
   }
   if (s === 'doors') {
-    await wait(300);
+    // Doors rise one by one; the first press looks closer, Enter steps through.
+    await page.waitForSelector('[data-screen="doors"] .hint');
     await page.keyboard.press(String(1 + Math.floor(Math.random() * 2)));
-    await wait(400);
+    await wait(250);
+    await page.keyboard.press('Enter');
+    await wait(900);
   } else if (s === 'event') {
     await wait(300);
     const outcome = await page.evaluate(() => !!document.querySelector('.outcome'));
@@ -71,7 +79,7 @@ while (Date.now() - t0 < MINUTES * 60_000) {
     await page.keyboard.press('Escape');
     await wait(200);
   } else if (s === 'reward') {
-    await wait(400);
+    await wait(1400); // offers slide in before they can be taken
     const cards = await page.locator('[data-screen="reward"] .card').count();
     await page.keyboard.press(cards ? '1' : 'Enter');
     await wait(400);

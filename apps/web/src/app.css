@@ -40,8 +40,8 @@
   --f-glyph: 'Cormorant Garamond', 'Cinzel Variable', Georgia, serif;
 
   /* type scale (1.25) */
-  --t-xs: 0.8rem;
-  --t-sm: 0.9rem;
+  --t-xs: 0.85rem;
+  --t-sm: 0.95rem;
   --t-md: 1.05rem;
   --t-lg: 1.3rem;
   --t-xl: 1.65rem;
@@ -74,7 +74,8 @@
 }
 
 html {
-  font-size: calc(16px * var(--font-scale));
+  /* Text grows with the window (17px at 1280×720, 21px at 1080p), by whichever of width or height is tighter. */
+  font-size: calc(clamp(17px, min(1.33vw, 2.36vh), 21px) * var(--font-scale));
 }
 
 html,
@@ -84,9 +85,13 @@ body {
   background: var(--night);
   color: var(--moon);
   font-family: var(--f-text);
-  font-size: var(--t-md);
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Only on body: on html, rem would mean the browser default and override the scaling above. */
+body {
+  font-size: var(--t-md);
 }
 
 body {

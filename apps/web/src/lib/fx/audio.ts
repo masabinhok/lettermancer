@@ -141,6 +141,82 @@ export const select = () => tone(660, 0.06, 'triangle', 0.04);
 
 export const windup = () => tone(220, 0.25, 'sine', 0.035, { slideTo: 330, attack: 0.08 });
 
+/** Filtered noise whose pitch sweeps from one frequency to another: whooshes and swishes. */
+function sweep(dur: number, gain: number, from: number, to: number, q = 1.4, delay = 0): void {
+  const a = ac();
+  if (!a || volumes.volume === 0) return;
+  const t = a.currentTime + delay;
+  const len = Math.ceil(a.sampleRate * dur);
+  const buf = a.createBuffer(1, len, a.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  const src = a.createBufferSource();
+  src.buffer = buf;
+  const f = a.createBiquadFilter();
+  f.type = 'bandpass';
+  f.Q.value = q;
+  f.frequency.setValueAtTime(from, t);
+  f.frequency.exponentialRampToValueAtTime(to, t + dur);
+  const g = a.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(gain, t + dur * 0.35);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(f).connect(g).connect(sfxBus);
+  src.start(t);
+  src.stop(t + dur + 0.05);
+}
+
+// ---------- doors and boons (the big choice moments) ----------
+
+/** A door rises out of the dark: a deep thump and a rising shimmer, higher for each door. */
+export const doorReveal = (i: number) => {
+  tone(70, 0.45, 'sine', 0.16, { slideTo: 42 });
+  noise(0.25, 0.12, 'lowpass', 380);
+  tone(note(294, 5 + i * 2), 0.6, 'triangle', 0.035, { delay: 0.08, attack: 0.12 });
+};
+
+/** Hovering a door or plaque: a soft bell, pitched by position. */
+export const chime = (i: number) => {
+  tone(note(587, i * 2), 0.5, 'sine', 0.045, { attack: 0.01 });
+  tone(note(587, i * 2) * 2, 0.3, 'sine', 0.015, { attack: 0.01 });
+};
+
+/** Stepping through a door: a rushing whoosh under a rising chord. */
+export const portal = () => {
+  sweep(0.75, 0.32, 180, 3200);
+  tone(55, 0.8, 'sawtooth', 0.05, { slideTo: 110, attack: 0.1 });
+  [0, 2, 4, 7].forEach((s, i) => tone(note(294, s), 0.9, 'triangle', 0.045, { delay: 0.18 + i * 0.05, attack: 0.05 }));
+};
+
+/** A muse arrives: a slow choir-like pad, each muse on her own root. */
+export const museArrive = (root: number) => {
+  const base = note(147, root);
+  for (const [ratio, detune] of [
+    [1, 0],
+    [1.5, 0.003],
+    [2, -0.004],
+    [2.52, 0.002],
+  ])
+    for (const d of [1 - detune, 1 + detune])
+      tone(base * ratio * d, 1.9, 'triangle', 0.022, { attack: 0.45, bus: sfxBus });
+  sweep(1.2, 0.08, 6000, 1200, 0.8);
+};
+
+/** A plaque slides in: a paper swish and a plucked note. */
+export const cardIn = (i: number) => {
+  sweep(0.22, 0.12, 1800, 5200, 0.9);
+  tone(note(392, i * 2), 0.35, 'triangle', 0.04, { delay: 0.05 });
+};
+
+/** Taking a boon: a chord that grows with rarity, then a sparkle. */
+export const take = (rarity: number) => {
+  noise(0.3, 0.18, 'bandpass', 1400, 0.9);
+  const steps = [0, 2, 4, 5, 7, 9, 10].slice(0, 3 + rarity);
+  steps.forEach((s, i) => tone(note(294, s), 0.9, 'sine', 0.05, { delay: i * 0.05, attack: 0.02 }));
+  [12, 14, 16].forEach((s, i) => tone(note(294, s), 0.25, 'sine', 0.025, { delay: 0.25 + i * 0.06 }));
+  if (rarity >= 2) tone(note(147, 0), 1.1, 'sawtooth', 0.035, { attack: 0.05 });
+};
+
 // ---------- music ----------
 
 let musicTimer: ReturnType<typeof setInterval> | null = null;

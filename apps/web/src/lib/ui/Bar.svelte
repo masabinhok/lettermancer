@@ -9,6 +9,7 @@
     value: number;
     max: number;
     tone?: 'hp' | 'foe' | 'threat' | 'danger' | 'shield';
+    /** at the base 16px text size; scales with the text */
     height?: number;
     label?: string | null;
   } = $props();
@@ -17,7 +18,7 @@
 
 <div
   class="bar {tone}"
-  style:height="{height}px"
+  style:height="{height / 16}rem"
   role="meter"
   aria-valuenow={value}
   aria-valuemin={0}
@@ -60,11 +61,13 @@
   }
   span {
     position: relative;
-    display: block;
     text-align: center;
     font-weight: 700;
     font-size: 0.78rem;
-    line-height: 1.35;
+    line-height: 1;
+    height: 100%;
+    display: grid;
+    place-items: center;
     text-shadow: 0 1px 2px #000;
   }
 </style>
