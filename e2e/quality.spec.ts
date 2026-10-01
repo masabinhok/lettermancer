@@ -27,11 +27,14 @@ for (const path of SCREENS) {
 }
 
 test('the first screen loads under 200 KB of gzipped JavaScript', async ({ page }) => {
-  const sizes: number[] = [];
-  page.on('response', async (r) => {
-    if (r.url().endsWith('.js')) sizes.push(gzipSync(await r.body()).length);
+  const urls = new Set<string>();
+  page.on('response', (r) => {
+    if (r.url().endsWith('.js')) urls.add(r.url());
   });
   await page.goto('/', { waitUntil: 'networkidle' });
-  const kb = sizes.reduce((a, b) => a + b, 0) / 1024;
-  expect(kb).toBeLessThan(200);
+  // Fetch each script again rather than reading response bodies, which the browser may already have dropped.
+  let bytes = 0;
+  for (const url of urls) bytes += gzipSync(await (await page.request.get(url)).body()).length;
+  expect(urls.size).toBeGreaterThan(0);
+  expect(bytes / 1024).toBeLessThan(200);
 });
