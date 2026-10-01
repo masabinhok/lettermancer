@@ -434,3 +434,21 @@ verify_jwt = false
 
 [functions.delete-account]
 verify_jwt = false
+
+# Production (hosted) overrides. `npx supabase config push --project-ref ociostrisqnyezjpyjas` applies them.
+[remotes.production]
+project_id = "ociostrisqnyezjpyjas"
+
+[remotes.production.auth]
+site_url = "https://lettermancer.vercel.app"
+additional_redirect_urls = ["https://lettermancer.vercel.app", "https://lettermancer.vercel.app/profile"]
+
+# Keep the hosted project's safer defaults rather than the local dev ones.
+[remotes.production.auth.email]
+enable_confirmations = true
+max_frequency = "1m0s"
+otp_length = 8
+
+[remotes.production.auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
