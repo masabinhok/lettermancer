@@ -217,6 +217,36 @@ export const take = (rarity: number) => {
   if (rarity >= 2) tone(note(147, 0), 1.1, 'sawtooth', 0.035, { attack: 0.05 });
 };
 
+// ---------- act and boss title cards ----------
+
+/** A new act: a deep gong under a slow, rising chord. */
+export const actCard = (act: number) => {
+  tone(55 * 2 ** (((act - 1) * 2) / 12), 2.4, 'sine', 0.2, { attack: 0.01 });
+  tone(110 * 2 ** (((act - 1) * 2) / 12) * 1.01, 1.8, 'triangle', 0.05, { attack: 0.01 });
+  noise(0.5, 0.1, 'lowpass', 900);
+  [0, 2, 4].forEach((s, i) => tone(note(147, s + act), 2.2, 'triangle', 0.03, { delay: 0.4 + i * 0.25, attack: 0.5 }));
+};
+
+/** One letter of a title being set down: a soft quill tap. */
+export const titleTap = (i: number) => {
+  noise(0.03, 0.08, 'highpass', 3600);
+  tone(note(587, i % 5), 0.12, 'triangle', 0.02);
+};
+
+/** A boss arrives: a low brass hit, then a slow heartbeat. */
+export const bossCard = () => {
+  tone(41, 1.4, 'sawtooth', 0.12, { slideTo: 33 });
+  tone(82, 1.0, 'square', 0.04, { slideTo: 65 });
+  noise(0.8, 0.3, 'lowpass', 500);
+  for (const at of [0.9, 1.15, 1.9, 2.15]) tone(55, 0.18, 'sine', 0.22, { delay: at, slideTo: 40 });
+};
+
+/** A boss title letter slamming down. */
+export const stamp = () => {
+  noise(0.08, 0.2, 'lowpass', 700);
+  tone(70, 0.12, 'sine', 0.12, { slideTo: 45 });
+};
+
 // ---------- music ----------
 
 let musicTimer: ReturnType<typeof setInterval> | null = null;

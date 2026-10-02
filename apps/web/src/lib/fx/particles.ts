@@ -24,6 +24,8 @@ export function setReducedMotion(on: boolean): void {
   reduced = on;
 }
 
+export const isReduced = (): boolean => reduced;
+
 export function attachCanvas(el: HTMLCanvasElement): () => void {
   g = el.getContext('2d');
   const resize = () => {
@@ -140,13 +142,14 @@ export function motesAt(el: Element | null | undefined, color: string, count?: n
 }
 
 /** Floating damage/label text anchored to an element. Styled by `.float-text.<cls>` in the layout. */
-export function floatText(el: Element | null | undefined, text: string, cls = ''): void {
+export function floatText(el: Element | null | undefined, text: string, cls = '', scale = 1): void {
   if (!el) return;
   const r = el.getBoundingClientRect();
   const d = document.createElement('div');
   d.className = `float-text ${cls}`;
   d.textContent = text;
   d.setAttribute('aria-hidden', 'true');
+  if (scale !== 1) d.style.setProperty('--s', String(scale));
   d.style.left = `${r.left + r.width / 2 + (Math.random() * 36 - 18)}px`;
   d.style.top = `${r.top + r.height * 0.25}px`;
   document.body.appendChild(d);

@@ -1,5 +1,13 @@
 import { expect, test, type Page } from '@playwright/test';
 
+/** The act's title card: the first Enter finishes its animation, the second begins the act. */
+async function passIntro(page: Page) {
+  await expect(page.locator('[data-screen="intro"]')).toBeVisible();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('[data-screen="intro"].ready')).toBeVisible();
+  await page.keyboard.press('Enter');
+}
+
 /** Doors rise one by one; once they're all up, the first press looks closer and Enter steps through. */
 async function goThroughDoor(page: Page, n = 1) {
   await expect(page.locator('[data-screen="doors"] .hint')).toContainText('look closer');
@@ -9,9 +17,7 @@ async function goThroughDoor(page: Page, n = 1) {
 
 async function enterFight(page: Page) {
   await page.goto('/run?starter=apprentice');
-  await expect(page.locator('[data-screen="intro"]')).toBeVisible();
-  await page.waitForTimeout(350); // the title card ignores an Enter pressed right away
-  await page.keyboard.press('Enter');
+  await passIntro(page);
   await expect(page.locator('[data-screen="doors"]')).toBeVisible();
   await goThroughDoor(page); // the first doors are always fights
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
@@ -75,9 +81,8 @@ test('the pause menu opens your build', async ({ page }) => {
 
 test('choosing a muse door leads to that muse offering boons', async ({ page }) => {
   await page.goto('/run?starter=apprentice');
-  await expect(page.locator('[data-screen="intro"]')).toBeVisible();
-  await page.waitForTimeout(350);
-  await page.keyboard.press('Enter');
+  await passIntro(page);
+  await expect(page.locator('[data-screen="doors"]')).toBeVisible();
   const muse = (await page.locator('.door .title').first().textContent())!.trim();
   await goThroughDoor(page);
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();

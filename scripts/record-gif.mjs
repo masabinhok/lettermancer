@@ -22,8 +22,8 @@ await page.evaluate(() =>
   localStorage.setItem('lettermancer.meta.v1', JSON.stringify({ prologueDone: true, runs: 1 })),
 );
 await page.goto(`${URL}/run?starter=apprentice`);
-await page.waitForSelector('[data-screen="intro"]');
-await page.waitForTimeout(1200);
+await page.waitForSelector('[data-screen="intro"].ready');
+await page.waitForTimeout(600);
 await page.keyboard.press('Enter');
 await page.waitForSelector('[data-screen="doors"] .hint');
 await page.keyboard.press('1');

@@ -2,6 +2,7 @@
   import { COMBO_TIERS, MODS, type MachineEvent } from '@lettermancer/engine';
   import { onMount } from 'svelte';
   import * as sfx from '../fx/audio';
+  import { banner, hitStop, punch, shatter, slash } from '../fx/impact';
   import { burstAt, floatText, motesAt, shake } from '../fx/particles';
   import type { Session } from '../game/session.svelte';
   import { profile } from '../stores/profile.svelte';
@@ -33,13 +34,25 @@
 
   // eslint-disable-next-line svelte/prefer-svelte-reactivity -- bookkeeping for sounds, never rendered
   const windupsSeen = new Set<number>();
+  /** Color of the power on the last key typed: the slash that finishes a word takes it on. */
+  let strikeColor = '#ddd7ea';
+
+  /** Bigger hits, relative to the foe's health, get bigger numbers (up to about twice the size). */
+  function hitScale(enemyId: number, dmg: number, crit: boolean): number {
+    const e = snap.enemies.find((x) => x.id === enemyId);
+    const share = e ? dmg / Math.max(1, e.maxHp) : 0.2;
+    return Math.min(2.1, 0.9 + share * 2.2) * (crit ? 1.25 : 1);
+  }
 
   function onEvent(ev: MachineEvent) {
     switch (ev.t) {
-      case 'key-ok':
+      case 'key-ok': {
+        const boons = run.keyMods[ev.key] ?? [];
+        strikeColor = boons.length ? MODS[boons[boons.length - 1].mod].color : '#ddd7ea';
         kb?.flash(ev.key, true);
         sfx.keyClick(session.machine.combat?.combo ?? 0);
         break;
+      }
       case 'key-miss':
         kb?.flash(ev.key, false);
         sfx.miss();
@@ -52,24 +65,22 @@
       case 'combo-tier':
         sfx.tierUp(ev.tier);
         sfx.setIntensity(ev.tier);
-        floatText(comboEl, `×${COMBO_TIERS[ev.tier].mult}`, 'ft-combo');
-        motesAt(comboEl, '#f3d98c', 22);
+        banner(stage, `×${COMBO_TIERS[ev.tier].mult}`, `${COMBO_TIERS[ev.tier].at} combo`, '#f3d98c');
+        motesAt(comboEl, '#f3d98c', 30);
         break;
       case 'hit': {
         sfx.hit(ev.crit);
+        const el = enemyEl(ev.enemyId);
         floatText(
-          enemyEl(ev.enemyId),
+          el,
           `${ev.dmg}${ev.crit ? '!' : ''}${ev.armored ? ' (armored)' : ''}`,
           ev.crit ? 'ft-crit' : 'ft-dmg',
+          hitScale(ev.enemyId, ev.dmg, ev.crit),
         );
-        burstAt(glyphEl(ev.enemyId), ev.crit ? '#f3d98c' : '#ddd7ea', ev.crit ? 34 : 16);
-        const el = enemyEl(ev.enemyId);
-        el?.animate(
-          [{ transform: 'translateX(0)' }, { transform: 'translateX(8px) rotate(1deg)' }, { transform: 'none' }],
-          {
-            duration: 180,
-          },
-        );
+        burstAt(glyphEl(ev.enemyId), ev.crit ? '#f3d98c' : strikeColor, ev.crit ? 40 : 18);
+        slash(el?.querySelector('.word'), ev.crit ? '#f3d98c' : strikeColor, ev.crit);
+        punch(el, ev.crit);
+        hitStop(stage, ev.crit ? 110 : 45);
         if (ev.crit) shake(stage, 'small');
         break;
       }
@@ -89,11 +100,16 @@
         floatText(enemyEl(ev.enemyId), `+${(ev.ms / 1000).toFixed(1)}s`, 'ft-frost');
         burstAt(enemyEl(ev.enemyId)?.querySelector('.threat'), MODS.frost.color, 10, 120);
         break;
-      case 'kill':
+      case 'kill': {
         sfx.kill();
-        burstAt(glyphEl(ev.enemyId), '#f3d98c', 44, 380);
-        shake(stage, 'small');
+        const el = enemyEl(ev.enemyId);
+        const big = !!el?.matches('.boss, .elite');
+        burstAt(glyphEl(ev.enemyId), '#f3d98c', big ? 90 : 48, big ? 520 : 380);
+        shatter(el, big ? '#e24b6e' : '#f3d98c', big);
+        hitStop(stage, big ? 220 : 120);
+        shake(stage, big ? 'big' : 'small');
         break;
+      }
       case 'player-hit':
         sfx.hurt();
         shake(stage, 'big');
@@ -146,13 +162,14 @@
         sfx.select();
         break;
       case 'wave':
-        floatText(stage.querySelector('.field'), `Wave ${ev.wave}`, 'ft-combo');
+        banner(stage, `Wave ${ev.wave}`, 'More are coming', '#ddd7ea');
         break;
       case 'phase':
         sfx.tierUp(ev.phase + 1);
         shake(stage, 'big');
-        floatText(enemyEl(ev.enemyId), 'It changes', 'ft-crit');
+        banner(stage, 'It changes', snap.enemies.find((e) => e.id === ev.enemyId)?.name ?? '', '#e24b6e');
         burstAt(glyphEl(ev.enemyId), '#e24b6e', 50, 400);
+        hitStop(stage, 200);
         break;
       case 'typo-hurt':
         floatText(stage.querySelector('.hud .hp'), `−${ev.dmg}`, 'ft-hurt');
