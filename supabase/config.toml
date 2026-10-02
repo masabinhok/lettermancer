@@ -452,3 +452,13 @@ otp_length = 8
 [remotes.production.auth.mfa.totp]
 enroll_enabled = true
 verify_enabled = true
+
+# Sign-in providers that are live in production. Their client IDs and secrets live only in the dashboard;
+# declaring them enabled here stops a `config push` from switching them off.
+[remotes.production.auth.external.github]
+enabled = true
+client_id = "Ov23liQsmqAh7azn7FJy"
+
+[remotes.production.auth.external.google]
+enabled = true
+client_id = "722554373799-rivg0q24ahiespr9pf6ts9b5i692ffiu.apps.googleusercontent.com"
