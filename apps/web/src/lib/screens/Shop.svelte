@@ -2,7 +2,7 @@
   import { MODS, RARITY_NAMES, RELICS, REROLL_BASE } from '@lettermancer/engine';
   import { RARITY_COLOR } from '../game/look';
   import * as sfx from '../fx/audio';
-  import { floatText } from '../fx/particles';
+  import { burstAt, floatText } from '../fx/particles';
   import type { Session } from '../game/session.svelte';
   import Button from '../ui/Button.svelte';
   import Hud from '../ui/Hud.svelte';
@@ -15,9 +15,23 @@
   let root = $state<HTMLElement>();
 
   function buy(i: number) {
-    if (session.buy(i)) sfx.coin();
-    else deny();
+    const card = root?.querySelectorAll('.card')[order.indexOf(i)];
+    if (session.buy(i)) {
+      sfx.purchase();
+      burstAt(card, '#e9c46a', 36, 340);
+      card?.animate(
+        [
+          { transform: 'scale(1.08)', filter: 'brightness(1.8)' },
+          { transform: 'scale(1)', filter: 'brightness(1)' },
+        ],
+        { duration: 380, easing: 'cubic-bezier(.2,.8,.2,1)' },
+      );
+    } else deny();
   }
+
+  /** Items in the order their cards appear on screen (grouped by kind). */
+  const GROUPS = ['mod', 'relic', 'heal'] as const;
+  const order = $derived(v ? GROUPS.flatMap((g) => v.items.flatMap((it, i) => (it.kind === g ? [i] : []))) : []);
 
   function reroll() {
     if (session.reroll()) sfx.select();
@@ -73,6 +87,8 @@
                       color={MODS[it.mod].color}
                       kind="{RARITY_NAMES[it.rarity]} key power"
                       rarityColor={RARITY_COLOR[it.rarity]}
+                      tier={it.rarity}
+                      index={order.indexOf(i)}
                       cost={it.cost}
                       sold={it.sold}
                       affordable={it.cost <= run.coins}
@@ -86,6 +102,8 @@
                       desc={RELICS[it.relic].desc}
                       kind="Relic"
                       ornate
+                      tier={2}
+                      index={order.indexOf(i)}
                       cost={it.cost}
                       sold={it.sold}
                       affordable={it.cost <= run.coins}
@@ -99,6 +117,7 @@
                       desc="Restore {it.amount} health."
                       color="var(--witchfire)"
                       kind="Service"
+                      index={order.indexOf(i)}
                       cost={it.cost}
                       sold={it.sold}
                       affordable={it.cost <= run.coins}
@@ -143,7 +162,7 @@
     text-align: center;
   }
   h1 {
-    font-size: var(--t-2xl);
+    font-size: var(--t-3xl);
     color: var(--gold-bright);
   }
   header p {
@@ -171,18 +190,20 @@
     display: flex;
     gap: var(--space-3);
   }
+  /* Seven wares on one screen: narrower cards, smaller medallions. */
   .row :global(.card) {
-    width: 150px;
-    min-height: 236px;
+    width: 9.4rem;
+    min-height: 14.5rem;
     padding: var(--space-5) var(--space-3) var(--space-3);
   }
   .row :global(.card .name) {
-    font-size: var(--t-md);
+    font-size: var(--t-lg);
   }
-  .row :global(.card .sigil) {
-    width: 52px;
-    height: 52px;
-    font-size: 1.7rem;
+  .row :global(.card .desc) {
+    font-size: var(--t-sm);
+  }
+  .row :global(.card .sigil .emblem) {
+    --size: 3.6rem !important;
   }
   .actions {
     display: flex;

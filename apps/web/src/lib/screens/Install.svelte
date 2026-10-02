@@ -2,10 +2,11 @@
   import { letterShare, MAX_MODS_PER_KEY, MODS, RARITY_NAMES, WORDS } from '@lettermancer/engine';
   import { RARITY_COLOR } from '../game/look';
   import * as sfx from '../fx/audio';
-  import { motesAt } from '../fx/particles';
+  import { burstAt, motesAt } from '../fx/particles';
   import type { Session } from '../game/session.svelte';
   import { profile } from '../stores/profile.svelte';
   import Button from '../ui/Button.svelte';
+  import Emblem from '../ui/Emblem.svelte';
   import Hud from '../ui/Hud.svelte';
   import Keyboard from '../ui/Keyboard.svelte';
 
@@ -29,8 +30,18 @@
 
   function install(k: string) {
     if (!v) return;
-    motesAt(wrap?.querySelector(`[data-key="${k}"]`), MODS[v.mod.mod].color, 24);
-    sfx.boon();
+    const key = wrap?.querySelector(`[data-key="${k}"]`);
+    const color = MODS[v.mod.mod].color;
+    burstAt(key, color, 40, 340);
+    motesAt(key, color, 24);
+    key?.animate(
+      [
+        { transform: 'scale(1.35)', filter: 'brightness(2.2)' },
+        { transform: 'scale(1)', filter: 'brightness(1)' },
+      ],
+      { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' },
+    );
+    sfx.take(v.mod.rarity);
     session.install(k);
   }
 
@@ -56,7 +67,8 @@
   <div class="screen" data-screen="install" bind:this={wrap}>
     <Hud hp={run.hp} maxHp={run.maxHp} coins={run.coins} act={run.act} room={run.room} relics={run.relics} {onbuild} />
     <div class="body">
-      <h1>Press the key that should carry <span style:color={m.color}>{m.glyph} {m.name}</span></h1>
+      <Emblem glyph={m.glyph} color={m.color} tier={v.mod.rarity} size="6.5rem" bob />
+      <h1>Press the key that should carry <span style:color={m.color}>{m.name}</span></h1>
       <p class="desc">
         <span style:color={RARITY_COLOR[v.mod.rarity]}>{RARITY_NAMES[v.mod.rarity]}.</span>
         {m.describe(v.mod.rarity)}
@@ -111,7 +123,8 @@
     text-align: center;
   }
   .desc {
-    color: var(--moon-dim);
+    color: var(--moon);
+    font-size: var(--t-lg);
   }
   .recent {
     color: var(--moon-dim);

@@ -217,6 +217,13 @@ export const take = (rarity: number) => {
   if (rarity >= 2) tone(note(147, 0), 1.1, 'sawtooth', 0.035, { attack: 0.05 });
 };
 
+/** Buying something: a cascade of coins and a bright chord. */
+export const purchase = () => {
+  [1568, 1760, 2093, 2349].forEach((f, i) => tone(f, 0.12, 'sine', 0.04, { delay: i * 0.045 }));
+  [0, 4, 7].forEach((s, i) => tone(note(392, s), 0.6, 'triangle', 0.04, { delay: 0.12 + i * 0.03 }));
+  noise(0.15, 0.08, 'highpass', 6000);
+};
+
 // ---------- act and boss title cards ----------
 
 /** A new act: a deep gong under a slow, rising chord. */

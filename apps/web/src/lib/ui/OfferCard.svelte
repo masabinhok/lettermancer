@@ -1,6 +1,7 @@
 <!-- A choice card for boons, relics and shop items. Rarer offers get the ornate gold frame. -->
 <script lang="ts">
   import Corner from './Corner.svelte';
+  import Emblem from './Emblem.svelte';
 
   let {
     hotkey,
@@ -15,6 +16,8 @@
     ornate = false,
     detail = null,
     rarityColor = null,
+    tier = 0,
+    index = 0,
     onselect,
   }: {
     hotkey: string;
@@ -30,6 +33,10 @@
     detail?: string | null;
     /** colors the kind line to show rarity */
     rarityColor?: string | null;
+    /** 0-3: the medallion's rim, from bronze to heroic gold */
+    tier?: number;
+    /** position in a row, so cards arrive one after another */
+    index?: number;
     onselect: () => void;
   } = $props();
 </script>
@@ -40,6 +47,7 @@
   class:sold
   class:poor={!affordable}
   style:--c={color}
+  style:--i={index}
   onclick={onselect}
   disabled={sold}
   type="button"
@@ -49,7 +57,7 @@
       size={20}
     />{/if}
   <kbd class="hk">{hotkey}</kbd>
-  <span class="sigil" aria-hidden="true">{glyph}</span>
+  <span class="sigil" aria-hidden="true"><Emblem {glyph} {color} {tier} size="4.6rem" rays={tier >= 2} /></span>
   <span class="kind" style:color={rarityColor}>{kind}</span>
   <span class="name">{name}</span>
   <span class="desc">{desc}</span>
@@ -62,8 +70,8 @@
 <style>
   .card {
     position: relative;
-    width: 208px;
-    min-height: 250px;
+    width: 13.5rem;
+    min-height: 15.5rem;
     padding: var(--space-5) var(--space-4) var(--space-4);
     display: flex;
     flex-direction: column;
@@ -78,6 +86,14 @@
       transform var(--dur) var(--ease-out),
       box-shadow var(--dur) var(--ease-out),
       border-color var(--dur);
+    animation: deal 0.5s var(--ease-out) both;
+    animation-delay: calc(var(--i) * 90ms);
+  }
+  @keyframes deal {
+    from {
+      opacity: 0;
+      transform: translateY(24px) rotate(-2deg) scale(0.95);
+    }
   }
   .card:hover:not(:disabled),
   .card:focus-visible {
@@ -94,32 +110,26 @@
     left: 10px;
   }
   .sigil {
-    width: 64px;
-    height: 64px;
     display: grid;
     place-items: center;
-    margin-top: var(--space-2);
-    border-radius: 50%;
-    font-family: var(--f-glyph);
-    font-size: 2.1rem;
-    color: var(--c);
-    background: radial-gradient(circle, color-mix(in oklab, var(--c) 22%, transparent), transparent 70%);
-    border: 1px solid color-mix(in oklab, var(--c) 50%, transparent);
+    margin-top: var(--space-1);
   }
   .kind {
     font-size: var(--t-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--moon-faint);
   }
   .name {
     font-family: var(--f-display);
     font-weight: 700;
-    font-size: var(--t-lg);
+    font-size: var(--t-xl);
     color: var(--c);
     line-height: 1.1;
   }
   .desc {
-    font-size: var(--t-sm);
-    color: var(--moon-dim);
+    font-size: var(--t-md);
+    color: var(--moon);
     line-height: 1.35;
   }
   .detail {
@@ -129,7 +139,9 @@
   }
   .cost {
     margin-top: auto;
+    font-family: var(--f-display);
     font-weight: 700;
+    font-size: var(--t-lg);
     color: var(--aurum);
   }
   .poor .cost {

@@ -21,7 +21,8 @@
     "bundle:engine": "esbuild packages/engine/src/index.ts --bundle --format=esm --platform=neutral --outfile=supabase/functions/_shared/engine.js --legal-comments=none",
     "test:cloud": "vitest run --project cloud",
     "supabase:start": "npm run bundle:engine && npx supabase start",
-    "test:e2e:cloud": "CLOUD=1 playwright test e2e/cloud"
+    "test:e2e:cloud": "CLOUD=1 playwright test e2e/cloud",
+    "layout": "node scripts/layout-sweep.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
