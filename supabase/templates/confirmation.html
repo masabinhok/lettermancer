@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Welcome to Lettermancer</title>
+  </head>
+  <body style="margin: 0; padding: 0; background: #130f1d">
+    <div style="display: none; max-height: 0; overflow: hidden">
+      Confirm your email to save your Lettermancer progress on every device.
+    </div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background: #130f1d">
+      <tr>
+        <td align="center" style="padding: 40px 16px">
+          <table
+            role="presentation"
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            style="max-width: 480px; background: #221b33; border: 1px solid #8a6a2a"
+          >
+            <tr>
+              <td align="center" style="padding: 36px 32px 8px">
+                <div
+                  style="
+                    display: inline-block;
+                    width: 56px;
+                    height: 56px;
+                    line-height: 56px;
+                    border: 2px solid #d9b45b;
+                    background: #3b2160;
+                    color: #f3d98c;
+                    font-family: Georgia, 'Times New Roman', serif;
+                    font-size: 32px;
+                    font-weight: bold;
+                  "
+                >
+                  L
+                </div>
+                <p
+                  style="
+                    margin: 14px 0 0;
+                    font-family: Georgia, 'Times New Roman', serif;
+                    font-size: 22px;
+                    letter-spacing: 3px;
+                    color: #f3d98c;
+                  "
+                >
+                  LETTERMANCER
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 20px 32px 8px; font-family: Arial, Helvetica, sans-serif; color: #ddd7ea">
+                <p style="margin: 0 0 14px; font-size: 17px; line-height: 1.5">Welcome to the Scriptorium, scribe.</p>
+                <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: #a79fbd">
+                  Confirm your email to finish creating your account. Your progress will follow you to every device,
+                  and your runs can climb the leaderboards.
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding: 0 32px 28px">
+                <a
+                  href="{{ .ConfirmationURL }}"
+                  style="
+                    display: inline-block;
+                    padding: 14px 28px;
+                    background: #d9b45b;
+                    color: #1a1326;
+                    font-family: Georgia, 'Times New Roman', serif;
+                    font-size: 16px;
+                    font-weight: bold;
+                    letter-spacing: 1px;
+                    text-decoration: none;
+                  "
+                  >Confirm and start playing</a
+                >
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 0 32px 32px; font-family: Arial, Helvetica, sans-serif">
+                <p style="margin: 0 0 8px; font-size: 13px; line-height: 1.5; color: #8f87a8">
+                  The link works once and expires in an hour. If the button doesn't work, paste this into your browser:
+                </p>
+                <p style="margin: 0; font-size: 12px; line-height: 1.5; word-break: break-all">
+                  <a href="{{ .ConfirmationURL }}" style="color: #d9b45b">{{ .ConfirmationURL }}</a>
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td
+                style="
+                  padding: 18px 32px;
+                  border-top: 1px solid #3d3358;
+                  font-family: Arial, Helvetica, sans-serif;
+                  font-size: 12px;
+                  line-height: 1.5;
+                  color: #8f87a8;
+                "
+              >
+                You're getting this because someone created a Lettermancer account with this address. If that wasn't
+                you, ignore this email; nothing happens without the link.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
