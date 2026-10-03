@@ -127,7 +127,8 @@ export const BOSSES: Record<BossRule, BossDef> = {
     desc: 'Its words fade after a moment. Type from memory.',
     phases: [0.5],
     phaseDesc: ['The dark deepens: words vanish faster.'],
-    len: [5, 8],
+    // Short enough to hold in memory: it's a memory test, not a reading-speed spike (issue #19).
+    len: [4, 7],
     hp: 1,
   },
   redactor: {
@@ -175,5 +176,6 @@ export const BOSS_BASE = [
   { hp: 356, atk: 18, intentMs: 5510 },
 ];
 
-export const BLACKOUT_VISIBLE_MS = [1400, 900];
+/** How long a Blackout word stays visible, per phase. Long enough to read a word once, calmly. */
+export const BLACKOUT_VISIBLE_MS = [2000, 1300];
 export const PUNCTUATION = ',.;:!?';

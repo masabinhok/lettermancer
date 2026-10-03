@@ -210,7 +210,7 @@ test('power pips sit on their own keys, whatever their rarity', async ({ page })
       startBoon: { key: 's', mod: 'frost', rarity: 2 },
     };
     const config = {
-      rules: 2,
+      rules: 3, // RULES_VERSION in packages/engine/src/machine.ts
       seed: 7,
       starter: 'apprentice',
       weak: {},

@@ -55,7 +55,7 @@ import { WordBank } from './words';
 /** Simulation step. Every combat timestamp is advanced to in multiples of this. */
 export const STEP_MS = 5;
 /** Bump when rules change in a way that would alter old replays. */
-export const RULES_VERSION = 2;
+export const RULES_VERSION = 3;
 
 export type RunMode = 'standard' | 'daily' | 'weekly';
 
