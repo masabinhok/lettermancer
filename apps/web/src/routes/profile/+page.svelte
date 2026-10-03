@@ -2,7 +2,7 @@
 <script lang="ts">
   import { keyMastery, PROPHECIES } from '@lettermancer/engine';
   import { account } from '$lib/cloud/account.svelte';
-  import { cloudEnabled, supabase } from '$lib/cloud/client';
+  import { cloudEnabled } from '$lib/cloud/client';
   import { nav } from '$lib/nav';
   import { profile } from '$lib/stores/profile.svelte';
   import Button from '$lib/ui/Button.svelte';
@@ -39,6 +39,7 @@
 
   $effect(() => {
     const user = account.user;
+    const supabase = account.db;
     if (!supabase || !user) return;
     void supabase
       .from('runs')

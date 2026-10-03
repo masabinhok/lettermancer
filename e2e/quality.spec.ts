@@ -26,7 +26,7 @@ for (const path of SCREENS) {
   });
 }
 
-test('the first screen loads under 200 KB of gzipped JavaScript', async ({ page }) => {
+test('the first screen loads under 150 KB of gzipped JavaScript', async ({ page }) => {
   const urls = new Set<string>();
   page.on('response', (r) => {
     if (r.url().endsWith('.js')) urls.add(r.url());
@@ -36,5 +36,5 @@ test('the first screen loads under 200 KB of gzipped JavaScript', async ({ page 
   let bytes = 0;
   for (const url of urls) bytes += gzipSync(await (await page.request.get(url)).body()).length;
   expect(urls.size).toBeGreaterThan(0);
-  expect(bytes / 1024).toBeLessThan(200);
+  expect(bytes / 1024).toBeLessThan(150);
 });

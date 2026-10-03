@@ -20,9 +20,9 @@ import {
   type RunConfig,
   type Stats,
 } from '@lettermancer/engine';
-import type { User } from '@supabase/supabase-js';
+import type { SupabaseClient, User } from '@supabase/supabase-js';
 import { profile, readStore, writeStore, type Settings } from '../stores/profile.svelte';
-import { functionsUrl, supabase } from './client';
+import { authPending, cloudEnabled, functionsUrl, loadSupabase } from './client';
 
 const LINK_KEY = 'lettermancer.cloud.v1';
 const OUTBOX_KEY = 'lettermancer.outbox.v1';
@@ -64,29 +64,48 @@ class Account {
   error = $state<string | null>(null);
   private pushTimer: ReturnType<typeof setTimeout> | null = null;
   private started = false;
+  /** The loaded client. Set before `user` ever is, so signed-in code can use it directly. */
+  private sb: SupabaseClient | null = null;
+  private loading: Promise<SupabaseClient | null> | null = null;
 
   get enabled() {
-    return supabase !== null;
+    return cloudEnabled;
   }
 
-  /** Call once at app start. */
+  /** The client, once loaded (always, when someone is signed in). */
+  get db(): SupabaseClient | null {
+    return this.sb;
+  }
+
+  /** Call once at app start. The client loads now only if a sign-in is saved or arriving. */
   start(): void {
-    if (!supabase || this.started) return;
+    if (!cloudEnabled || this.started) return;
     this.started = true;
-    supabase.auth.onAuthStateChange((event, session) => {
-      const was = this.user?.id;
-      this.user = session?.user ?? null;
-      if (this.user && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && was !== this.user.id) {
-        void this.onSignedIn();
-      }
-    });
     profile.onChange(() => this.schedulePush());
     addEventListener('online', () => void this.flushOutbox());
+    if (authPending()) void this.client();
+  }
+
+  /** Load the client (once) and start following the sign-in state. */
+  client(): Promise<SupabaseClient | null> {
+    this.loading ??= loadSupabase().then((sb) => {
+      this.sb = sb;
+      sb?.auth.onAuthStateChange((event, session) => {
+        const was = this.user?.id;
+        this.user = session?.user ?? null;
+        if (this.user && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && was !== this.user.id) {
+          void this.onSignedIn();
+        }
+      });
+      return sb;
+    });
+    return this.loading;
   }
 
   // ---------- sign in / out ----------
 
   async sendMagicLink(email: string): Promise<string | null> {
+    const supabase = await this.client();
     if (!supabase) return 'Accounts are not set up on this build.';
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -96,6 +115,7 @@ class Account {
   }
 
   async signInWith(provider: 'github' | 'google'): Promise<string | null> {
+    const supabase = await this.client();
     if (!supabase) return 'Accounts are not set up on this build.';
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
@@ -106,15 +126,15 @@ class Account {
 
   async signOut(): Promise<void> {
     await this.push();
-    await supabase?.auth.signOut();
+    await this.sb?.auth.signOut();
     this.user = null;
     this.username = null;
   }
 
   async setUsername(name: string): Promise<string | null> {
-    if (!supabase || !this.user) return 'Sign in first.';
+    if (!this.sb || !this.user) return 'Sign in first.';
     if (!/^[A-Za-z0-9_]{3,20}$/.test(name)) return 'Use 3 to 20 letters, numbers or underscores.';
-    const { error } = await supabase.from('profiles').update({ username: name }).eq('id', this.user.id);
+    const { error } = await this.sb.from('profiles').update({ username: name }).eq('id', this.user.id);
     if (error) return error.code === '23505' ? 'That name is taken.' : error.message;
     this.username = name;
     return null;
@@ -123,8 +143,8 @@ class Account {
   // ---------- sync ----------
 
   private async onSignedIn(): Promise<void> {
-    if (!supabase || !this.user) return;
-    const { data: prof } = await supabase.from('profiles').select('username').eq('id', this.user.id).maybeSingle();
+    if (!this.sb || !this.user) return;
+    const { data: prof } = await this.sb.from('profiles').select('username').eq('id', this.user.id).maybeSingle();
     this.username = prof?.username ?? null;
     await this.pull();
     await this.flushOutbox();
@@ -132,12 +152,12 @@ class Account {
 
   /** Fetch cloud progress and merge it with this device's. */
   async pull(): Promise<void> {
-    if (!supabase || !this.user) return;
+    if (!this.sb || !this.user) return;
     this.syncing = true;
     this.error = null;
     try {
       const link = readStore<Link>(LINK_KEY, () => ({ userId: null, lastSync: null }));
-      const { data, error } = await supabase
+      const { data, error } = await this.sb
         .from('progress')
         .select('meta, stats, settings, updated_at')
         .eq('user_id', this.user.id)
@@ -184,9 +204,9 @@ class Account {
 
   /** Upload this device's progress. */
   async push(): Promise<void> {
-    if (!supabase || !this.user) return;
+    if (!this.sb || !this.user) return;
     const now = new Date().toISOString();
-    const { error } = await supabase.from('progress').upsert({
+    const { error } = await this.sb.from('progress').upsert({
       user_id: this.user.id,
       meta: profile.meta,
       stats: profile.stats,
@@ -204,7 +224,7 @@ class Account {
   // ---------- verified submissions ----------
 
   private async invoke(name: string, body: unknown): Promise<Response> {
-    const { data } = await supabase!.auth.getSession();
+    const { data } = await this.sb!.auth.getSession();
     return fetch(`${functionsUrl}/${name}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${data.session?.access_token ?? ''}` },
@@ -213,7 +233,7 @@ class Account {
   }
 
   private async send(job: Job): Promise<SubmitResult> {
-    if (!supabase || !this.user) return { ok: false, reason: 'Sign in to post to the leaderboards.' };
+    if (!this.sb || !this.user) return { ok: false, reason: 'Sign in to post to the leaderboards.' };
     try {
       const res = await this.invoke(job.kind === 'run' ? 'verify-run' : 'verify-practice', job.body);
       const body = await res.json();
@@ -261,8 +281,8 @@ class Account {
     if (local.day === day)
       return { ok: false, reason: 'You’ve already played today’s daily. A new one opens at midnight UTC.' };
     let ranked = false;
-    if (supabase && this.user) {
-      const { error } = await supabase.from('daily_entries').insert({ user_id: this.user.id, day });
+    if (this.sb && this.user) {
+      const { error } = await this.sb.from('daily_entries').insert({ user_id: this.user.id, day });
       if (error?.code === '23505')
         return { ok: false, reason: 'You’ve already played today’s daily. A new one opens at midnight UTC.' };
       ranked = !error;
@@ -274,8 +294,8 @@ class Account {
   /** Has this device (or account) already played the daily for `day`? */
   async dailyPlayed(day: string): Promise<boolean> {
     if (readStore<{ day: string | null }>(DAILY_KEY, () => ({ day: null })).day === day) return true;
-    if (!supabase || !this.user) return false;
-    const { data } = await supabase
+    if (!this.sb || !this.user) return false;
+    const { data } = await this.sb
       .from('daily_entries')
       .select('day')
       .eq('user_id', this.user.id)
@@ -286,6 +306,7 @@ class Account {
 
   /** The top of a board, plus where you stand if you're further down. */
   async board(name: string, limit = 50): Promise<{ rows: BoardRow[]; you: BoardRow | null } | null> {
+    const supabase = await this.client();
     if (!supabase) return null;
     const { data, error } = await supabase
       .from('leaderboard_named')
@@ -310,6 +331,7 @@ class Account {
 
   /** The keystrokes of a ranked practice test, to race as a ghost. */
   async practiceGhost(practiceId: number): Promise<{ config: PracticeConfig; inputs: PracticeInput[] } | null> {
+    const supabase = await this.client();
     if (!supabase) return null;
     const { data } = await supabase.from('practice_results').select('replay').eq('id', practiceId).maybeSingle();
     return (data?.replay as { config: PracticeConfig; inputs: PracticeInput[] } | undefined) ?? null;
@@ -323,11 +345,11 @@ class Account {
       exportedAt: new Date().toISOString(),
       local: { meta: profile.meta, stats: profile.stats, settings: profile.settings, runs: profile.analytics },
     };
-    if (supabase && this.user) {
+    if (this.sb && this.user) {
       const [prog, runs, practice] = await Promise.all([
-        supabase.from('progress').select('*').eq('user_id', this.user.id).maybeSingle(),
-        supabase.from('runs').select('*').eq('user_id', this.user.id),
-        supabase.from('practice_results').select('*').eq('user_id', this.user.id),
+        this.sb.from('progress').select('*').eq('user_id', this.user.id).maybeSingle(),
+        this.sb.from('runs').select('*').eq('user_id', this.user.id),
+        this.sb.from('practice_results').select('*').eq('user_id', this.user.id),
       ]);
       out.cloud = {
         account: { id: this.user.id, email: this.user.email, username: this.username },
@@ -341,11 +363,11 @@ class Account {
 
   /** Permanently delete the account and its cloud data. Local progress on this device stays. */
   async deleteAccount(): Promise<string | null> {
-    if (!supabase || !this.user) return 'Sign in first.';
+    if (!this.sb || !this.user) return 'Sign in first.';
     const res = await this.invoke('delete-account', {});
     if (!res.ok) return (await res.json()).error ?? 'Could not delete the account.';
     writeStore(LINK_KEY, { userId: null, lastSync: null });
-    await supabase.auth.signOut();
+    await this.sb.auth.signOut();
     this.user = null;
     this.username = null;
     return null;
