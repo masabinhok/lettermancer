@@ -1,9 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
-/** The act's title card: the first Enter finishes its animation, the second begins the act. */
+/** The act's title card: once its title has typed in (instantly with reduced motion), Enter begins the act. */
 async function passIntro(page: Page) {
-  await expect(page.locator('[data-screen="intro"]')).toBeVisible();
-  await page.keyboard.press('Enter');
   await expect(page.locator('[data-screen="intro"].ready')).toBeVisible();
   await page.keyboard.press('Enter');
 }
@@ -239,4 +237,14 @@ test('power pips sit on their own keys, whatever their rarity', async ({ page })
   );
   expect(await page.locator('[data-key="s"] .pip').count()).toBe(1);
   expect(misplaced).toEqual([]);
+});
+
+test('with reduced motion, damage numbers still show (they hold still instead)', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await enterFight(page);
+  const word = (await page.locator('.enemy .word').first().textContent())!.trim();
+  for (const ch of word) await page.keyboard.press(ch);
+  const num = page.locator('.float-text').first();
+  await expect(num).toBeVisible();
+  expect(Number(await num.evaluate((el) => getComputedStyle(el).opacity))).toBeGreaterThan(0.9);
 });

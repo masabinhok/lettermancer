@@ -174,6 +174,17 @@ kbd {
   transition-duration: 1ms !important;
 }
 
+/* Some animations carry information (damage numbers, combo banners). With reduced motion they
+   would skip straight to their faded-out end, so instead they hold still until removed. */
+:root[data-reduced-motion='true'] :is(.float-text, .fx-banner) {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.float-text, .fx-banner) {
+    animation: none !important;
+  }
+}
+
 /* ---------- effects ---------- */
 .shake-small {
   animation: shake 0.18s linear;
@@ -372,17 +383,5 @@ kbd {
   100% {
     opacity: 0;
     transform: translateY(-12px);
-  }
-}
-:root[data-reduced-motion='true'] .fx-banner {
-  animation: fx-fade 0.9s ease forwards;
-}
-@keyframes fx-fade {
-  0%,
-  70% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
   }
 }
