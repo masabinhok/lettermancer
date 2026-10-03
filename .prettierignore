@@ -7,3 +7,5 @@ packages/engine/src/content/words.json
 docs/reviews
 playtest-shots
 supabase/functions/_shared/engine.js
+# Email HTML: whitespace matters to mail clients, keep it as written
+supabase/templates
