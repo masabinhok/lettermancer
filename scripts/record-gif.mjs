@@ -1,5 +1,5 @@
-// Records a short fight for the README: opens a run, types enemy words at a steady pace, and turns the
-// video into docs/media/lettermancer.gif with ffmpeg.
+// Records the README GIF: the act's title card, the doors rising, a fight typed at a steady pace,
+// and the muse's boon screen. Turns the video into docs/media/lettermancer.gif with ffmpeg.
 //
 // Usage: node scripts/record-gif.mjs   (env URL, default http://localhost:4173 — run `npm run preview` first)
 import { execFileSync } from 'node:child_process';
@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { chromium } from 'playwright';
 
 const URL = process.env.URL ?? 'http://localhost:4173';
-const SECONDS = 14;
+const FIGHT_SECONDS = 16;
 const dir = mkdtempSync(join(tmpdir(), 'lettermancer-gif-'));
 const browser = await chromium.launch();
 const ctx = await browser.newContext({
@@ -23,15 +23,16 @@ await page.evaluate(() =>
 );
 await page.goto(`${URL}/run?starter=apprentice`);
 await page.waitForSelector('[data-screen="intro"].ready');
-await page.waitForTimeout(600);
+await page.waitForTimeout(900);
 await page.keyboard.press('Enter');
 await page.waitForSelector('[data-screen="doors"] .hint');
-await page.keyboard.press('1');
 await page.waitForTimeout(500);
+await page.keyboard.press('1');
+await page.waitForTimeout(1300); // let the preview read
 await page.keyboard.press('Enter');
 await page.waitForSelector('[data-screen="combat"]');
 
-const end = Date.now() + SECONDS * 1000;
+const end = Date.now() + FIGHT_SECONDS * 1000;
 while (Date.now() < end && (await page.locator('[data-screen="combat"]').count())) {
   const next = page.locator('.enemy.targeted .l.next');
   const k = (await next.count())
@@ -40,7 +41,9 @@ while (Date.now() < end && (await page.locator('[data-screen="combat"]').count()
   if (k) await page.keyboard.press(k);
   await page.waitForTimeout(110 + Math.random() * 60);
 }
-await page.waitForTimeout(800);
+// The first doors lead to a muse: hold on her offer.
+if (await page.locator('[data-screen="reward"]').count()) await page.waitForTimeout(2600);
+else await page.waitForTimeout(800);
 await ctx.close();
 await browser.close();
 
@@ -52,11 +55,11 @@ mkdirSync('docs/media', { recursive: true });
 execFileSync('ffmpeg', [
   '-y',
   '-ss',
-  '2.5',
+  '1.2',
   '-i',
   video,
   '-vf',
-  'fps=10,scale=720:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=64:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle',
+  'fps=9,scale=640:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=64:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle',
   'docs/media/lettermancer.gif',
 ]);
 console.log('wrote docs/media/lettermancer.gif');
