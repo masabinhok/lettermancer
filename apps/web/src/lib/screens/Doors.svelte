@@ -192,9 +192,9 @@
             tabindex={ready ? 0 : -1}
             type="button"
           >
-            <span class="arch" aria-hidden="true">
+            <span class="arch" aria-hidden="true" data-clip>
               <span class="light"></span>
-              <Emblem glyph={info.glyph} color={info.color} tier={info.tier} size="9.4rem" bob />
+              <Emblem glyph={info.glyph} color={info.color} tier={info.tier} size="8.4rem" bob />
             </span>
             <kbd>{i + 1}</kbd>
             <span class="kind">{info.kind}</span>
@@ -235,7 +235,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--space-5);
+    gap: var(--space-4);
   }
   header {
     text-align: center;
@@ -256,7 +256,7 @@
   }
   .door {
     position: relative;
-    width: 15.5rem;
+    width: 14.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -290,8 +290,8 @@
   }
   .arch {
     position: relative;
-    width: 13.75rem;
-    height: 18.75rem;
+    width: 12.75rem;
+    height: 16.5rem;
     display: grid;
     place-items: center;
     border-radius: 6.9rem 6.9rem 0.353rem 0.353rem;
@@ -350,7 +350,7 @@
   }
   .preview {
     min-height: 4.2em;
-    max-width: 60ch;
+    max-width: 72ch;
     display: flex;
     flex-direction: column;
     align-items: center;

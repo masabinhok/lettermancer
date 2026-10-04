@@ -436,7 +436,7 @@
       {#if ghost}<span class="ghost-name">racing {ghost.name} · {ghost.wpm} wpm</span>{/if}
       <span class="wpm">{view.wpm ? `${view.wpm} wpm` : ''}</span>
     </div>
-    <div class="window">
+    <div class="window" data-clip>
       <p class="text" bind:this={textEl} style:transform="translateY({-Math.max(0, caretTop - 52)}px)" aria-live="off">
         {#each [...view.text] as ch, i (i)}<span
             class:done={i < view.pos}

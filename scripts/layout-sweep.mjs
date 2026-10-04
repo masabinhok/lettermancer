@@ -38,7 +38,10 @@ function overflow() {
     let p = el.parentElement;
     let clipped = false;
     while (p) {
-      if (getComputedStyle(p).overflowY !== 'visible' && p.scrollHeight > p.clientHeight + 1) {
+      // Content inside a scroll box, or a box marked data-clip (clipping on purpose), is fine.
+      // Anything else hidden by overflow counts: that's content cut off at the edge.
+      const o = getComputedStyle(p).overflowY;
+      if (((o === 'auto' || o === 'scroll') && p.scrollHeight > p.clientHeight + 1) || p.hasAttribute('data-clip')) {
         clipped = true;
         break;
       }
@@ -129,6 +132,15 @@ for (const [w, h] of SIZES) {
       await page.waitForTimeout(400);
     }
     await record(kind);
+    if (kind === 'doors') {
+      // Looking closer at a door adds its caption and hint underneath: the tallest state of the screen.
+      await page.waitForSelector('[data-screen="doors"] .hint');
+      for (const n of ['1', '2']) {
+        await page.keyboard.press(n);
+        await page.waitForTimeout(500);
+        await record(`doors-preview${n}`);
+      }
+    }
   }
   console.log(`${w}x${h}  ${results.join('  ')}`);
   await page.close();
