@@ -328,3 +328,35 @@ describe('oaths', () => {
     expect(ev.some((e) => e.t === 'player-hit')).toBe(true);
   });
 });
+
+describe('boss signature relics', () => {
+  it("Hydra's Tooth heals 2 on every kill", () => {
+    const run = testRun();
+    run.relics = ['hydra-tooth'];
+    run.hp = 30;
+    const ctx = queueCtx(['abc']);
+    const c = fight(run, ctx, spec({ hp: 3, maxHp: 3 }));
+    const ev = typeWord(c, run, ctx, 'abc');
+    expect(ev).toContainEqual({ t: 'heal', amount: 2 });
+    expect(run.hp).toBe(32);
+  });
+
+  it('Mirror Shard starts every fight with 6 Shield', () => {
+    const run = testRun();
+    run.relics = ['mirror-shard'];
+    const c = fight(run, queueCtx(['abc']), spec());
+    expect(c.shield).toBe(6);
+  });
+
+  it('Red Pen forgives only the first typo of a fight', () => {
+    const run = testRun();
+    run.relics = ['red-pen'];
+    const ctx = queueCtx(['abcdef']);
+    const c = fight(run, ctx, spec());
+    typeWord(c, run, ctx, 'abc');
+    pressKey(c, run, 'x', ctx, 500);
+    expect(c.combo).toBe(3);
+    pressKey(c, run, 'x', ctx, 600);
+    expect(c.combo).toBe(0);
+  });
+});

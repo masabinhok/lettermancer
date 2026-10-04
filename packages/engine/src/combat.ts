@@ -35,6 +35,8 @@ export interface Combat {
   streak: number;
   coinsEarned: number;
   firstWordDone: boolean;
+  /** the Red Pen has forgiven this fight's first typo */
+  pardonUsed: boolean;
   burnClock: number;
   nextId: number;
   /** combat time of the last correct press, for latency stats and the Oath of Flow */
@@ -201,6 +203,7 @@ export function createCombat(waves: EnemySpec[][], ctx: CombatCtx, run?: Run): C
     streak: 0,
     coinsEarned: 0,
     firstWordDone: false,
+    pardonUsed: false,
     burnClock: 0,
     nextId: 1,
     lastCorrectAt: null,
@@ -210,6 +213,7 @@ export function createCombat(waves: EnemySpec[][], ctx: CombatCtx, run?: Run): C
   };
   if (run && has(run, 'golden-aegis')) c.shield += Math.floor(run.coins / 10);
   if (run) c.shield += run.bonuses.startShield;
+  if (run?.relics.includes('mirror-shard')) c.shield += 6;
   c.maxCombo = c.combo;
   spawnWave(c, run ?? DUMMY_RUN, waves[0] ?? [], ctx, null);
   // Keepsake grace: enemies hold their first attack a little longer.
@@ -276,6 +280,7 @@ function kill(c: Combat, run: Run, e: Enemy, ctx: CombatCtx, ev: CombatEvent[]):
   c.enemies = c.enemies.filter((o) => o !== e);
   if (c.targetId === e.id) cancelTarget(c);
   ev.push({ t: 'kill', enemyId: e.id });
+  if (run.relics.includes('hydra-tooth')) heal(run, 2, ev);
   if (has(run, 'windfall')) addCoins(c, run, 3, ev);
   if (has(run, 'wildfire') && e.burn > 0 && c.enemies.length) {
     const to = pick(ctx.rng, c.enemies);
@@ -376,7 +381,8 @@ function miss(
   c.errors++;
   c.streak = 0;
   if (expected) recordError(c.stats, lower(expected));
-  breakCombo(c, run, ev);
+  if (run.relics.includes('red-pen') && !c.pardonUsed) c.pardonUsed = true;
+  else breakCombo(c, run, ev);
   const k = expected ? lower(expected) : null;
   if (k && run.keyMods[k]?.some((b) => b.mod === 'glass')) {
     run.keyMods = removeMod(run.keyMods, k, 'glass');

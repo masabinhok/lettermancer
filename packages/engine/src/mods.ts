@@ -1,7 +1,7 @@
 /**
  * Boons: key powers you bind to letters, blessings from the muses, duo boons, and relics.
  */
-import type { MuseId } from './state';
+import type { BossRule, MuseId } from './state';
 
 // ---------- rarity ----------
 
@@ -281,7 +281,12 @@ export type RelicId =
   | 'interest'
   | 'vampire'
   | 'first-strike'
-  | 'thorns';
+  | 'thorns'
+  // signature relics: each dropped only by its boss
+  | 'hydra-tooth'
+  | 'mirror-shard'
+  | 'night-lantern'
+  | 'red-pen';
 
 export interface RelicDef {
   id: RelicId;
@@ -289,6 +294,8 @@ export interface RelicDef {
   glyph: string;
   desc: string;
   cost: number;
+  /** A signature relic: dropped only by this boss, never offered in shops or by elites. */
+  boss?: BossRule;
 }
 
 export const RELICS: Record<RelicId, RelicDef> = {
@@ -326,9 +333,47 @@ export const RELICS: Record<RelicId, RelicDef> = {
     cost: 13,
   },
   thorns: { id: 'thorns', name: 'Thorns', glyph: '✱', desc: 'When hit, deal 4 damage back to the attacker.', cost: 13 },
+  'hydra-tooth': {
+    id: 'hydra-tooth',
+    name: "Hydra's Tooth",
+    glyph: '♆',
+    desc: 'Every kill heals 2 health.',
+    cost: 0,
+    boss: 'hydra',
+  },
+  'mirror-shard': {
+    id: 'mirror-shard',
+    name: 'Mirror Shard',
+    glyph: '◫',
+    desc: 'Start every fight with 6 Shield.',
+    cost: 0,
+    boss: 'mirror',
+  },
+  'night-lantern': {
+    id: 'night-lantern',
+    name: 'Night Lantern',
+    glyph: '☾',
+    desc: 'Your whole combo carries into the next fight, not half.',
+    cost: 0,
+    boss: 'blackout',
+  },
+  'red-pen': {
+    id: 'red-pen',
+    name: 'Red Pen',
+    glyph: '✎',
+    desc: "The first typo in each fight doesn't break your combo.",
+    cost: 0,
+    boss: 'redactor',
+  },
 };
 
-export const RELIC_IDS = Object.keys(RELICS) as RelicId[];
+/** Relics that can turn up in shops, elite rewards and events (signature relics come only from bosses). */
+export const RELIC_IDS = (Object.keys(RELICS) as RelicId[]).filter((id) => !RELICS[id].boss);
+
+/** The signature relic each boss always drops (the final bosses end the run, so they drop none). */
+export const BOSS_RELIC: Partial<Record<BossRule, RelicId>> = Object.fromEntries(
+  (Object.keys(RELICS) as RelicId[]).filter((id) => RELICS[id].boss).map((id) => [RELICS[id].boss!, id]),
+);
 
 // ---------- combo ----------
 

@@ -23,7 +23,7 @@ import {
 import { CURSES, EVENT_IDS, FOLIO_TYPO_HP, TRIAL_MS, type EventId } from './content/events';
 import { type OathLevels } from './content/oaths';
 import WORDS from './content/words.json';
-import { installMod, MUSE_IDS, MUSES, type Rarity, type RelicId } from './mods';
+import { BOSS_RELIC, installMod, MUSE_IDS, MUSES, type Rarity, type RelicId } from './mods';
 import { deriveSeed, makeRng, pick, sample, type Rng } from './rng';
 import {
   ACTS,
@@ -513,7 +513,7 @@ export class RunMachine {
 
     t.fights++;
     if (summary.perfect) t.perfectFights++;
-    run.carryCombo = Math.floor(c.combo * COMBO_CARRY);
+    run.carryCombo = run.relics.includes('night-lantern') ? c.combo : Math.floor(c.combo * COMBO_CARRY);
     run.carryShield = run.blessings.includes('bulwark') ? Math.min(BULWARK_MAX, c.shield) : 0;
     const coins = fightCoins(run, node, v.reward, this.rng.rewards);
     run.coins += coins;
@@ -539,7 +539,12 @@ export class RunMachine {
     const extra = run.bonuses.extraChoices;
     const title = node === 'boss' ? 'The boss falls' : node === 'elite' ? 'Elite slain' : 'Victory';
     const canReroll = run.rerollsLeft > 0;
-    if (node === 'boss' || node === 'elite' || v.reward?.kind === 'relic') {
+    const signature = node === 'boss' ? BOSS_RELIC[run.bosses[run.act - 1]] : undefined;
+    if (signature) {
+      // Every boss drops its own relic: a known reward, not a roll.
+      const offers: Offer[] = run.relics.includes(signature) ? [] : [{ kind: 'relic', relic: signature }];
+      this.view = { kind: 'reward', title, muse: null, offers, summary, canReroll: false };
+    } else if (node === 'boss' || node === 'elite' || v.reward?.kind === 'relic') {
       const offers = relicOffers(run, this.rng.rewards, 3 + extra);
       this.view = { kind: 'reward', title, muse: null, offers, summary, canReroll };
     } else if (v.reward?.kind === 'muse') {

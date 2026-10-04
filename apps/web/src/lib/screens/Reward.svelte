@@ -3,7 +3,17 @@
   Keys are held until every offer is on screen, so a choice is never made blind.
 -->
 <script lang="ts">
-  import { BLESSINGS, isDuo, MODS, MUSE_IDS, MUSES, RARITY_NAMES, RELICS, type Offer } from '@lettermancer/engine';
+  import {
+    BLESSINGS,
+    BOSSES,
+    isDuo,
+    MODS,
+    MUSE_IDS,
+    MUSES,
+    RARITY_NAMES,
+    RELICS,
+    type Offer,
+  } from '@lettermancer/engine';
   import { onMount } from 'svelte';
   import * as sfx from '../fx/audio';
   import { burstAt } from '../fx/particles';
@@ -85,7 +95,9 @@
       };
     }
     const r = RELICS[o.relic];
-    return { glyph: r.glyph, name: r.name, desc: r.desc, color: '#e6a100', kind: 'Relic', tier: 2 };
+    const boss = r.boss ? BOSSES[r.boss].name : '';
+    const kind = r.boss ? `Boss relic · always dropped by ${boss.startsWith('The ') ? boss : `the ${boss}`}` : 'Relic';
+    return { glyph: r.glyph, name: r.name, desc: r.desc, color: '#e6a100', kind, tier: r.boss ? 3 : 2 };
   }
 
   const cards = $derived(v ? v.offers.map(card) : []);

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { InvalidAction, newRunConfig, RunMachine, type Action } from '../src/machine';
+import { BOSS_RELIC, RELIC_IDS } from '../src/mods';
 import { makeRng } from '../src/rng';
 import { playRun } from '../src/sim';
 
@@ -132,5 +133,26 @@ describe('RunReport', () => {
     expect(r.enemiesSeen.length).toBeGreaterThan(0);
     if (r.result === 'lost') expect(r.killedBy).toBeTruthy();
     expect(RunMachine.replay(cfg, m.actions).report).toEqual(r);
+  });
+});
+
+describe('boss rewards', () => {
+  it('each Act I and II boss offers its own signature relic, and only that', () => {
+    const m = playRun(newRunConfig('apprentice', 404), { wpm: 90, accuracy: 0.99, rng: makeRng(1) });
+    const seen: string[] = [];
+    const replay = new RunMachine(m.config);
+    for (const a of m.actions) {
+      replay.dispatch(a);
+      const v = replay.view;
+      if (v.kind === 'reward' && v.title === 'The boss falls') seen.push(JSON.stringify(v.offers));
+    }
+    expect(seen).toHaveLength(2);
+    for (const [i, offers] of seen.map((s) => JSON.parse(s)).entries()) {
+      expect(offers).toEqual([{ kind: 'relic', relic: BOSS_RELIC[m.run.bosses[i]] }]);
+    }
+  });
+
+  it('signature relics never turn up in shops or elite rewards', () => {
+    for (const id of Object.values(BOSS_RELIC)) expect(RELIC_IDS).not.toContain(id);
   });
 });
