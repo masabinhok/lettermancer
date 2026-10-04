@@ -112,6 +112,13 @@ describe('RunMachine', () => {
     expect(kinds.has('fight')).toBe(true);
     expect(kinds.size).toBeGreaterThan(1);
   });
+
+  it('ends the moment the final boss falls, with no prize to choose', () => {
+    const m = playRun(newRunConfig('apprentice', 404), { wpm: 90, accuracy: 0.99, rng: makeRng(1) });
+    expect(m.view.kind).toBe('over');
+    const last = m.actions[m.actions.length - 1];
+    expect(['key', 'time']).toContain(last.t);
+  });
 });
 
 describe('RunReport', () => {

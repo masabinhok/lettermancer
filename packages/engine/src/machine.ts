@@ -55,7 +55,7 @@ import { WordBank } from './words';
 /** Simulation step. Every combat timestamp is advanced to in multiples of this. */
 export const STEP_MS = 5;
 /** Bump when rules change in a way that would alter old replays. */
-export const RULES_VERSION = 3;
+export const RULES_VERSION = 4;
 
 export type RunMode = 'standard' | 'daily' | 'weekly';
 
@@ -529,6 +529,12 @@ export class RunMachine {
     run.hp += summary.healed;
     if (node === 'boss') this.report.bossesBeaten.push(run.bosses[run.act - 1]);
     ev.push({ t: 'fight-end', result: 'win', summary });
+
+    // The final boss ends the run: no prize to choose when nothing comes after it.
+    if (node === 'boss' && run.act >= ACTS) {
+      this.view = this.next(ev);
+      return;
+    }
 
     const extra = run.bonuses.extraChoices;
     const title = node === 'boss' ? 'The boss falls' : node === 'elite' ? 'Elite slain' : 'Victory';
