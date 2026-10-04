@@ -5,6 +5,7 @@
 <script lang="ts">
   let {
     glyph,
+    /** in pixels at the reference scale (1280×720); scales with the window */
     size = 96,
     field = '#3a2458',
     ink = 'var(--gold-bright)',
@@ -13,7 +14,7 @@
   const id = `vine-${Math.random().toString(36).slice(2, 8)}`;
 </script>
 
-<div class="initial" style:width="{size}px" style:height="{size}px" style:--field={field} style:--ink={ink}>
+<div class="initial" style:width="{size / 17}rem" style:height="{size / 17}rem" style:--field={field} style:--ink={ink}>
   <svg class="vines" viewBox="0 0 100 100" aria-hidden="true" preserveAspectRatio="none">
     <defs>
       <pattern {id} width="25" height="25" patternUnits="userSpaceOnUse">
@@ -28,7 +29,7 @@
     </defs>
     <rect width="100" height="100" fill="url(#{id})" />
   </svg>
-  <span class="glyph" class:mirrored style:font-size="{size * 0.66}px">{glyph}</span>
+  <span class="glyph" class:mirrored style:font-size="{(size * 0.66) / 17}rem">{glyph}</span>
 </div>
 
 <style>

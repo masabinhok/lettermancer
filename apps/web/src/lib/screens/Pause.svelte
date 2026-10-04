@@ -77,6 +77,6 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
-    min-width: 220px;
+    min-width: 12.941rem;
   }
 </style>

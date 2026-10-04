@@ -106,8 +106,8 @@
   }
   .hk {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 0.588rem;
+    left: 0.588rem;
   }
   .sigil {
     display: grid;

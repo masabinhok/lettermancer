@@ -113,10 +113,10 @@
   .key {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 0.353rem;
   }
   .key i {
-    width: 16px;
+    width: 0.941rem;
     height: 3px;
     display: inline-block;
   }
@@ -125,8 +125,8 @@
     border-top: 2px dashed;
   }
   .key i.dot {
-    width: 9px;
-    height: 9px;
+    width: 0.529rem;
+    height: 0.529rem;
     border-radius: 50%;
     background: var(--rose);
   }
@@ -135,7 +135,7 @@
     background: none;
     border: 1px solid var(--rule);
     color: var(--moon-dim);
-    padding: 2px 8px;
+    padding: 2px 0.471rem;
     cursor: pointer;
     font-size: var(--t-xs);
   }
@@ -151,12 +151,12 @@
   }
   .axis {
     fill: var(--moon-faint);
-    font-size: 11px;
+    font-size: 0.647rem;
     font-family: var(--f-text);
   }
   .label {
     fill: var(--moon);
-    font-size: 12px;
+    font-size: 0.706rem;
     font-weight: 700;
     font-family: var(--f-text);
   }
@@ -175,13 +175,13 @@
   }
   .tipt {
     fill: var(--moon);
-    font-size: 12px;
+    font-size: 0.706rem;
     font-weight: 700;
     font-family: var(--f-text);
   }
   .tipv {
     fill: var(--moon-dim);
-    font-size: 11px;
+    font-size: 0.647rem;
     font-family: var(--f-text);
   }
   table {
@@ -192,7 +192,7 @@
   th,
   td {
     text-align: right;
-    padding: 2px 8px;
+    padding: 2px 0.471rem;
     border-bottom: 1px solid var(--rule);
   }
 </style>

@@ -303,7 +303,7 @@
   }
   .combo {
     display: grid;
-    grid-template-columns: auto 240px;
+    grid-template-columns: auto 14.118rem;
     grid-template-rows: auto auto;
     column-gap: var(--space-4);
     align-items: center;

@@ -122,7 +122,7 @@
     overflow: auto;
   }
   .inner {
-    width: min(980px, 94vw);
+    width: min(57.647rem, 94vw);
     max-height: 92vh;
     overflow: auto;
     padding: var(--space-5) var(--space-6);

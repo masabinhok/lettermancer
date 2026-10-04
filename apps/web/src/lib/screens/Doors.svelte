@@ -294,10 +294,10 @@
     height: 18.75rem;
     display: grid;
     place-items: center;
-    border-radius: 6.9rem 6.9rem 6px 6px;
+    border-radius: 6.9rem 6.9rem 0.353rem 0.353rem;
     border: 2px solid var(--gold-deep);
     outline: 1px solid color-mix(in oklab, var(--gold-deep) 50%, transparent);
-    outline-offset: 6px;
+    outline-offset: 0.353rem;
     background:
       radial-gradient(ellipse 70% 60% at 50% 55%, color-mix(in oklab, var(--c) 30%, transparent), transparent 75%),
       linear-gradient(180deg, var(--night-deep), var(--ink));

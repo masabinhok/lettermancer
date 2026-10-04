@@ -20,21 +20,21 @@
   }
   i {
     display: inline-block;
-    height: 12px;
+    height: 0.706rem;
     border: 1px solid var(--rule);
     border-radius: 2px;
   }
   .scale {
-    width: 56px;
+    width: 3.294rem;
     background: linear-gradient(90deg, var(--ink), color-mix(in oklab, var(--rose) 85%, var(--ink)));
   }
   .item {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 0.353rem;
   }
   .none {
-    width: 12px;
+    width: 0.706rem;
     background: repeating-linear-gradient(135deg, var(--ink) 0 3px, var(--ink-2) 3px 6px);
   }
 </style>

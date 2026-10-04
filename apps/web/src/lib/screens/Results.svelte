@@ -336,13 +336,13 @@
     margin: var(--space-2) 0 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 300px));
+    grid-template-columns: repeat(2, minmax(0, 17.647rem));
     gap: var(--space-2);
   }
   .rewards li {
     display: flex;
     flex-direction: column;
-    padding: 6px 12px;
+    padding: 0.353rem 0.706rem;
     background: var(--ink);
     border: 1px solid var(--rule);
     border-left: 2px solid var(--gold);
@@ -384,12 +384,12 @@
     flex-basis: 100%;
     text-align: center;
   }
-  @media (max-width: 700px) {
+  @media (max-aspect-ratio: 3/4) {
     .rewards {
       grid-template-columns: minmax(0, 1fr);
     }
   }
-  @media (max-width: 900px) {
+  @media (max-aspect-ratio: 1/1) {
     .columns {
       grid-template-columns: 1fr;
       gap: var(--space-4);

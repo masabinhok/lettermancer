@@ -140,7 +140,7 @@
     width: var(--k);
     height: var(--k);
     padding: 0;
-    border-radius: 6px;
+    border-radius: 0.353rem;
     border: 1px solid var(--rule);
     border-bottom-width: 3px;
     background: linear-gradient(180deg, var(--ink-2), var(--ink));

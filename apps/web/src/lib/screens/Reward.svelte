@@ -222,14 +222,17 @@
       radial-gradient(ellipse 120% 100% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.55));
     animation: dim 0.5s ease-out;
   }
+  .screen > :global(.hud) {
+    align-self: center;
+  }
   .stage {
     flex: 1;
     min-height: 0;
     display: grid;
-    grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.4fr);
+    grid-template-columns: minmax(15.294rem, 0.8fr) minmax(0, 1.4fr);
     align-items: center;
     gap: var(--space-6);
-    width: min(1200px, 100%);
+    width: min(70.588rem, 100%);
     margin: 0 auto;
   }
   .giver {
@@ -371,7 +374,7 @@
       filter: blur(8px);
     }
   }
-  @media (max-width: 900px) {
+  @media (max-aspect-ratio: 1/1) {
     .stage {
       grid-template-columns: 1fr;
     }

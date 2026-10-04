@@ -27,7 +27,7 @@
   li {
     display: flex;
     align-items: baseline;
-    gap: 6px;
+    gap: 0.353rem;
     white-space: nowrap;
     cursor: help;
   }

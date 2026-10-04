@@ -92,7 +92,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 0.353rem;
     background: linear-gradient(180deg, rgba(44, 36, 66, 0.9), rgba(26, 20, 40, 0.9));
     border: 1px solid var(--rule);
     border-radius: 2px;
@@ -163,8 +163,8 @@
     gap: 3px;
   }
   .phase i {
-    width: 7px;
-    height: 7px;
+    width: 0.412rem;
+    height: 0.412rem;
     transform: rotate(45deg);
     border: 1px solid var(--rose);
   }
@@ -194,7 +194,7 @@
   }
   .traits li {
     font-size: var(--t-xs);
-    padding: 0 6px;
+    padding: 0 0.353rem;
     border: 1px solid var(--rule);
     color: var(--moon-dim);
     cursor: help;

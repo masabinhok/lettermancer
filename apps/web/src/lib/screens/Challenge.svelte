@@ -75,7 +75,7 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-4);
-    max-width: 1000px;
+    max-width: 58.824rem;
   }
   h1 {
     font-size: var(--t-2xl);
@@ -105,7 +105,7 @@
     border-bottom: 3px solid var(--gold-bright);
   }
   .timer {
-    width: 360px;
+    width: 21.176rem;
     display: flex;
     align-items: center;
     gap: var(--space-3);

@@ -213,7 +213,7 @@
     padding: var(--space-4) var(--space-5);
   }
   .prologue :global(.coach) {
-    width: min(720px, 100%);
+    width: min(42.353rem, 100%);
   }
   .coach-inner {
     padding: var(--space-3) var(--space-6);

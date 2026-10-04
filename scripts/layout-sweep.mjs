@@ -10,12 +10,20 @@ import { chromium } from 'playwright';
 const URL = process.env.URL ?? 'http://localhost:5317';
 const OUT = process.argv[2];
 const ENGINE = `/@fs${resolve('packages/engine/src/index.ts')}`;
-const SIZES = [
-  [1280, 720],
-  [1366, 768],
-  [1536, 864],
-  [1920, 1080],
-];
+/** Common desktop windows (browser toolbars eat ~100-130px of height), plus 133% zoom on 1080p and 768p screens. */
+const SIZES = process.env.SIZES
+  ? process.env.SIZES.split(',').map((s) => s.split('x').map(Number))
+  : [
+      [1280, 720],
+      [1366, 657],
+      [1440, 780],
+      [1536, 730],
+      [1920, 950],
+      [2560, 1300],
+      [1444, 714], // 1920x1080 at 133% zoom
+      [1027, 486], // 1366x768 at 133% zoom
+      [1280, 560], // a short window
+    ];
 const ROUTES = ['/', '/practice', '/leaderboards', '/profile', '/login', '/privacy'];
 const KINDS = ['combat', 'doors', 'reward', 'install', 'shop', 'event'];
 if (OUT) mkdirSync(OUT, { recursive: true });
@@ -43,7 +51,19 @@ function overflow() {
       what = typeof el.className === 'string' ? el.className : el.tagName;
     }
   }
-  return worst > 2 ? `${Math.round(worst)}px over (${what.slice(0, 40)})` : 'ok';
+  if (worst > 2) return `${Math.round(worst)}px over (${what.slice(0, 40)})`;
+  // Game screens should fit without scrolling; long pages (practice, profile...) may scroll.
+  const screen = document.querySelector('[data-screen]');
+  const longPage = ['practice', 'profile', 'leaderboards', 'privacy', 'login'].includes(
+    screen?.getAttribute('data-screen'),
+  );
+  if (!longPage)
+    for (const el of [screen, ...screen.querySelectorAll('*')]) {
+      const st = getComputedStyle(el);
+      if (/(auto|scroll)/.test(st.overflowY) && el.scrollHeight > el.clientHeight + 2)
+        return `scrolls ${el.scrollHeight - el.clientHeight}px (${String(el.className).slice(0, 30)})`;
+    }
+  return 'ok';
 }
 
 const browser = await chromium.launch();
@@ -83,7 +103,7 @@ for (const [w, h] of SIZES) {
     const r = await page.evaluate(overflow);
     if (r !== 'ok') failed = true;
     results.push(`${name}:${r}`);
-    if (OUT && (w === 1280 || w === 1920))
+    if (OUT && (w === 1280 || w === 1920 || w === 1027))
       await page.screenshot({ path: `${OUT}/${name.replace(/\W/g, '') || 'home'}-${w}.png` });
   };
   for (const route of ROUTES) {

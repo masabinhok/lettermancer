@@ -9,7 +9,7 @@
     value: number;
     max: number;
     tone?: 'hp' | 'foe' | 'threat' | 'danger' | 'shield';
-    /** at the base 16px text size; scales with the text */
+    /** in pixels at the reference scale (1280×720); scales with the window */
     height?: number;
     label?: string | null;
   } = $props();
@@ -18,7 +18,7 @@
 
 <div
   class="bar {tone}"
-  style:height="{height / 16}rem"
+  style:height="{height / 17}rem"
   role="meter"
   aria-valuenow={value}
   aria-valuemin={0}

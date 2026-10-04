@@ -344,10 +344,10 @@
   .hall {
     flex: 1;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 380px;
+    grid-template-columns: minmax(0, 1fr) 22.353rem;
     gap: var(--space-6);
     align-items: start;
-    width: min(1240px, 100%);
+    width: min(72.941rem, 100%);
     margin: 0 auto;
   }
   .left {
@@ -376,7 +376,7 @@
     margin-top: var(--space-2);
     background: none;
     border: 1px solid var(--rule);
-    padding: 4px 10px;
+    padding: 4px 0.588rem;
     color: var(--moon-dim);
     cursor: pointer;
   }
@@ -404,12 +404,12 @@
     cursor: pointer;
     background: var(--ink);
     border: 1px solid var(--rule);
-    min-height: 128px;
+    min-height: 7.529rem;
   }
   .starter kbd {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 0.471rem;
+    right: 0.471rem;
   }
   .selected {
     border-color: var(--gold);
@@ -438,7 +438,7 @@
     font-size: var(--t-xs);
     font-weight: 700;
     color: var(--c);
-    padding: 0 5px;
+    padding: 0 0.294rem;
     border: 1px solid color-mix(in oklab, var(--c) 60%, transparent);
   }
   .options {
@@ -450,7 +450,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    padding: 6px 12px;
+    padding: 0.353rem 0.706rem;
     background: var(--ink);
     border: 1px solid var(--rule);
     color: var(--moon-dim);
@@ -490,8 +490,8 @@
   }
   .rite kbd {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 0.471rem;
+    right: 0.471rem;
   }
   .right {
     display: flex;
@@ -505,7 +505,7 @@
   }
   .station {
     display: grid;
-    grid-template-columns: 36px 1fr auto;
+    grid-template-columns: 2.118rem 1fr auto;
     grid-template-rows: auto auto;
     column-gap: var(--space-3);
     align-items: center;
@@ -570,7 +570,7 @@
     color: var(--moon-dim);
     text-align: center;
   }
-  @media (max-width: 1100px) {
+  @media (max-aspect-ratio: 1/1) {
     .hall {
       grid-template-columns: 1fr;
     }

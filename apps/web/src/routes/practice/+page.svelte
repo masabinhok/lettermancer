@@ -504,7 +504,7 @@
     overflow: auto;
   }
   .bar {
-    width: min(1000px, 100%);
+    width: min(58.824rem, 100%);
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -534,7 +534,7 @@
   .amounts button {
     background: none;
     border: none;
-    padding: 4px 10px;
+    padding: 4px 0.588rem;
     color: var(--moon-faint);
     cursor: pointer;
     font-size: var(--t-sm);
@@ -561,12 +561,12 @@
   }
   .lesson {
     display: flex;
-    gap: 6px;
+    gap: 0.353rem;
   }
   .lk {
     position: relative;
-    width: 34px;
-    height: 34px;
+    width: 2rem;
+    height: 2rem;
     display: grid;
     place-items: center;
     font-family: var(--f-type);
@@ -591,7 +591,7 @@
     border-style: dashed;
   }
   .live {
-    width: min(1000px, 100%);
+    width: min(58.824rem, 100%);
     display: flex;
     justify-content: space-between;
     font-family: var(--f-display);
@@ -600,15 +600,15 @@
     min-height: 2em;
   }
   .window {
-    width: min(1000px, 100%);
-    height: 156px;
+    width: min(58.824rem, 100%);
+    height: 9.176rem;
     overflow: hidden;
   }
   .text {
     margin: 0;
     font-family: var(--f-type);
     font-size: 1.85rem;
-    line-height: 52px;
+    line-height: 3.059rem;
     color: var(--moon-faint);
     transition: transform 0.15s var(--ease-out);
     word-break: keep-all;
@@ -656,7 +656,7 @@
     margin-top: var(--space-2);
   }
   .result {
-    width: min(820px, 100%);
+    width: min(48.235rem, 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -713,7 +713,7 @@
     background: rgba(12, 9, 20, 0.84);
   }
   .trials {
-    width: min(640px, 92vw);
+    width: min(37.647rem, 92vw);
     padding: var(--space-5) var(--space-6);
     display: flex;
     flex-direction: column;

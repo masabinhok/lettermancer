@@ -121,7 +121,7 @@
     overflow: auto;
   }
   .inner {
-    width: min(520px, 92vw);
+    width: min(30.588rem, 92vw);
     padding: var(--space-6);
     display: flex;
     flex-direction: column;
@@ -167,14 +167,14 @@
   }
   .check input {
     accent-color: var(--gold);
-    width: 18px;
-    height: 18px;
+    width: 1.059rem;
+    height: 1.059rem;
   }
   select {
     font: inherit;
     color: var(--moon);
     background: var(--ink);
     border: 1px solid var(--rule);
-    padding: 4px 8px;
+    padding: 4px 0.471rem;
   }
 </style>

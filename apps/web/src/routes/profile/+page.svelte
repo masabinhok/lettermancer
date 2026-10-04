@@ -277,7 +277,7 @@
     align-items: center;
   }
   header {
-    width: min(1100px, 100%);
+    width: min(64.706rem, 100%);
     display: flex;
     align-items: center;
     gap: var(--space-5);
@@ -293,7 +293,7 @@
     color: var(--gold-bright);
   }
   .grid {
-    width: min(1100px, 100%);
+    width: min(64.706rem, 100%);
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-4);
@@ -354,7 +354,7 @@
   }
   input {
     font: inherit;
-    padding: 6px 10px;
+    padding: 0.353rem 0.588rem;
     color: var(--moon);
     background: var(--night-deep);
     border: 1px solid var(--rule);
@@ -393,10 +393,10 @@
   }
   td,
   th {
-    padding: 3px 6px;
+    padding: 3px 0.353rem;
     border-bottom: 1px solid color-mix(in oklab, var(--rule) 60%, transparent);
   }
-  @media (max-width: 900px) {
+  @media (max-aspect-ratio: 1/1) {
     .grid {
       grid-template-columns: 1fr;
     }

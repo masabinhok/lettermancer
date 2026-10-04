@@ -75,7 +75,7 @@
     overflow: auto;
   }
   .inner {
-    width: min(640px, 92vw);
+    width: min(37.647rem, 92vw);
     padding: var(--space-5) var(--space-6);
     display: flex;
     flex-direction: column;
@@ -128,8 +128,8 @@
     gap: var(--space-2);
   }
   .stepper button {
-    width: 28px;
-    height: 28px;
+    width: 1.647rem;
+    height: 1.647rem;
     background: var(--ink);
     border: 1px solid var(--rule);
     cursor: pointer;
@@ -143,8 +143,8 @@
     gap: 4px;
   }
   .pips i {
-    width: 10px;
-    height: 10px;
+    width: 0.588rem;
+    height: 0.588rem;
     transform: rotate(45deg);
     border: 1px solid var(--rose);
   }

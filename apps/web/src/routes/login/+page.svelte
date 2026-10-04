@@ -81,7 +81,7 @@
     padding: var(--space-5);
   }
   .inner {
-    width: min(460px, 90vw);
+    width: min(27.059rem, 90vw);
     padding: var(--space-6);
     display: flex;
     flex-direction: column;
@@ -107,7 +107,7 @@
   }
   input {
     font: inherit;
-    padding: 10px 12px;
+    padding: 0.588rem 0.706rem;
     color: var(--moon);
     background: var(--night-deep);
     border: 1px solid var(--rule);

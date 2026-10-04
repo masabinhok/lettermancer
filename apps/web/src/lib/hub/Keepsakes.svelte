@@ -113,8 +113,8 @@
     box-shadow: 0 0 0 1px var(--gold-deep);
   }
   .glyph {
-    width: 44px;
-    height: 44px;
+    width: 2.588rem;
+    height: 2.588rem;
     display: grid;
     place-items: center;
     font-family: var(--f-glyph);
@@ -142,6 +142,6 @@
     font-size: var(--t-xs);
     color: var(--gold-bright);
     border: 1px solid var(--gold-deep);
-    padding: 2px 8px;
+    padding: 2px 0.471rem;
   }
 </style>

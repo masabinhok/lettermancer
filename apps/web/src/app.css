@@ -49,13 +49,13 @@
   --t-3xl: 2.75rem;
   --t-hero: clamp(3rem, 8vw, 5.5rem);
 
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
-  --space-6: 32px;
-  --space-7: 48px;
+  --space-1: 0.235rem;
+  --space-2: 0.471rem;
+  --space-3: 0.706rem;
+  --space-4: 0.941rem;
+  --space-5: 1.412rem;
+  --space-6: 1.882rem;
+  --space-7: 2.824rem;
 
   --radius-sm: 4px;
   --radius: 8px;
@@ -74,8 +74,12 @@
 }
 
 html {
-  /* Text grows with the window (17px at 1280×720, 21px at 1080p), by whichever of width or height is tighter. */
-  font-size: calc(clamp(17px, min(1.33vw, 2.36vh), 21px) * var(--font-scale));
+  /*
+   * The whole game scales like one canvas: every size is in rem, and the root follows whichever of the
+   * window's width or height is tighter. 17px at 1280×720 (the reference layout), about 23px at 1080p,
+   * smaller on short or zoomed windows so nothing overflows.
+   */
+  font-size: calc(clamp(10px, min(1.328vw, 2.361vh), 34px) * var(--font-scale));
 }
 
 html,
@@ -139,7 +143,7 @@ button {
 kbd {
   font-family: var(--f-type);
   font-size: 0.85em;
-  padding: 1px 6px;
+  padding: 1px 0.353rem;
   border: 1px solid var(--rule);
   border-bottom-width: 2px;
   border-radius: var(--radius-sm);
@@ -292,7 +296,7 @@ kbd {
   position: fixed;
   z-index: 85;
   pointer-events: none;
-  border-radius: 99px;
+  border-radius: 5.824rem;
   background: linear-gradient(90deg, transparent, var(--c) 30%, white 50%, var(--c) 70%, transparent);
   box-shadow: 0 0 18px 4px color-mix(in oklab, var(--c) 70%, transparent);
   transform: translateY(-50%) rotate(var(--tilt)) scaleX(0);

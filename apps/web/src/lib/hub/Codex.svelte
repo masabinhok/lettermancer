@@ -105,7 +105,7 @@
     margin-bottom: var(--space-4);
   }
   .tabs button {
-    padding: 6px 14px;
+    padding: 0.353rem 0.824rem;
     background: var(--ink);
     border: 1px solid var(--rule);
     cursor: pointer;
@@ -130,14 +130,14 @@
   }
   li {
     display: grid;
-    grid-template-columns: 40px 1fr;
+    grid-template-columns: 2.353rem 1fr;
     gap: var(--space-3);
     align-items: center;
     color: var(--moon-faint);
   }
   .g {
-    width: 40px;
-    height: 40px;
+    width: 2.353rem;
+    height: 2.353rem;
     display: grid;
     place-items: center;
     font-family: var(--f-glyph);

@@ -85,7 +85,7 @@
     align-items: center;
   }
   .page > :global(*) {
-    width: min(760px, 100%);
+    width: min(44.706rem, 100%);
   }
   header {
     display: flex;

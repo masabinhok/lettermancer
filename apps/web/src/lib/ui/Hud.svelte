@@ -67,7 +67,7 @@
 
 <style>
   .hud {
-    width: min(1120px, 100%);
+    width: min(65.882rem, 100%);
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
@@ -79,7 +79,7 @@
     gap: var(--space-4);
   }
   .hp {
-    width: 230px;
+    width: 13.529rem;
   }
   .low {
     animation: low 0.9s infinite alternate;
@@ -109,7 +109,7 @@
   }
   ol {
     display: flex;
-    gap: 6px;
+    gap: 0.353rem;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -118,8 +118,8 @@
     position: relative;
   }
   ol li {
-    width: 14px;
-    height: 14px;
+    width: 0.824rem;
+    height: 0.824rem;
     display: grid;
     place-items: center;
     font-size: 0.8rem;
@@ -140,8 +140,8 @@
     box-shadow: 0 0 12px -2px var(--gold);
   }
   ol li.boss {
-    width: 22px;
-    height: 22px;
+    width: 1.294rem;
+    height: 1.294rem;
   }
   ol li.boss:not(.here) {
     border-color: color-mix(in oklab, var(--rose) 60%, var(--rule));
@@ -159,7 +159,7 @@
     gap: var(--space-3);
   }
   .build {
-    padding: 4px 12px;
+    padding: 4px 0.706rem;
     font-family: var(--f-display);
     font-size: var(--t-sm);
     color: var(--moon-dim);
@@ -174,7 +174,7 @@
   .relics {
     display: flex;
     justify-content: flex-end;
-    gap: 6px;
+    gap: 0.353rem;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -182,8 +182,8 @@
   .relic {
     position: relative;
     padding: 0;
-    width: 32px;
-    height: 32px;
+    width: 1.882rem;
+    height: 1.882rem;
     display: grid;
     place-items: center;
     font-family: var(--f-glyph);
@@ -196,10 +196,10 @@
   .tip {
     display: none;
     position: absolute;
-    top: 40px;
+    top: 2.353rem;
     right: 0;
     z-index: 60;
-    width: 240px;
+    width: 14.118rem;
     padding: var(--space-3);
     font-family: var(--f-text);
     font-size: var(--t-sm);

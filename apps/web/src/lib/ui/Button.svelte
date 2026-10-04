@@ -27,7 +27,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-3);
-    padding: 10px 20px;
+    padding: 0.588rem 1.176rem;
     border-radius: 2px;
     cursor: pointer;
     font-family: var(--f-display);

@@ -136,7 +136,7 @@
     align-items: center;
   }
   .page > :global(*) {
-    width: min(900px, 100%);
+    width: min(52.941rem, 100%);
   }
   header {
     display: flex;
@@ -162,7 +162,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    padding: 6px 12px;
+    padding: 0.353rem 0.706rem;
     background: var(--ink);
     border: 1px solid var(--rule);
     color: var(--moon-dim);
@@ -207,11 +207,11 @@
     text-align: left;
     font-weight: 400;
     color: var(--moon-faint);
-    padding: 4px 8px;
+    padding: 4px 0.471rem;
     border-bottom: 1px solid var(--rule);
   }
   td {
-    padding: 6px 8px;
+    padding: 0.353rem 0.471rem;
     border-bottom: 1px solid color-mix(in oklab, var(--rule) 50%, transparent);
   }
   .num {
@@ -240,7 +240,7 @@
     background: none;
     border: 1px solid var(--rule);
     color: var(--moon-dim);
-    padding: 2px 8px;
+    padding: 2px 0.471rem;
     cursor: pointer;
     font-size: var(--t-xs);
   }

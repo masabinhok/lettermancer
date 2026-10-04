@@ -72,7 +72,7 @@
     position: relative;
     width: 100%;
     height: 100%;
-    min-height: 150px;
+    min-height: 8.824rem;
     padding: var(--space-3) var(--space-3) var(--space-2);
     display: flex;
     flex-direction: column;
@@ -95,8 +95,8 @@
   }
   kbd {
     position: absolute;
-    top: 8px;
-    left: 8px;
+    top: 0.471rem;
+    left: 0.471rem;
   }
   .glyph {
     font-family: var(--f-glyph);
@@ -119,8 +119,8 @@
     margin-top: auto;
   }
   .ranks i {
-    width: 9px;
-    height: 9px;
+    width: 0.529rem;
+    height: 0.529rem;
     transform: rotate(45deg);
     border: 1px solid var(--gold);
   }
