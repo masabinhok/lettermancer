@@ -262,7 +262,10 @@ export class Session {
         if (this.recentWords.length > RECENT_WORDS) this.recentWords.shift();
       }
     }
-    this.view = m.view.kind === 'combat' || m.view.kind === 'challenge' ? { ...m.view } : m.view;
+    // The engine updates some views in place (a shop item marked sold, an event's outcome), so hand
+    // the screens a fresh copy every time; otherwise they wouldn't notice and would show stale state.
+    const v = m.view;
+    this.view = v.kind === 'shop' ? { ...v, items: v.items.map((it) => ({ ...it })) } : { ...v };
     this.run = { ...m.run };
     this.snap = m.combat ? combatSnapshot(m.combat, m.run) : null;
   }

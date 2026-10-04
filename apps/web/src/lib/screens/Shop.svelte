@@ -4,6 +4,7 @@
   import * as sfx from '../fx/audio';
   import { burstAt, floatText } from '../fx/particles';
   import type { Session } from '../game/session.svelte';
+  import { scale } from 'svelte/transition';
   import Button from '../ui/Button.svelte';
   import Hud from '../ui/Hud.svelte';
   import OfferCard from '../ui/OfferCard.svelte';
@@ -15,7 +16,9 @@
   let root = $state<HTMLElement>();
 
   function buy(i: number) {
-    const card = root?.querySelectorAll('.card')[order.indexOf(i)];
+    // Bought items leave the shelf; their number does nothing now.
+    if (!v || v.items[i]?.sold) return;
+    const card = root?.querySelector(`[data-item="${i}"] .card`);
     if (session.buy(i)) {
       sfx.purchase();
       burstAt(card, '#e9c46a', 36, 340);
@@ -73,61 +76,62 @@
 
       <div class="groups">
         {#each [{ title: 'Key powers', kind: 'mod' }, { title: 'Relics', kind: 'relic' }, { title: 'Services', kind: 'heal' }] as g (g.kind)}
-          <section>
-            <h2>{g.title}</h2>
-            <div class="row">
-              {#each v.items as it, i (i)}
-                {#if it.kind === g.kind}
-                  {#if it.kind === 'mod'}
-                    <OfferCard
-                      hotkey={String(i + 1)}
-                      glyph={MODS[it.mod].glyph}
-                      name={MODS[it.mod].name}
-                      desc={MODS[it.mod].describe(it.rarity)}
-                      color={MODS[it.mod].color}
-                      kind="{RARITY_NAMES[it.rarity]} key power"
-                      rarityColor={RARITY_COLOR[it.rarity]}
-                      tier={it.rarity}
-                      index={order.indexOf(i)}
-                      cost={it.cost}
-                      sold={it.sold}
-                      affordable={it.cost <= run.coins}
-                      onselect={() => buy(i)}
-                    />
-                  {:else if it.kind === 'relic'}
-                    <OfferCard
-                      hotkey={String(i + 1)}
-                      glyph={RELICS[it.relic].glyph}
-                      name={RELICS[it.relic].name}
-                      desc={RELICS[it.relic].desc}
-                      kind="Relic"
-                      ornate
-                      tier={2}
-                      index={order.indexOf(i)}
-                      cost={it.cost}
-                      sold={it.sold}
-                      affordable={it.cost <= run.coins}
-                      onselect={() => buy(i)}
-                    />
-                  {:else}
-                    <OfferCard
-                      hotkey={String(i + 1)}
-                      glyph="✚"
-                      name="Mend"
-                      desc="Restore {it.amount} health."
-                      color="var(--witchfire)"
-                      kind="Service"
-                      index={order.indexOf(i)}
-                      cost={it.cost}
-                      sold={it.sold}
-                      affordable={it.cost <= run.coins}
-                      onselect={() => buy(i)}
-                    />
+          {#if v.items.some((it) => it.kind === g.kind && !it.sold)}
+            <section out:scale={{ duration: 250, start: 0.9 }}>
+              <h2>{g.title}</h2>
+              <div class="row">
+                {#each v.items as it, i (i)}
+                  {#if it.kind === g.kind && !it.sold}
+                    <div class="slot" data-item={i} out:scale={{ duration: 320, start: 0.85 }}>
+                      {#if it.kind === 'mod'}
+                        <OfferCard
+                          hotkey={String(i + 1)}
+                          glyph={MODS[it.mod].glyph}
+                          name={MODS[it.mod].name}
+                          desc={MODS[it.mod].describe(it.rarity)}
+                          color={MODS[it.mod].color}
+                          kind="{RARITY_NAMES[it.rarity]} key power"
+                          rarityColor={RARITY_COLOR[it.rarity]}
+                          tier={it.rarity}
+                          index={order.indexOf(i)}
+                          cost={it.cost}
+                          affordable={it.cost <= run.coins}
+                          onselect={() => buy(i)}
+                        />
+                      {:else if it.kind === 'relic'}
+                        <OfferCard
+                          hotkey={String(i + 1)}
+                          glyph={RELICS[it.relic].glyph}
+                          name={RELICS[it.relic].name}
+                          desc={RELICS[it.relic].desc}
+                          kind="Relic"
+                          ornate
+                          tier={2}
+                          index={order.indexOf(i)}
+                          cost={it.cost}
+                          affordable={it.cost <= run.coins}
+                          onselect={() => buy(i)}
+                        />
+                      {:else}
+                        <OfferCard
+                          hotkey={String(i + 1)}
+                          glyph="✚"
+                          name="Mend"
+                          desc="Restore {it.amount} health."
+                          color="var(--witchfire)"
+                          kind="Service"
+                          index={order.indexOf(i)}
+                          cost={it.cost}
+                          affordable={it.cost <= run.coins}
+                          onselect={() => buy(i)}
+                        />
+                      {/if}
+                    </div>
                   {/if}
-                {/if}
-              {/each}
-            </div>
-          </section>
+                {/each}
+              </div>
+            </section>
+          {/if}
         {/each}
       </div>
 
@@ -190,11 +194,11 @@
     display: flex;
     gap: var(--space-3);
   }
-  /* Seven wares on one screen: narrower cards, smaller medallions. */
+  /* Seven wares on one screen: narrower cards, smaller medallions, all exactly the same size. */
   .row :global(.card) {
     width: 9.4rem;
-    min-height: 14.5rem;
-    padding: var(--space-5) var(--space-3) var(--space-3);
+    height: 18rem;
+    padding: var(--space-4) var(--space-3) var(--space-3);
   }
   .row :global(.card .name) {
     font-size: var(--t-lg);

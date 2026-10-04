@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { loadEngine } from './engine';
 
 /** The act's title card: once its title has typed in (instantly with reduced motion), Enter begins the act. */
 async function passIntro(page: Page) {
@@ -247,4 +248,34 @@ test('with reduced motion, damage numbers still show (they hold still instead)',
   const num = page.locator('.float-text').first();
   await expect(num).toBeVisible();
   expect(Number(await num.evaluate((el) => getComputedStyle(el).opacity))).toBeGreaterThan(0.9);
+});
+
+test('in the shop, a bought item leaves the shelf and its number does nothing', async ({ page }) => {
+  // Load a bot-played run at its first shop, with plenty of coins.
+  const { makeRng, newRunConfig, playRun, RunMachine } = await loadEngine();
+  const cfg = newRunConfig('apprentice', 4242);
+  const full = playRun(cfg, { wpm: 70, accuracy: 0.97, rng: makeRng(2) }).actions;
+  let n = 1;
+  while (RunMachine.replay(cfg, full.slice(0, n)).view.kind !== 'shop') n++;
+  const save = { config: cfg, actions: full.slice(0, n) };
+  await page.addInitScript((save) => {
+    if (sessionStorage.getItem('seeded')) return;
+    sessionStorage.setItem('seeded', '1');
+    localStorage.setItem('lettermancer.meta.v1', JSON.stringify({ prologueDone: true, runs: 1 }));
+    localStorage.setItem('lettermancer.run.v1', JSON.stringify(save));
+  }, save);
+  await page.goto('/run?resume');
+  await expect(page.locator('[data-screen="shop"]')).toBeVisible();
+  // Mend (a service) is always the last item and always affordable here.
+  const mend = page.locator('[data-screen="shop"] .card', { hasText: 'Mend' });
+  const key = (await mend.locator('.hk').textContent())!.trim();
+  await page.keyboard.press(key);
+  await expect(mend).toHaveCount(0);
+  await page.keyboard.press(key);
+  await expect(page.locator('.float-text', { hasText: 'Not enough coins' })).toHaveCount(0);
+  // Every remaining card is the same size.
+  const heights = await page
+    .locator('[data-screen="shop"] .card')
+    .evaluateAll((els) => els.map((e) => (e as HTMLElement).offsetHeight));
+  expect(new Set(heights).size).toBe(1);
 });
