@@ -1,6 +1,7 @@
 <!-- Run status: health, shield, coins, where you are in the act, and your relics. -->
 <script lang="ts">
   import { RELICS, ROOMS_PER_ACT, type RelicId } from '@lettermancer/engine';
+  import { formatRunTime, runClock } from '../game/runClock.svelte';
   import Bar from './Bar.svelte';
 
   let {
@@ -48,6 +49,9 @@
       {/each}
     </ol>
     <span class="here-name">{room >= ROOMS_PER_ACT ? 'Boss' : `Room ${room + 1} of ${ROOMS_PER_ACT}`}</span>
+    {#if runClock.running}<span class="clock" title="Run time (paused time doesn't count)"
+        >{formatRunTime(runClock.ms)}</span
+      >{/if}
   </nav>
 
   <div class="right">
@@ -66,6 +70,15 @@
 </header>
 
 <style>
+  .clock {
+    margin-left: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 1px solid var(--rule);
+    font-family: var(--f-type);
+    font-size: var(--t-sm);
+    font-variant-numeric: tabular-nums;
+    color: var(--moon-dim);
+  }
   .hud {
     width: min(65.882rem, 100%);
     display: grid;

@@ -217,6 +217,9 @@ export function replayPractice(config: PracticeConfig, inputs: PracticeInput[]):
 
 const union = <T>(a: T[] = [], b: T[] = []): T[] => [...new Set([...a, ...b])];
 
+/** The quicker of two times, where 0 means "none yet". */
+const fastest = (a = 0, b = 0): number => (a && b ? Math.min(a, b) : a || b);
+
 function maxRecord(a: Record<string, number> = {}, b: Record<string, number> = {}): Record<string, number> {
   const out = { ...a };
   for (const [k, v] of Object.entries(b)) out[k] = Math.max(out[k] ?? 0, v);
@@ -243,6 +246,7 @@ export function mergeMeta(older: Meta, newer: Meta, firstSignIn = false): Meta {
     wins: firstSignIn ? a.wins + b.wins : Math.max(a.wins, b.wins),
     bestAct: Math.max(a.bestAct, b.bestAct),
     bestScore: Math.max(a.bestScore, b.bestScore),
+    fastestWinMs: fastest(a.fastestWinMs, b.fastestWinMs),
     maxHeatWon: Math.max(a.maxHeatWon, b.maxHeatWon),
     unlocked: union(a.unlocked, b.unlocked),
     prologueDone: a.prologueDone || b.prologueDone,

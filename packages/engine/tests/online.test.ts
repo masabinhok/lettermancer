@@ -158,5 +158,8 @@ describe('mergeMeta', () => {
     expect(merged.prophecies.win).toBe('2026-09-01');
     expect(merged.upgrades).toEqual({ vitality: 2, purse: 1 });
     expect(mergeMeta(a, b).ink).toBe(100); // later syncs: the newer copy owns currencies
+    // The fastest win is the quicker of the two, ignoring 'no win yet'.
+    expect(mergeMeta({ ...a, fastestWinMs: 0 }, { ...b, fastestWinMs: 900_000 }).fastestWinMs).toBe(900_000);
+    expect(mergeMeta({ ...a, fastestWinMs: 700_000 }, { ...b, fastestWinMs: 900_000 }).fastestWinMs).toBe(700_000);
   });
 });

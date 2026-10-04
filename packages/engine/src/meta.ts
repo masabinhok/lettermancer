@@ -81,6 +81,8 @@ export interface Meta {
   /** highest Heat you have won at; your Oath cap is two above it */
   maxHeatWon: number;
   bestScore: number;
+  /** quickest won run by the stopwatch (active play time, ms); 0 until you win one */
+  fastestWinMs: number;
   lastRun: LastRun | null;
   practice: PracticeProgress;
   /** Archivist lines already heard */
@@ -110,6 +112,7 @@ export const defaultMeta = (): Meta => ({
   winsByStarter: {},
   maxHeatWon: 0,
   bestScore: 0,
+  fastestWinMs: 0,
   lastRun: null,
   practice: { streak: 0, lastDay: null, best: {}, inkToday: 0, inkDay: null, lessonLetters: 6 },
   heard: [],

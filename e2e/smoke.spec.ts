@@ -279,3 +279,21 @@ test('in the shop, a bought item leaves the shelf and its number does nothing', 
     .evaluateAll((els) => els.map((e) => (e as HTMLElement).offsetHeight));
   expect(new Set(heights).size).toBe(1);
 });
+
+test('the run stopwatch counts play time, stops while paused, and survives a reload', async ({ page }) => {
+  await enterFight(page);
+  const clock = page.locator('.hud .clock');
+  const seconds = async () => {
+    const [m, s] = (await clock.textContent())!.trim().split(':').map(Number);
+    return m * 60 + s;
+  };
+  await expect.poll(seconds, { timeout: 5000 }).toBeGreaterThanOrEqual(2);
+  await page.keyboard.press('Escape'); // pause
+  await expect(page.locator('[data-screen="pause"]')).toBeVisible();
+  const paused = await seconds();
+  await page.waitForTimeout(2200);
+  expect(await seconds()).toBe(paused);
+  await page.goto('/run?resume');
+  await expect(clock).toBeVisible();
+  expect(await seconds()).toBeGreaterThanOrEqual(paused);
+});

@@ -4,6 +4,7 @@
   import { account } from '$lib/cloud/account.svelte';
   import { cloudEnabled } from '$lib/cloud/client';
   import { nav } from '$lib/nav';
+  import { formatRunTime } from '$lib/game/runClock.svelte';
   import { profile } from '$lib/stores/profile.svelte';
   import Button from '$lib/ui/Button.svelte';
   import Frame from '$lib/ui/Frame.svelte';
@@ -150,6 +151,10 @@
           <div>
             <dt>Best score</dt>
             <dd>{meta.bestScore.toLocaleString()}</dd>
+          </div>
+          <div>
+            <dt>Fastest win</dt>
+            <dd>{meta.fastestWinMs ? formatRunTime(meta.fastestWinMs) : '—'}</dd>
           </div>
           <div>
             <dt>Highest Heat won</dt>

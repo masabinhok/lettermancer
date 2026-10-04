@@ -156,6 +156,14 @@ class Profile {
     return { mastery: keyMastery(this.stats), totalKeys: totalCorrect(this.stats) };
   }
 
+  /** Keep the quickest win by the run stopwatch. */
+  recordWinTime(ms: number): void {
+    if (ms > 0 && (!this.meta.fastestWinMs || ms < this.meta.fastestWinMs)) {
+      this.meta.fastestWinMs = Math.round(ms);
+      this.saveMeta();
+    }
+  }
+
   /** Record a finished run and hand out Ink, Gold Leaf, keepsakes and prophecies. */
   finishRun(m: RunMachine, abandoned = false): Award {
     const report: RunReport = abandoned ? { ...m.report, result: 'lost', act: m.run.act, room: m.run.room } : m.report;

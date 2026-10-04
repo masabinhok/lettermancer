@@ -19,6 +19,7 @@ import {
 } from '@lettermancer/engine';
 import { account, type SubmitResult } from '../cloud/account.svelte';
 import { profile, readStore, writeStore } from '../stores/profile.svelte';
+import { runClock } from './runClock.svelte';
 import { combatSnapshot, type CombatSnap } from './snapshot';
 
 const SAVE_KEY = 'lettermancer.run.v1';
@@ -29,6 +30,8 @@ const RECENT_WORDS = 40;
 interface SavedRun {
   config: RunConfig | null;
   actions: Action[];
+  /** active play time so far, for the run stopwatch */
+  elapsed?: number;
 }
 
 export type Intro = { kind: 'act'; act: number } | { kind: 'boss'; act: number } | null;
@@ -60,6 +63,8 @@ export class Session {
   submission = $state.raw<SubmitResult | 'sending' | null>(null);
   /** what the finished run earned (set when the run ends) */
   award = $state.raw<Award | null>(null);
+  /** active play time in ms: the run stopwatch (paused and background time don't count) */
+  elapsed = 0;
   /** the last words enemies carried — the install screen reads letter use from these */
   recentWords: string[] = [];
 
@@ -101,6 +106,7 @@ export class Session {
       const m = RunMachine.replay(saved.config, saved.actions);
       if (m.view.kind === 'over') return null;
       const s = new Session(m, false);
+      s.elapsed = saved.elapsed ?? 0;
       // Mid-fight or mid-challenge: start paused so the player isn't hit while getting ready.
       if (m.clock !== null) {
         s.startClock();
@@ -137,7 +143,18 @@ export class Session {
   }
 
   mount(): void {
+    let last = performance.now();
+    runClock.ms = this.elapsed;
+    runClock.running = true;
     const frame = (t: number) => {
+      // The stopwatch: count active time only, and never more than a quarter second per frame
+      // (so a sleeping tab or a long pause between frames doesn't add time).
+      if (!this.paused && this.view.kind !== 'over' && document.visibilityState === 'visible') {
+        const before = Math.floor(this.elapsed / 1000);
+        this.elapsed += Math.min(250, Math.max(0, t - last));
+        if (Math.floor(this.elapsed / 1000) !== before) runClock.ms = this.elapsed;
+      }
+      last = t;
       if (this.clockRunning()) {
         this.dispatch({ t: 'time', at: this.now() });
         if (t - this.lastSave > SAVE_EVERY_MS) this.persist();
@@ -149,6 +166,7 @@ export class Session {
 
   unmount(): void {
     cancelAnimationFrame(this.raf);
+    runClock.running = false;
     this.persist();
   }
 
@@ -288,6 +306,8 @@ export class Session {
       } else if (e.t === 'bought' || e.t === 'installed') {
         this.gain(profile.unlock({ coins: run.coins }));
       } else if (e.t === 'run-end') {
+        runClock.ms = this.elapsed;
+        if (e.result === 'won') profile.recordWinTime(this.elapsed);
         this.award = profile.finishRun(this.machine);
         clearSave();
         this.submit();
@@ -320,7 +340,7 @@ export class Session {
       if (kind === 'over') return;
       if (this.machine.clock === null) at = undefined;
     }
-    writeStore(SAVE_KEY, this.machine.save(at));
+    writeStore(SAVE_KEY, { ...this.machine.save(at), elapsed: Math.round(this.elapsed) });
   }
 }
 

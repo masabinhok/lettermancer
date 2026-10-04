@@ -4,6 +4,7 @@
   import { account } from '../cloud/account.svelte';
   import type { Session } from '../game/session.svelte';
   import { cardBlob, drawShareCard, saveCard, shareCard } from '../game/shareCard';
+  import { formatRunTime } from '../game/runClock.svelte';
   import { profile } from '../stores/profile.svelte';
   import Button from '../ui/Button.svelte';
   import HeatLegend from '../ui/HeatLegend.svelte';
@@ -28,6 +29,9 @@
   const runHeat = heat(run.oaths);
   const mode = untrack(() => session.machine.config.mode);
   const modeName = mode === 'daily' ? 'Daily rite' : mode === 'weekly' ? 'Weekly challenge' : null;
+  const runTime = untrack(() => session.elapsed);
+  const fastestWin = profile.meta.fastestWinMs;
+  const newRecord = won && fastestWin > 0 && Math.round(runTime) === fastestWin;
   const minutes = Math.floor(typingMs / 60000);
 
   let shared = $state<string | null>(null);
@@ -112,6 +116,18 @@
           <dt>Words</dt>
           <dd>{t.words}</dd>
         </div>
+        <div>
+          <dt>Run time</dt>
+          <dd>
+            {formatRunTime(runTime)}{#if newRecord}<small class="record"> fastest yet</small>{/if}
+          </dd>
+        </div>
+        {#if won && fastestWin > 0 && !newRecord}
+          <div>
+            <dt>Fastest win</dt>
+            <dd>{formatRunTime(fastestWin)}</dd>
+          </div>
+        {/if}
         <div>
           <dt>Time in combat</dt>
           <dd>{minutes}:{String(seconds).padStart(2, '0')}</dd>
@@ -232,6 +248,9 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     font-size: var(--t-sm);
+  }
+  .record {
+    color: var(--gold-bright);
   }
   .shared {
     font-size: var(--t-sm);
