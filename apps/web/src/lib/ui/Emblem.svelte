@@ -28,7 +28,7 @@
     ['#e3c3a0', '#9a6a43', '#4a2f1d'],
     ['#e6f1ff', '#7f9fc4', '#2c3d58'],
     ['#f3e2ff', '#a77fd6', '#3d2560'],
-    ['#fff4c9', '#d9b45b', '#6b4a14'],
+    ['#fff4c9', '#e6a100', '#6b4a14'],
   ] as const;
   const metal = $derived(METALS[Math.max(0, Math.min(3, tier))]);
   const beams = Array.from({ length: 16 }, (_, i) => i * 22.5);

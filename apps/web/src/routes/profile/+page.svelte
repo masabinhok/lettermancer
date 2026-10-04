@@ -365,6 +365,10 @@
     gap: var(--space-3) var(--space-5);
     margin: 0;
   }
+  dl > div {
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid color-mix(in oklab, var(--gold) 22%, transparent);
+  }
   dt {
     font-size: var(--t-xs);
     color: var(--moon-faint);
@@ -372,6 +376,8 @@
   dd {
     margin: 0;
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
     font-weight: 700;
     font-size: var(--t-lg);
   }

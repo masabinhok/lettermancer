@@ -110,6 +110,8 @@
     border: 1px solid var(--rule);
     cursor: pointer;
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: var(--ui-tracking);
   }
   .tabs .on {
     border-color: var(--gold);
@@ -160,5 +162,13 @@
     display: block;
     color: var(--moon-dim);
     font-size: var(--t-xs);
+  }
+
+  /* Typography roles (see app.css): boon names, titles and speakers get their own faces. */
+  li b {
+    font-family: var(--f-boon);
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0.02em;
   }
 </style>

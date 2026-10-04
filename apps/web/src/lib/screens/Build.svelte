@@ -188,4 +188,12 @@
     color: var(--moon-faint);
     font-size: var(--t-sm);
   }
+
+  /* Typography roles (see app.css): boon names, titles and speakers get their own faces. */
+  b {
+    font-family: var(--f-boon);
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
 </style>

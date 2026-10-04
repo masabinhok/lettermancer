@@ -31,6 +31,7 @@
     border-radius: 2px;
     cursor: pointer;
     font-family: var(--f-display);
+    text-transform: uppercase;
     font-weight: 600;
     font-size: var(--t-md);
     letter-spacing: 0.04em;

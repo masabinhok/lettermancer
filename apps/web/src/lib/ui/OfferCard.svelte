@@ -122,6 +122,8 @@
   }
   .name {
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: var(--ui-tracking);
     font-weight: 700;
     font-size: var(--t-xl);
     color: var(--c);
@@ -140,6 +142,8 @@
   .cost {
     margin-top: auto;
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
     font-weight: 700;
     font-size: var(--t-lg);
     color: var(--aurum);
@@ -150,5 +154,13 @@
   .sold {
     opacity: 0.3;
     cursor: default;
+  }
+
+  /* Typography roles (see app.css): boon names, titles and speakers get their own faces. */
+  .name {
+    font-family: var(--f-boon);
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0.02em;
   }
 </style>

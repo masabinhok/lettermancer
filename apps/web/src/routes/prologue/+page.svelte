@@ -72,12 +72,12 @@
       } else if (ev.t === 'hit') {
         sfx.hit(ev.crit);
         floatText(enemyEl(ev.enemyId), String(ev.dmg), 'ft-dmg');
-        burstAt(enemyEl(ev.enemyId)?.querySelector('.portrait'), '#ddd7ea', 16);
+        burstAt(enemyEl(ev.enemyId)?.querySelector('.portrait'), '#ffffff', 16);
       } else if (ev.t === 'burn') {
         floatText(enemyEl(ev.enemyId), String(ev.dmg), 'ft-burn');
       } else if (ev.t === 'kill') {
         sfx.kill();
-        burstAt(enemyEl(ev.enemyId)?.querySelector('.portrait'), '#f3d98c', 40, 360);
+        burstAt(enemyEl(ev.enemyId)?.querySelector('.portrait'), '#ffd700', 40, 360);
       } else if (ev.t === 'player-hit') {
         sfx.hurt();
         shake(stage ?? null, 'big');
@@ -261,6 +261,8 @@
   }
   .mult {
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
     font-weight: 700;
     font-size: var(--t-2xl);
   }

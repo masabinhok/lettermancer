@@ -10,15 +10,15 @@ const C = {
   night: '#130f1d',
   ink: '#221b33',
   rule: '#3d3358',
-  moon: '#ddd7ea',
+  moon: '#ffffff',
   dim: '#a79fbd',
   faint: '#6f6788',
-  gold: '#d9b45b',
-  bright: '#f3d98c',
+  gold: '#e6a100',
+  bright: '#ffd700',
   rose: '#e24b6e',
 };
-const DISPLAY = "'Cinzel Variable', 'Cinzel', serif";
-const TEXT = "'Alegreya Sans', system-ui, sans-serif";
+const DISPLAY = "'Libre Baskerville', Georgia, serif";
+const TEXT = "'Lato', system-ui, sans-serif";
 
 export interface CardFacts {
   avgWpm: number;

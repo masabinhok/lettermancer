@@ -35,7 +35,7 @@
   // eslint-disable-next-line svelte/prefer-svelte-reactivity -- bookkeeping for sounds, never rendered
   const windupsSeen = new Set<number>();
   /** Color of the power on the last key typed: the slash that finishes a word takes it on. */
-  let strikeColor = '#ddd7ea';
+  let strikeColor = '#ffffff';
 
   /** Bigger hits, relative to the foe's health, get bigger numbers (up to about twice the size). */
   function hitScale(enemyId: number, dmg: number, crit: boolean): number {
@@ -48,7 +48,7 @@
     switch (ev.t) {
       case 'key-ok': {
         const boons = run.keyMods[ev.key] ?? [];
-        strikeColor = boons.length ? MODS[boons[boons.length - 1].mod].color : '#ddd7ea';
+        strikeColor = boons.length ? MODS[boons[boons.length - 1].mod].color : '#ffffff';
         kb?.flash(ev.key, true);
         sfx.keyClick(session.machine.combat?.combo ?? 0);
         break;
@@ -65,8 +65,8 @@
       case 'combo-tier':
         sfx.tierUp(ev.tier);
         sfx.setIntensity(ev.tier);
-        banner(stage, `×${COMBO_TIERS[ev.tier].mult}`, `${COMBO_TIERS[ev.tier].at} combo`, '#f3d98c');
-        motesAt(comboEl, '#f3d98c', 30);
+        banner(stage, `×${COMBO_TIERS[ev.tier].mult}`, `${COMBO_TIERS[ev.tier].at} combo`, '#ffd700');
+        motesAt(comboEl, '#ffd700', 30);
         break;
       case 'hit': {
         sfx.hit(ev.crit);
@@ -77,8 +77,8 @@
           ev.crit ? 'ft-crit' : 'ft-dmg',
           hitScale(ev.enemyId, ev.dmg, ev.crit),
         );
-        burstAt(glyphEl(ev.enemyId), ev.crit ? '#f3d98c' : strikeColor, ev.crit ? 40 : 18);
-        slash(el?.querySelector('.word'), ev.crit ? '#f3d98c' : strikeColor, ev.crit);
+        burstAt(glyphEl(ev.enemyId), ev.crit ? '#ffd700' : strikeColor, ev.crit ? 40 : 18);
+        slash(el?.querySelector('.word'), ev.crit ? '#ffd700' : strikeColor, ev.crit);
         punch(el, ev.crit);
         hitStop(stage, ev.crit ? 110 : 45);
         if (ev.crit) shake(stage, 'small');
@@ -104,8 +104,8 @@
         sfx.kill();
         const el = enemyEl(ev.enemyId);
         const big = !!el?.matches('.boss, .elite');
-        burstAt(glyphEl(ev.enemyId), '#f3d98c', big ? 90 : 48, big ? 520 : 380);
-        shatter(el, big ? '#e24b6e' : '#f3d98c', big);
+        burstAt(glyphEl(ev.enemyId), '#ffd700', big ? 90 : 48, big ? 520 : 380);
+        shatter(el, big ? '#e24b6e' : '#ffd700', big);
         hitStop(stage, big ? 220 : 120);
         shake(stage, big ? 'big' : 'small');
         break;
@@ -162,7 +162,7 @@
         sfx.select();
         break;
       case 'wave':
-        banner(stage, `Wave ${ev.wave}`, 'More are coming', '#ddd7ea');
+        banner(stage, `Wave ${ev.wave}`, 'More are coming', '#ffffff');
         break;
       case 'phase':
         sfx.tierUp(ev.phase + 1);
@@ -313,6 +313,8 @@
     min-width: 2.6em;
     text-align: right;
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
     font-weight: 700;
     font-size: var(--t-3xl);
     line-height: 1;

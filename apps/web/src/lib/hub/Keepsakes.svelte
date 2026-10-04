@@ -130,6 +130,8 @@
   }
   b {
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }
   .text span {
     color: var(--moon-dim);
@@ -143,5 +145,13 @@
     color: var(--gold-bright);
     border: 1px solid var(--gold-deep);
     padding: 2px 0.471rem;
+  }
+
+  /* Typography roles (see app.css): boon names, titles and speakers get their own faces. */
+  b {
+    font-family: var(--f-boon);
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0.02em;
   }
 </style>

@@ -33,5 +33,6 @@ The rules engine is deterministic, framework-free TypeScript, and most content i
 
 ## Thanks
 
-Fonts by Natanael Gama, Huerta Tipográfica, Christian Thalmann and JetBrains (all SIL OFL). The word list comes from
+Fonts by Impallari Type, Julieta Ulanovsky, Production Type, Open Window, Łukasz Dziedzic, Christian Thalmann and
+JetBrains (all SIL OFL). The word list comes from
 SCOWL by Kevin Atkinson.

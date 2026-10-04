@@ -121,6 +121,7 @@
     display: grid;
     place-items: center;
     font-family: var(--f-display);
+    letter-spacing: 0.03em;
     font-weight: 700;
     font-size: min(70vh, 40vw);
     line-height: 1;
@@ -229,5 +230,16 @@
     50% {
       box-shadow: inset 0 0 160px rgba(226, 75, 110, 0.35);
     }
+  }
+
+  /* Typography roles (see app.css): boon names, titles and speakers get their own faces. */
+  h1 {
+    font-family: var(--f-title);
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0.01em;
+  }
+  .numeral {
+    font-family: var(--f-title);
   }
 </style>

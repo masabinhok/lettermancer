@@ -136,4 +136,12 @@
     font-size: var(--t-sm);
     color: var(--moon-faint);
   }
+
+  /* Typography roles (see app.css): boon names, titles and speakers get their own faces. */
+  h1 span {
+    font-family: var(--f-boon);
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
 </style>

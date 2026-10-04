@@ -33,6 +33,8 @@
   }
   b {
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
     font-size: var(--t-lg);
     color: var(--moon);
   }

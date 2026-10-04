@@ -10,10 +10,13 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
-    "@fontsource-variable/cinzel": "^5.3.0",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
-    "@fontsource/alegreya-sans": "^5.3.0",
+    "@fontsource-variable/montserrat": "^5.3.0",
+    "@fontsource/caesar-dressing": "^5.3.0",
     "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/lato": "^5.3.0",
+    "@fontsource/libre-baskerville": "^5.3.0",
+    "@fontsource/spectral-sc": "^5.3.0",
     "@lettermancer/engine": "*",
     "@supabase/supabase-js": "^2.117.2"
   },

@@ -10,6 +10,7 @@
   import { RARITY_COLOR } from '../game/look';
   import type { Session } from '../game/session.svelte';
   import Button from '../ui/Button.svelte';
+  import Dialogue from '../ui/Dialogue.svelte';
   import Emblem from '../ui/Emblem.svelte';
   import Hud from '../ui/Hud.svelte';
 
@@ -84,7 +85,7 @@
       };
     }
     const r = RELICS[o.relic];
-    return { glyph: r.glyph, name: r.name, desc: r.desc, color: '#d9b45b', kind: 'Relic', tier: 2 };
+    return { glyph: r.glyph, name: r.name, desc: r.desc, color: '#e6a100', kind: 'Relic', tier: 2 };
   }
 
   const cards = $derived(v ? v.offers.map(card) : []);
@@ -148,21 +149,21 @@
 </script>
 
 {#if v}
-  <div class="screen" data-screen="reward" style:--muse={muse?.color ?? '#d9b45b'}>
+  <div class="screen" data-screen="reward" style:--muse={muse?.color ?? '#e6a100'}>
     <Hud hp={run.hp} maxHp={run.maxHp} coins={run.coins} act={run.act} room={run.room} relics={run.relics} {onbuild} />
     <div class="stage">
       <section class="giver">
         <Emblem
           glyph={muse ? MODS[muse.mod].glyph : '✦'}
-          color={muse?.color ?? '#d9b45b'}
+          color={muse?.color ?? '#e6a100'}
           size="13rem"
           tier={muse ? 3 : 2}
           bob
         />
         {#if muse}
-          <h1>{muse.name}</h1>
+          <h1 class="speaker">{muse.name}</h1>
           <p class="title">{muse.title}</p>
-          {#if greeting}<p class="greeting">“{greeting}”</p>{/if}
+          {#if greeting}<Dialogue><p class="greeting">“{greeting}”</p></Dialogue>{/if}
         {:else}
           <h1>{v.title}</h1>
         {/if}
@@ -251,14 +252,15 @@
   }
   .title {
     font-family: var(--f-display);
+    text-transform: uppercase;
     font-size: var(--t-lg);
     color: var(--moon-dim);
     letter-spacing: 0.05em;
   }
   .greeting {
+    margin: 0;
     max-width: 26ch;
     font-size: var(--t-lg);
-    font-style: italic;
     color: var(--moon);
   }
   .perfect {
@@ -330,6 +332,8 @@
   }
   .name {
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: var(--ui-tracking);
     font-weight: 700;
     font-size: var(--t-2xl);
     line-height: 1.1;
@@ -378,5 +382,20 @@
     .stage {
       grid-template-columns: 1fr;
     }
+  }
+
+  /* Typography roles (see app.css): boon names, titles and speakers get their own faces. */
+  .name {
+    font-family: var(--f-boon);
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+  .giver h1.speaker {
+    font-family: var(--f-speaker);
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0.04em;
+    color: var(--gold-bright);
   }
 </style>

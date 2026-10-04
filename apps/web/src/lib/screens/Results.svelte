@@ -266,8 +266,13 @@
   .stats {
     display: grid;
     grid-template-columns: repeat(2, auto);
-    gap: var(--space-4) var(--space-6);
+    gap: var(--space-3) var(--space-6);
     margin: 0;
+  }
+  /* Each stat on its own line, ruled off with a fine divider. */
+  .stats > div {
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid color-mix(in oklab, var(--gold) 22%, transparent);
   }
   .score {
     grid-column: span 2;
@@ -283,6 +288,8 @@
   dd {
     margin: 0;
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
     font-weight: 700;
     font-size: var(--t-2xl);
   }
@@ -320,6 +327,8 @@
   }
   .purse b {
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
     font-size: var(--t-lg);
   }
   .ink {
@@ -394,5 +403,19 @@
       grid-template-columns: 1fr;
       gap: var(--space-4);
     }
+  }
+
+  /* Typography roles (see app.css): boon names, titles and speakers get their own faces. */
+  .rewards b {
+    font-family: var(--f-boon);
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+  h1 {
+    font-family: var(--f-title);
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0.01em;
   }
 </style>

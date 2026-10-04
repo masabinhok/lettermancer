@@ -101,7 +101,7 @@
         color: '#7fe0b0',
         tier: 0,
       };
-    return { kind: 'Fight', title: 'Fight', line: '', more: 'A fight.', glyph: '⚔', color: '#ddd7ea', tier: 0 };
+    return { kind: 'Fight', title: 'Fight', line: '', more: 'A fight.', glyph: '⚔', color: '#ffffff', tier: 0 };
   }
 
   const infos = $derived(v ? v.doors.map(describe) : []);
@@ -338,6 +338,8 @@
   }
   .title {
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: var(--ui-tracking);
     font-weight: 700;
     font-size: var(--t-2xl);
     line-height: 1.1;

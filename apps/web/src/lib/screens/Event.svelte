@@ -184,6 +184,8 @@
   }
   .label {
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: var(--ui-tracking);
     font-weight: 700;
     font-size: var(--t-lg);
     color: var(--moon);

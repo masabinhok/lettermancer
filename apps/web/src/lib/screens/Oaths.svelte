@@ -117,6 +117,8 @@
   }
   b {
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }
   .text span {
     font-size: var(--t-sm);
@@ -153,6 +155,8 @@
   }
   .heat {
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
     font-weight: 700;
     font-size: var(--t-xl);
     color: var(--rose);

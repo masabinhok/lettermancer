@@ -88,4 +88,12 @@
     color: var(--rose);
     font-size: var(--t-xs);
   }
+
+  /* Typography roles (see app.css): boon names, titles and speakers get their own faces. */
+  .text b {
+    font-family: var(--f-boon);
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
 </style>

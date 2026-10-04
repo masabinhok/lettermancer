@@ -228,6 +228,8 @@
   }
   .score {
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
     font-weight: 700;
   }
   tr.you td {

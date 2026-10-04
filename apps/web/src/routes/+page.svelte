@@ -37,6 +37,7 @@
   import Settings from '$lib/screens/Settings.svelte';
   import { profile } from '$lib/stores/profile.svelte';
   import Button from '$lib/ui/Button.svelte';
+  import Dialogue from '$lib/ui/Dialogue.svelte';
   import Frame from '$lib/ui/Frame.svelte';
   import Initial from '$lib/ui/Initial.svelte';
   import Keyboard from '$lib/ui/Keyboard.svelte';
@@ -160,20 +161,17 @@
 
   <main class="hall">
     <section class="left">
-      <Frame ornate>
-        <div class="archivist">
-          <Initial glyph="A" size={72} field="#2c2a4a" ink="var(--moon)" />
-          <div>
-            <p class="who">The Archivist</p>
-            <p class="says">“{line.text}”</p>
-            {#if meta.seals >= SEALS_PER_LEAF}
-              <button class="trade" onclick={trade} type="button"
-                ><kbd>X</kbd> Trade {SEALS_PER_LEAF} Seals for a Gold Leaf</button
-              >
-            {/if}
-          </div>
-        </div>
-      </Frame>
+      <div class="archivist">
+        <Initial glyph="A" size={72} field="#2c2a4a" ink="var(--moon)" />
+        <Dialogue speaker="The Archivist">
+          <p class="says">“{line.text}”</p>
+          {#if meta.seals >= SEALS_PER_LEAF}
+            <button class="trade" onclick={trade} type="button"
+              ><kbd>X</kbd> Trade {SEALS_PER_LEAF} Seals for a Gold Leaf</button
+            >
+          {/if}
+        </Dialogue>
+      </div>
 
       <div class="begin">
         {#if hasSave}
@@ -329,7 +327,7 @@
     gap: var(--space-2);
   }
   .logo span {
-    font-size: 2.3rem;
+    font-size: 1.95rem;
     line-height: 0.85;
     letter-spacing: 0.03em;
   }
@@ -358,19 +356,15 @@
   .archivist {
     display: flex;
     gap: var(--space-4);
-    align-items: flex-start;
-    padding: var(--space-4) var(--space-5);
+    align-items: flex-end;
   }
-  .who {
-    font-family: var(--f-display);
-    color: var(--gold);
-    font-size: var(--t-sm);
+  .archivist > :global(.dialogue) {
+    flex: 1;
   }
   .says {
     font-size: var(--t-lg);
     line-height: 1.45;
     max-width: 60ch;
-    font-style: italic;
   }
   .trade {
     margin-top: var(--space-2);
@@ -421,6 +415,8 @@
   }
   .name {
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: var(--ui-tracking);
     font-weight: 700;
   }
   .desc {
@@ -528,6 +524,8 @@
   }
   .station .n {
     font-family: var(--f-display);
+    text-transform: uppercase;
+    letter-spacing: var(--ui-tracking);
     font-weight: 700;
   }
   .station .h {
@@ -577,5 +575,24 @@
     .starters {
       grid-template-columns: repeat(2, 1fr);
     }
+  }
+
+  /* Typography roles (see app.css): boon names, titles and speakers get their own faces. */
+  .starter .name {
+    font-family: var(--f-boon);
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+  .logo span {
+    font-family: var(--f-title);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  /* Header buttons: a step smaller, so spaced capitals fit beside the logo and purse. */
+  .util :global(.btn) {
+    font-size: var(--t-sm);
+    padding: 0.5rem 0.9rem;
   }
 </style>

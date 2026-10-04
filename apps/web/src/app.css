@@ -1,8 +1,14 @@
-@import '@fontsource-variable/cinzel';
-@import '@fontsource/alegreya-sans/400.css';
-@import '@fontsource/alegreya-sans/500.css';
-@import '@fontsource/alegreya-sans/700.css';
-@import '@fontsource/alegreya-sans/400-italic.css';
+/* Typography after Hades II: a classic serif for titles, a spaced small-caps sans for the interface,
+   serif small caps for boons, a chiseled face for speakers, and a clean sans for reading. */
+@import '@fontsource/libre-baskerville/400.css';
+@import '@fontsource/libre-baskerville/700.css';
+@import '@fontsource-variable/montserrat';
+@import '@fontsource/spectral-sc/500.css';
+@import '@fontsource/spectral-sc/700.css';
+@import '@fontsource/caesar-dressing/400.css';
+@import '@fontsource/lato/400.css';
+@import '@fontsource/lato/700.css';
+@import '@fontsource/lato/400-italic.css';
 @import '@fontsource-variable/jetbrains-mono';
 @import '@fontsource/cormorant-garamond/600.css';
 
@@ -16,11 +22,11 @@
   --ink: #221b33;
   --ink-2: #2c2442;
   --rule: #3d3358;
-  --moon: #ddd7ea;
-  --moon-dim: #a79fbd;
-  --moon-faint: #8f87a8;
-  --gold: #d9b45b;
-  --gold-bright: #f3d98c;
+  --moon: #ffffff;
+  --moon-dim: #c4c1cc;
+  --moon-faint: #9a97a5;
+  --gold: #e6a100;
+  --gold-bright: #ffd700;
   --gold-deep: #8a6a2a;
   --witchfire: #7fe0b0;
   --rose: #e24b6e;
@@ -34,10 +40,21 @@
   --glass: #eaf2ff;
   --ward: #7fe0b0;
 
-  --f-display: 'Cinzel Variable', 'Cinzel', serif;
-  --f-text: 'Alegreya Sans', system-ui, sans-serif;
+  /* Main title and big milestones (act names, Victory) */
+  --f-title: 'Libre Baskerville', Georgia, serif;
+  /* Interface: headers, buttons, stats, prices. Always uppercase with loose tracking. */
+  --f-ui: 'Montserrat Variable', 'Montserrat', system-ui, sans-serif;
+  --ui-tracking: 0.15em;
+  /* Names of boons, powers, relics, keepsakes and prophecies */
+  --f-boon: 'Spectral SC', Georgia, serif;
+  /* Who is speaking: the Archivist, the muses */
+  --f-speaker: 'Caesar Dressing', 'Libre Baskerville', serif;
+  /* Reading: descriptions, dialogue, lore */
+  --f-text: 'Lato', system-ui, sans-serif;
+  /* Older name for the interface face */
+  --f-display: var(--f-ui);
   --f-type: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
-  --f-glyph: 'Cormorant Garamond', 'Cinzel Variable', Georgia, serif;
+  --f-glyph: 'Cormorant Garamond', 'Libre Baskerville', Georgia, serif;
 
   /* type scale (1.25) */
   --t-xs: 0.85rem;
@@ -121,7 +138,8 @@ h2,
 h3 {
   font-family: var(--f-display);
   font-weight: 600;
-  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  letter-spacing: var(--ui-tracking);
   margin: 0;
   line-height: 1.1;
 }
@@ -142,6 +160,9 @@ button {
 
 kbd {
   font-family: var(--f-type);
+  /* Key caps read as printed on the keyboard, even inside uppercase interface text. */
+  text-transform: none;
+  letter-spacing: 0;
   font-size: 0.85em;
   padding: 1px 0.353rem;
   border: 1px solid var(--rule);
@@ -222,6 +243,8 @@ kbd {
   z-index: 90;
   pointer-events: none;
   font-family: var(--f-display);
+  text-transform: uppercase;
+  letter-spacing: var(--ui-tracking);
   font-weight: 700;
   font-size: 1.5rem;
   transform: translate(-50%, 0);
@@ -357,6 +380,7 @@ kbd {
 }
 .fx-banner strong {
   font-family: var(--f-display);
+  text-transform: uppercase;
   font-size: 2.6rem;
   line-height: 1;
   color: var(--c);
