@@ -80,7 +80,7 @@ for (const [w, h] of SIZES) {
     async ({ ENGINE, KINDS }) => {
       const E = await import(ENGINE);
       const out = {};
-      for (const seed of [4242, 77, 913]) {
+      for (let seed = 1; seed < 400 && KINDS.some((k) => !out[k]); seed += 37) {
         const cfg = E.newRunConfig('apprentice', seed);
         const full = E.playRun(cfg, { wpm: 70, accuracy: 0.97, rng: E.makeRng(seed) }).actions;
         for (let n = 1; n < full.length; n++) {
@@ -123,6 +123,8 @@ for (const [w, h] of SIZES) {
       results.push(`${kind}:not reached`);
       continue;
     }
+    // Leave the run page first: on its way out it saves its own run, which would overwrite ours.
+    await page.goto(`${URL}/privacy`);
     await page.evaluate((save) => localStorage.setItem('lettermancer.run.v1', JSON.stringify(save)), found[kind].save);
     await page.goto(`${URL}/run?resume`);
     await page.waitForSelector(`[data-screen="${kind}"]`);
