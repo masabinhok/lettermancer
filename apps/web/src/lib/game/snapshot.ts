@@ -4,6 +4,7 @@
  */
 import {
   blackoutVisibleMs,
+  sandLimitMs,
   comboTier,
   COMBO_TIERS,
   intentRate,
@@ -72,6 +73,8 @@ export interface CombatSnap {
   coins: number;
   /** damage the current target word will deal if finished now */
   preview: number | null;
+  /** ms of sand left under the Oath of the Sandglass (0 = run out), or null without it */
+  sandLeft: number | null;
   over: Combat['over'];
 }
 
@@ -139,6 +142,10 @@ export function combatSnapshot(c: Combat, run: Run): CombatSnap {
           streak: c.streak,
         }).dmg
       : null,
+    sandLeft: (() => {
+      const limit = sandLimitMs(c, run);
+      return limit === null ? null : Math.max(0, limit - c.time);
+    })(),
     over: c.over,
   };
 }

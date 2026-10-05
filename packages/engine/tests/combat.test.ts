@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { backspace, createCombat, pressKey, tick, type Combat, type CombatCtx } from '../src/combat';
+import { backspace, createCombat, pressKey, sandLimitMs, tick, type Combat, type CombatCtx } from '../src/combat';
 import { comboTier, eligibleDuos, installMod, resolveWord, type WordContext } from '../src/mods';
 import type { EnemySpec, Run } from '../src/state';
 import { queueCtx, spec, testRun } from './helpers';
@@ -358,5 +358,44 @@ describe('boss signature relics', () => {
     expect(c.combo).toBe(3);
     pressKey(c, run, 'x', ctx, 600);
     expect(c.combo).toBe(0);
+  });
+});
+
+describe('Oath of the Sandglass', () => {
+  const calm = (over: Partial<EnemySpec> = {}) => spec({ intentMs: 1e9, ...over }); // never attacks
+
+  it('does nothing until the sand runs out, then costs 1 health a second', () => {
+    const run = testRun();
+    run.oaths = { sand: 1 };
+    const ctx = queueCtx(['abc']);
+    const c = fight(run, ctx, calm());
+    const hp = run.hp;
+    expect(sandLimitMs(c, run)).toBe(60_000);
+    tick(c, run, 60_000, ctx);
+    expect(run.hp).toBe(hp);
+    const ev = tick(c, run, 2_500, ctx);
+    expect(ev.filter((e) => e.t === 'sand')).toHaveLength(2);
+    expect(run.hp).toBe(hp - 2);
+  });
+
+  it('gives 45 seconds at level 2, and boss fights twice as long', () => {
+    const run = testRun();
+    run.oaths = { sand: 2 };
+    const ctx = queueCtx(['abc']);
+    expect(sandLimitMs(fight(run, ctx, calm()), run)).toBe(45_000);
+    expect(sandLimitMs(fight(run, ctx, calm({ kind: 'boss' })), run)).toBe(90_000);
+    run.oaths = {};
+    expect(sandLimitMs(fight(run, ctx, calm()), run)).toBeNull();
+  });
+
+  it('can end the run when the sand outlasts your health', () => {
+    const run = testRun();
+    run.oaths = { sand: 1 };
+    run.hp = 2;
+    const ctx = queueCtx(['abc']);
+    const c = fight(run, ctx, calm());
+    tick(c, run, 63_000, ctx);
+    expect(c.over).toBe('lose');
+    expect(run.hp).toBe(0);
   });
 });

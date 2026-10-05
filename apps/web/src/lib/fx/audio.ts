@@ -224,6 +224,18 @@ export const purchase = () => {
   noise(0.15, 0.08, 'highpass', 6000);
 };
 
+/** The Sandglass's last seconds: a dry tick that rises as time runs out. */
+export const sandTick = (secsLeft: number) => {
+  noise(0.04, 0.12, 'highpass', 5200);
+  tone(880 + (10 - secsLeft) * 70, 0.08, 'square', 0.025);
+};
+
+/** The sand has run out and burns: a gritty hiss and a low thud. */
+export const sandBurn = () => {
+  noise(0.25, 0.22, 'bandpass', 2400, 0.8);
+  tone(98, 0.22, 'sine', 0.1, { slideTo: 60 });
+};
+
 // ---------- act and boss title cards ----------
 
 /** A new act: a deep gong under a slow, rising chord. */

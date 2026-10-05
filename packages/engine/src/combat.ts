@@ -3,7 +3,7 @@
  * Pure and deterministic given the same inputs and random stream.
  */
 import { BLACKOUT_VISIBLE_MS, BOSSES, MAX_MINIONS, MINION, PUNCTUATION, TRAIT_EVERY } from './content/enemies';
-import { oath } from './content/oaths';
+import { oath, SAND_SECONDS } from './content/oaths';
 import { comboTier, removeMod, resolveWord, type BlessingId } from './mods';
 import { pick, type Rng } from './rng';
 import { GENTLE_SPEED } from './run';
@@ -37,6 +37,10 @@ export interface Combat {
   firstWordDone: boolean;
   /** the Red Pen has forgiven this fight's first typo */
   pardonUsed: boolean;
+  /** time since the Sandglass ran out, toward the next second's damage */
+  sandClock: number;
+  /** a boss fight (the Sandglass gives it twice the time) */
+  bossFight: boolean;
   burnClock: number;
   nextId: number;
   /** combat time of the last correct press, for latency stats and the Oath of Flow */
@@ -71,6 +75,8 @@ export type CombatEvent =
   | { t: 'phase'; enemyId: number; phase: number }
   | { t: 'player-hit'; enemyId: number; dmg: number; blocked: number }
   | { t: 'typo-hurt'; dmg: number }
+  /** the Sandglass has run out: the sand burns you */
+  | { t: 'sand'; dmg: number }
   | { t: 'second-wind'; hp: number }
   | { t: 'shield'; amount: number }
   | { t: 'heal'; amount: number }
@@ -204,6 +210,8 @@ export function createCombat(waves: EnemySpec[][], ctx: CombatCtx, run?: Run): C
     coinsEarned: 0,
     firstWordDone: false,
     pardonUsed: false,
+    sandClock: 0,
+    bossFight: waves.some((w) => w.some((spec) => spec.kind === 'boss')),
     burnClock: 0,
     nextId: 1,
     lastCorrectAt: null,
@@ -576,6 +584,13 @@ export const intentRate = (run: Run): number =>
   (run.gentle ? GENTLE_SPEED : 1);
 
 /** Advance time: enemy attacks, behaviors and burn. */
+/** When this fight's sand runs out (ms on the fight clock), or null without the Oath of the Sandglass. */
+export function sandLimitMs(c: Combat, run: Run): number | null {
+  const level = oath(run.oaths, 'sand');
+  if (!level) return null;
+  return SAND_SECONDS[level - 1] * 1000 * (c.bossFight ? 2 : 1);
+}
+
 export function tick(c: Combat, run: Run, dt: number, ctx: CombatCtx): CombatEvent[] {
   const ev: CombatEvent[] = [];
   if (c.over) return ev;
@@ -592,6 +607,19 @@ export function tick(c: Combat, run: Run, dt: number, ctx: CombatCtx): CombatEve
       attack(c, run, e, ctx, ev);
       if (run.hp <= 0) break;
     }
+  }
+
+  // Oath of the Sandglass: once the fight's sand runs out, lose 1 health every second.
+  const sand = sandLimitMs(c, run);
+  if (sand !== null && c.time > sand) {
+    c.sandClock += dt;
+    while (c.sandClock >= 1000 && !c.over) {
+      c.sandClock -= 1000;
+      run.hp -= 1;
+      ev.push({ t: 'sand', dmg: 1 });
+      checkEnd(c, run, ctx, ev);
+    }
+    if (c.over) return ev;
   }
 
   if (oath(run.oaths, 'brittle') && c.combo > 0 && c.time - c.lastKeyAt > FLOW_BREAK_MS) {

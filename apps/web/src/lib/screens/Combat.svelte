@@ -171,6 +171,11 @@
         burstAt(glyphEl(ev.enemyId), '#e24b6e', 50, 400);
         hitStop(stage, 200);
         break;
+      case 'sand':
+        sfx.sandBurn();
+        flash('hurt');
+        floatText(stage.querySelector('.hud .hp'), `−${ev.dmg}`, 'ft-hurt');
+        break;
       case 'typo-hurt':
         floatText(stage.querySelector('.hud .hp'), `−${ev.dmg}`, 'ft-hurt');
         break;
@@ -184,6 +189,18 @@
         break;
     }
   }
+
+  // The Sandglass ticks each second of its last ten.
+  let lastSandTick = -1;
+  $effect(() => {
+    const left = snap.sandLeft;
+    if (left === null || left <= 0) return;
+    const secs = Math.ceil(left / 1000);
+    if (secs <= 10 && secs !== lastSandTick) {
+      lastSandTick = secs;
+      sfx.sandTick(secs);
+    }
+  });
 
   // A soft chime the moment an enemy begins its wind-up, once per swing.
   $effect(() => {
@@ -222,7 +239,7 @@
     {/each}
   </section>
 
-  <section class="combo tier-{snap.tier}" bind:this={comboEl} aria-live="off">
+  <section class="combo tier-{snap.tier}" class:has-sand={snap.sandLeft !== null} bind:this={comboEl} aria-live="off">
     <span class="mult">×{snap.mult}</span>
     <div class="meter">
       <span class="count">
@@ -238,6 +255,18 @@
         Type the first letter of a word to lock on
       {/if}
     </span>
+    {#if snap.sandLeft !== null}
+      {@const secs = Math.ceil(snap.sandLeft / 1000)}
+      <span
+        class="sand"
+        class:low={secs <= 10}
+        class:out={secs === 0}
+        title="Oath of the Sandglass: when the sand runs out, you lose 1 health a second"
+      >
+        <span class="glass" aria-hidden="true">⧗</span>
+        {secs === 0 ? 'Sand out' : `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`}
+      </span>
+    {/if}
   </section>
 
   {#if settings.keyboard !== 'hidden'}
@@ -307,6 +336,45 @@
     grid-template-rows: auto auto;
     column-gap: var(--space-4);
     align-items: center;
+  }
+  .combo.has-sand {
+    grid-template-columns: auto 14.118rem auto;
+  }
+  /* The Sandglass countdown: calm, then red in the last ten seconds, then cracked when out. */
+  .sand {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--rule);
+    font-family: var(--f-type);
+    font-size: var(--t-lg);
+    font-variant-numeric: tabular-nums;
+    color: var(--moon-dim);
+  }
+  .sand .glass {
+    font-family: var(--f-glyph);
+    color: var(--spark);
+  }
+  .sand.low {
+    color: var(--rose);
+    border-color: var(--rose);
+    animation: sand-pulse 1s ease-in-out infinite;
+  }
+  .sand.out {
+    color: #fff;
+    background: color-mix(in oklab, var(--rose) 45%, transparent);
+    font-family: var(--f-ui);
+    font-size: var(--t-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--ui-tracking);
+  }
+  @keyframes sand-pulse {
+    50% {
+      box-shadow: 0 0 18px -2px var(--rose);
+    }
   }
   .mult {
     grid-row: span 2;

@@ -297,3 +297,16 @@ test('the run stopwatch counts play time, stops while paused, and survives a rel
   await expect(clock).toBeVisible();
   expect(await seconds()).toBeGreaterThanOrEqual(paused);
 });
+
+test('under the Oath of the Sandglass, fights show a sand timer', async ({ page }) => {
+  await page.addInitScript(() => {
+    if (sessionStorage.getItem('seeded')) return;
+    sessionStorage.setItem('seeded', '1');
+    localStorage.setItem('lettermancer.meta.v1', JSON.stringify({ prologueDone: true, runs: 1, oaths: { sand: 1 } }));
+  });
+  await page.goto('/run?starter=apprentice');
+  await expect(page.locator('[data-screen="intro"].ready')).toBeVisible();
+  await page.keyboard.press('Enter');
+  await goThroughDoor(page);
+  await expect(page.locator('[data-screen="combat"] .sand')).toContainText(/0:5\d|1:00/);
+});

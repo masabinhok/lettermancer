@@ -1,7 +1,7 @@
 /**
  * Oaths: difficulty you choose. Each level raises the run's Heat, and Heat raises rewards.
  */
-export type OathId = 'swift' | 'iron' | 'fragile' | 'brittle' | 'caps' | 'punct' | 'scarce';
+export type OathId = 'swift' | 'iron' | 'fragile' | 'brittle' | 'caps' | 'punct' | 'scarce' | 'sand';
 
 export interface OathDef {
   id: OathId;
@@ -24,7 +24,16 @@ export const OATHS: Record<OathId, OathDef> = {
   caps: { id: 'caps', name: 'Oath of Capitals', desc: 'Some words are capitalized, and case matters.', max: 1 },
   punct: { id: 'punct', name: 'Oath of Punctuation', desc: 'Some words end in punctuation you must type.', max: 1 },
   scarce: { id: 'scarce', name: 'Oath of Scarcity', desc: 'Shop prices rise 25% per level.', max: 2 },
+  sand: {
+    id: 'sand',
+    name: 'Oath of the Sandglass',
+    desc: 'Every fight has a sand timer: 60s, then 45s (bosses get double). When it runs out, lose 1 health a second.',
+    max: 2,
+  },
 };
+
+/** Seconds of sand per fight at each Sandglass level (boss fights get twice as long). */
+export const SAND_SECONDS = [60, 45] as const;
 
 export const OATH_IDS = Object.keys(OATHS) as OathId[];
 
