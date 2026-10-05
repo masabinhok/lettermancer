@@ -1,6 +1,6 @@
 # Launch posts (drafts for Oct 5+)
 
-Each is tuned to where it's posted. Replace `<link>` with https://lettermancer.vercel.app (or your own domain),
+Each is tuned to where it's posted. Replace https://lettermancer.vercel.app with https://lettermancer.vercel.app (or your own domain),
 and attach `docs/media/lettermancer.gif` wherever images are allowed. Post at a time you can answer comments for the
 next few hours; the first hour of replies matters most.
 
@@ -10,7 +10,7 @@ next few hours; the first hour of replies matters most.
 
 **Title:** Show HN: Lettermancer – a typing roguelike where your keyboard is the deck
 
-**URL:** `<link>`
+**URL:** https://lettermancer.vercel.app
 
 **First comment (post it yourself right after submitting):**
 
@@ -43,7 +43,7 @@ next few hours; the first hour of replies matters most.
 > Spark on N zaps other enemies. Three acts, six bosses, daily and weekly challenges, and it secretly drills the keys
 > you're slowest at.
 >
-> Free, no ads, no sign-up needed: `<link>`
+> Free, no ads, no sign-up needed: https://lettermancer.vercel.app
 
 (Attach the GIF.)
 
@@ -62,7 +62,7 @@ next few hours; the first hour of replies matters most.
 >
 > Runs are seeded and deterministic, so the daily rite is the same run for everyone.
 >
-> Play free in the browser: `<link>` · Source (MIT): https://github.com/masabinhok/lettermancer
+> Play free in the browser: https://lettermancer.vercel.app · Source (MIT): https://github.com/masabinhok/lettermancer
 >
 > I'm especially interested in whether the build choices feel meaningful by Act 2.
 
@@ -82,7 +82,7 @@ next few hours; the first hour of replies matters most.
 > one at a time, trials, and ghosts to race (your best run, or anyone on the leaderboard). Finger colors for QWERTY,
 > Dvorak, Colemak and AZERTY.
 >
-> `<link>`
+> https://lettermancer.vercel.app
 
 ---
 
@@ -93,7 +93,7 @@ next few hours; the first hour of replies matters most.
 > Bind powers to keys (E burns, S freezes, N throws sparks), fight through three acts, and it quietly trains your
 > slowest letters.
 >
-> Free in the browser, open source: `<link>`
+> Free in the browser, open source: https://lettermancer.vercel.app
 
 (Attach the GIF. Short follow-up post in the thread: the GitHub link and one line on the deterministic replay engine.)
 
@@ -101,6 +101,6 @@ next few hours; the first hour of replies matters most.
 
 ## Discord (friends / communities)
 
-> Hey! I've been building a typing roguelike called Lettermancer and it's finally public: `<link>`
+> Hey! I've been building a typing roguelike called Lettermancer and it's finally public: https://lettermancer.vercel.app
 > You fight by typing words and bind powers to individual keys. There's a daily run that's the same for everyone,
 > if anyone wants to compare scores 👀 Feedback very welcome, especially on what feels slow or confusing.

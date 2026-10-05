@@ -1,4 +1,4 @@
-# Good first issues (drafts to file at launch)
+# Good first issues (filed at launch as #22–#43)
 
 Each is small, self-contained, and names the files to start from. File them with the labels shown. Suggested labels
 for the repo: `good first issue`, `help wanted`, `bug`, `idea`, `content`, `engine`, `web`, `cloud`, `a11y`, `docs`.
