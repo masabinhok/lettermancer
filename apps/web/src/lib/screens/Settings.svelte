@@ -22,7 +22,7 @@
   const layouts: KeyboardLayout[] = ['qwerty', 'dvorak', 'colemak', 'azerty'];
 </script>
 
-<div class="scrim" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+<div class="scrim" data-screen="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title">
   <Frame ornate>
     <form class="inner" onsubmit={(e) => e.preventDefault()}>
       <h2 id="settings-title">Settings</h2>
@@ -115,7 +115,7 @@
     inset: 0;
     z-index: 85;
     display: grid;
-    place-items: center;
+    place-items: safe center;
     background: rgba(12, 9, 20, 0.8);
     backdrop-filter: blur(3px);
     overflow: auto;

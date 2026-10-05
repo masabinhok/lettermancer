@@ -69,18 +69,19 @@
     inset: 0;
     z-index: 85;
     display: grid;
-    place-items: center;
+    /* safe: centered when it fits, top-aligned (and scrollable) when the window is too short */
+    place-items: safe center;
     background: rgba(12, 9, 20, 0.82);
     backdrop-filter: blur(3px);
     overflow: auto;
   }
   .inner {
-    width: min(37.647rem, 92vw);
-    padding: var(--space-5) var(--space-6);
+    width: min(58rem, 94vw);
+    padding: var(--space-4) var(--space-6);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-4);
+    gap: var(--space-3);
   }
   h2 {
     font-size: var(--t-2xl);
@@ -91,14 +92,15 @@
     text-align: center;
     max-width: 56ch;
   }
+  /* Two columns of Oaths, so all of them fit on one screen. */
   ul {
     width: 100%;
     list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2) var(--space-3);
   }
   li {
     display: flex;

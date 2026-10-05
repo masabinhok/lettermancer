@@ -23,7 +23,7 @@
 
 <div class="scrim" role="dialog" aria-modal="true" aria-label={title} data-screen={screen}>
   <Frame ornate>
-    <div class="inner" style:width="min({width}px, 94vw)">
+    <div class="inner" style:width="min({width / 17}rem, 94vw)">
       <header>
         <h2>{title}</h2>
         {#if subtitle}<p>{subtitle}</p>{/if}

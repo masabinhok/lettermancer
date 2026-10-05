@@ -116,7 +116,7 @@
     inset: 0;
     z-index: 82;
     display: grid;
-    place-items: center;
+    place-items: safe center;
     background: rgba(12, 9, 20, 0.82);
     backdrop-filter: blur(3px);
     overflow: auto;

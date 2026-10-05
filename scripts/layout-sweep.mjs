@@ -57,9 +57,18 @@ function overflow() {
   if (worst > 2) return `${Math.round(worst)}px over (${what.slice(0, 40)})`;
   // Game screens should fit without scrolling; long pages (practice, profile...) may scroll.
   const screen = document.querySelector('[data-screen]');
-  const longPage = ['practice', 'profile', 'leaderboards', 'privacy', 'login'].includes(
-    screen?.getAttribute('data-screen'),
-  );
+  const longPage = [
+    'practice',
+    'profile',
+    'leaderboards',
+    'privacy',
+    'login',
+    // hub panels with long lists scroll inside themselves
+    'codex',
+    'codex-of-hands',
+    'prophecies',
+    'keepsakes',
+  ].includes(screen?.getAttribute('data-screen'));
   if (!longPage)
     for (const el of [screen, ...screen.querySelectorAll('*')]) {
       const st = getComputedStyle(el);
@@ -117,6 +126,29 @@ for (const [w, h] of SIZES) {
     await page.waitForSelector('[data-screen]');
     await page.waitForTimeout(400);
     await record(route);
+  }
+  // The hub's panels, opened by their hotkeys.
+  for (const [key, name] of [
+    ['o', 'oaths'],
+    ['s', 'settings'],
+    ['h', 'codex-of-hands'],
+    ['k', 'keepsakes'],
+    ['p', 'prophecies'],
+    ['c', 'codex'],
+  ]) {
+    await page.goto(URL + '/');
+    await page.waitForSelector('[data-screen="title"]');
+    await page.keyboard.press(key);
+    await page.waitForTimeout(400);
+    const screenEl = await page.$('[data-screen]:not([data-screen="title"])');
+    if (!screenEl) {
+      results.push(`${name}:did not open`);
+      failed = true;
+      continue;
+    }
+    // Measure the panel, not the hub behind it.
+    await page.evaluate(() => document.querySelector('[data-screen="title"]')?.removeAttribute('data-screen'));
+    await record(name);
   }
   for (const kind of KINDS) {
     if (!found[kind]) {
