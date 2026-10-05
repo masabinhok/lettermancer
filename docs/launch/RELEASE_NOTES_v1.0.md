@@ -8,12 +8,15 @@ six muses, and bind powers to individual keys. Every run quietly feeds you more 
 ## What's in it
 
 - **Runs:** three acts, seven rooms and a boss each. Six bosses with phases, nine enemy traits, and elites guarding
-  relics.
+  relics. Doors rise one by one and show what waits behind them; each Act I and II boss drops its own signature
+  relic.
 - **Builds:** six muses, key powers in four rarities, blessings, duo boons, relics, and Glass keys that shatter on a
   typo.
 - **The Scriptorium:** permanent upgrades bought with Ink and Gold Leaf, keepsakes, 60+ Prophecies (achievements), and
   a Codex.
-- **Oaths and Heat:** handicaps you choose that multiply your score, and Gentle pace while you're learning.
+- **Oaths and Heat:** handicaps you choose that multiply your score, including the Oath of the Sandglass, a time
+  limit on every fight. Gentle pace while you're learning.
+- **A run stopwatch:** how long each run took, and your fastest win.
 - **Practice desk:** time, word, quote and adaptive-lesson tests, trials that pay Gold Leaf, a per-second speed
   chart, and daily streaks.
 - **Learning while you play:** per-key timing, weak-key word picks, heatmaps, key mastery ranks, and finger colors for
