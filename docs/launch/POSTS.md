@@ -1,7 +1,7 @@
-# Launch posts (drafts for Oct 5+)
+# Launch posts
 
-Each is tuned to where it's posted. Replace https://lettermancer.vercel.app with https://lettermancer.vercel.app (or your own domain),
-and attach `docs/media/lettermancer.gif` wherever images are allowed. Post at a time you can answer comments for the
+Each is tuned to where it's posted, and links point to the live game. Attach `docs/media/lettermancer.gif` wherever
+images are allowed. Post at a time you can answer comments for the
 next few hours; the first hour of replies matters most.
 
 ---
