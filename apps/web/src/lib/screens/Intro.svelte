@@ -144,7 +144,7 @@
     font-family: var(--f-display);
     font-size: var(--t-lg);
     letter-spacing: 0.4em;
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     color: var(--c);
     animation: spread 1s var(--ease-out) both;
   }
@@ -235,7 +235,7 @@
   /* Typography roles (see app.css): boon names, titles and speakers get their own faces. */
   h1 {
     font-family: var(--f-title);
-    font-weight: 700;
+    font-weight: 400;
     text-transform: none;
     letter-spacing: 0.01em;
   }

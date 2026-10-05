@@ -33,7 +33,7 @@
   }
   b {
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: 0.03em;
     font-size: var(--t-lg);
     color: var(--moon);

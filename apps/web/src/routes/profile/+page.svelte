@@ -381,7 +381,7 @@
   dd {
     margin: 0;
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: 0.03em;
     font-weight: 700;
     font-size: var(--t-lg);

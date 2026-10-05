@@ -368,7 +368,7 @@
     background: color-mix(in oklab, var(--rose) 45%, transparent);
     font-family: var(--f-ui);
     font-size: var(--t-sm);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: var(--ui-tracking);
   }
   @keyframes sand-pulse {
@@ -381,7 +381,7 @@
     min-width: 2.6em;
     text-align: right;
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: 0.03em;
     font-weight: 700;
     font-size: var(--t-3xl);

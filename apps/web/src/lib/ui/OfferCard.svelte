@@ -117,12 +117,13 @@
   .kind {
     font-size: var(--t-xs);
     letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-family: var(--f-ui);
+    text-transform: var(--ui-case);
     color: var(--moon-faint);
   }
   .name {
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: var(--ui-tracking);
     font-weight: 700;
     font-size: var(--t-xl);
@@ -142,7 +143,7 @@
   .cost {
     margin-top: auto;
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: 0.03em;
     font-weight: 700;
     font-size: var(--t-lg);

@@ -143,7 +143,7 @@
   }
   legend {
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: var(--ui-tracking);
     color: var(--gold);
     padding-right: var(--space-2);

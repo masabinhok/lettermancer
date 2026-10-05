@@ -246,7 +246,7 @@
     font-family: var(--f-display);
     color: var(--gold);
     letter-spacing: 0.08em;
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     font-size: var(--t-sm);
   }
   .record {
@@ -307,7 +307,7 @@
   dd {
     margin: 0;
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: 0.03em;
     font-weight: 700;
     font-size: var(--t-2xl);
@@ -346,7 +346,7 @@
   }
   .purse b {
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: 0.03em;
     font-size: var(--t-lg);
   }
@@ -433,7 +433,7 @@
   }
   h1 {
     font-family: var(--f-title);
-    font-weight: 700;
+    font-weight: 400;
     text-transform: none;
     letter-spacing: 0.01em;
   }

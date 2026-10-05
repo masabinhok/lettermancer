@@ -320,8 +320,8 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: var(--space-4) var(--space-6);
-    gap: var(--space-4);
+    padding: var(--space-5) var(--space-7);
+    gap: var(--space-5);
     overflow: auto;
   }
   .top {
@@ -336,7 +336,7 @@
     gap: var(--space-2);
   }
   .logo span {
-    font-size: 1.95rem;
+    font-size: 2.6rem;
     line-height: 0.85;
     letter-spacing: 0.03em;
   }
@@ -348,19 +348,25 @@
     gap: var(--space-2);
     white-space: nowrap;
   }
+  /* The hub sits at 90% of the game's scale, with wider gaps: room to breathe. */
+  .top,
+  .hall {
+    zoom: 0.9;
+  }
   .hall {
     flex: 1;
     display: grid;
     grid-template-columns: minmax(0, 1fr) 22.353rem;
-    gap: var(--space-6);
+    gap: var(--space-7);
     align-items: start;
+    align-content: center;
     width: min(72.941rem, 100%);
     margin: 0 auto;
   }
   .left {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-5);
   }
   .archivist {
     display: flex;
@@ -424,7 +430,7 @@
   }
   .name {
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: var(--ui-tracking);
     font-weight: 700;
   }
@@ -479,7 +485,7 @@
     gap: var(--space-2);
     font-family: var(--f-ui);
     font-size: var(--t-xs);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: var(--ui-tracking);
     color: var(--moon-faint);
     text-decoration: none;
@@ -557,7 +563,7 @@
   }
   .station .n {
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: var(--ui-tracking);
     font-weight: 700;
   }
@@ -619,8 +625,8 @@
   }
   .logo span {
     font-family: var(--f-title);
-    font-weight: 700;
-    text-transform: uppercase;
+    font-weight: 400;
+    text-transform: var(--ui-case);
     letter-spacing: 0.04em;
   }
   /* Header buttons: a step smaller, so spaced capitals fit beside the logo and purse. */

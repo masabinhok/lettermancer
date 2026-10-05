@@ -595,7 +595,7 @@
     display: flex;
     justify-content: space-between;
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: 0.03em;
     font-size: var(--t-xl);
     color: var(--gold);
@@ -675,7 +675,7 @@
   }
   .big .n {
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: 0.03em;
     font-weight: 700;
     font-size: 4rem;

@@ -264,7 +264,7 @@
   }
   .title {
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     font-size: var(--t-lg);
     color: var(--moon-dim);
     letter-spacing: 0.05em;
@@ -339,12 +339,13 @@
   .kind {
     font-size: var(--t-sm);
     letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-family: var(--f-ui);
+    text-transform: var(--ui-case);
     color: var(--rc);
   }
   .name {
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: var(--ui-tracking);
     font-weight: 700;
     font-size: var(--t-2xl);

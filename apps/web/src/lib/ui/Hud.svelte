@@ -117,7 +117,7 @@
   }
   .act {
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: var(--ui-tracking);
     font-weight: 700;
     color: var(--gold);
@@ -176,7 +176,7 @@
   .build {
     padding: 4px 0.706rem;
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: var(--ui-tracking);
     font-size: var(--t-sm);
     color: var(--moon-dim);
@@ -229,7 +229,7 @@
   .tip b {
     display: block;
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: var(--ui-tracking);
     color: var(--gold-bright);
   }

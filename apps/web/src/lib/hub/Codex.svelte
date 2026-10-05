@@ -110,7 +110,7 @@
     border: 1px solid var(--rule);
     cursor: pointer;
     font-family: var(--f-display);
-    text-transform: uppercase;
+    text-transform: var(--ui-case);
     letter-spacing: var(--ui-tracking);
   }
   .tabs .on {
