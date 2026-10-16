@@ -153,7 +153,10 @@
 </script>
 
 <svelte:window {onkeydown} />
-<svelte:head><title>Lettermancer</title></svelte:head>
+<svelte:head>
+  <title>Lettermancer</title>
+  <meta name="robots" content="noindex,follow" />
+</svelte:head>
 
 {#if refused}
   <div class="refused" data-screen="refused">

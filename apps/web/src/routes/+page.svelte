@@ -141,7 +141,59 @@
 </script>
 
 <svelte:window {onkeydown} />
-<svelte:head><title>Lettermancer</title></svelte:head>
+<svelte:head>
+  <title>Lettermancer — Roguelike Typing Deckbuilder Game</title>
+  <meta
+    name="description"
+    content="Lettermancer is a browser-based roguelike typing game where your keyboard is the deck."
+  />
+  <link rel="canonical" href="https://lettermancer.sabinshrestha3.com.np/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Lettermancer" />
+  <meta property="og:title" content="Lettermancer — Roguelike Typing Deckbuilder Game" />
+  <meta
+    property="og:description"
+    content="A browser-based typing game where your keyboard is the deck."
+  />
+  <meta property="og:url" content="https://lettermancer.sabinshrestha3.com.np/" />
+  <meta property="og:image" content="https://lettermancer.sabinshrestha3.com.np/og/cover.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta
+    property="og:image:alt"
+    content="Lettermancer screenshot-style banner showing a roguelike typing game with a keyboard deck"
+  />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Lettermancer — Roguelike Typing Deckbuilder Game" />
+  <meta
+    name="twitter:description"
+    content="A browser-based typing game where your keyboard is the deck."
+  />
+  <meta name="twitter:image" content="https://lettermancer.sabinshrestha3.com.np/og/cover.png" />
+  <meta
+    name="twitter:image:alt"
+    content="Lettermancer screenshot-style banner showing a roguelike typing game with a keyboard deck"
+  />
+
+  <meta name="theme-color" content="#16131f" />
+  {@html `<script type="application/ld+json">${JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'VideoGame',
+    name: 'Lettermancer',
+    url: 'https://lettermancer.sabinshrestha3.com.np/',
+    description: 'A browser-based roguelike typing game where your keyboard is the deck.',
+    applicationCategory: 'GameApplication',
+    operatingSystem: 'Web Browser',
+    browserRequirements: 'Requires JavaScript and a modern browser.',
+    gamePlatform: 'Web Browser',
+    genre: ['Typing game', 'Roguelike', 'Deckbuilder', 'Indie game'],
+    isAccessibleForFree: true,
+    image: 'https://lettermancer.sabinshrestha3.com.np/og/cover.png',
+  })}</script>`}
+</svelte:head>
 
 <div class="hub" data-screen="title">
   <header class="top">
@@ -161,6 +213,7 @@
 
   <main class="hall">
     <section class="left">
+      <p class="pitch">A browser-based typing game where your keyboard is the deck. Draft boons, swear oaths, and survive a roguelike run.</p>
       <div class="archivist">
         <Initial glyph="A" size={72} field="#2c2a4a" ink="var(--moon)" />
         <Dialogue speaker="The Archivist">
@@ -297,6 +350,10 @@
       </Frame>
     </aside>
   </main>
+  <p class="seo">
+    Lettermancer is a browser-based typing game, a roguelike keyboard deckbuilder, and an indie web game built for fast
+    runs and sharper hands.
+  </p>
   <a class="star" href="https://github.com/masabinhok/lettermancer" target="_blank" rel="noopener noreferrer">
     <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"
       ><path
@@ -367,6 +424,12 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-5);
+  }
+  .pitch {
+    max-width: 54rem;
+    font-size: var(--t-lg);
+    color: var(--moon-dim);
+    line-height: 1.45;
   }
   .archivist {
     display: flex;
@@ -606,6 +669,14 @@
     font-size: var(--t-sm);
     color: var(--moon-dim);
     text-align: center;
+  }
+  .seo {
+    margin: 0 auto;
+    width: min(72.941rem, 100%);
+    font-size: var(--t-xs);
+    line-height: 1.5;
+    color: var(--moon-faint);
+    opacity: 0.82;
   }
   @media (max-aspect-ratio: 1/1) {
     .hall {

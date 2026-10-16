@@ -1,0 +1,16 @@
+{
+  "name": "Lettermancer",
+  "short_name": "Lettermancer",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#16131f",
+  "background_color": "#0f0d14",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /profile
+Disallow: /run
+
+Sitemap: https://lettermancer.sabinshrestha3.com.np/sitemap.xml

@@ -90,7 +90,10 @@
 </script>
 
 <svelte:window {onkeydown} />
-<svelte:head><title>Profile · Lettermancer</title></svelte:head>
+<svelte:head>
+  <title>Profile · Lettermancer</title>
+  <meta name="robots" content="noindex,follow" />
+</svelte:head>
 
 <div class="page" data-screen="profile">
   <header>

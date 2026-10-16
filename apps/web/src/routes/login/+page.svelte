@@ -33,7 +33,10 @@
 </script>
 
 <svelte:window {onkeydown} />
-<svelte:head><title>Sign in · Lettermancer</title></svelte:head>
+<svelte:head>
+  <title>Sign in · Lettermancer</title>
+  <meta name="robots" content="noindex,follow" />
+</svelte:head>
 
 <div class="page" data-screen="login">
   <Frame ornate>

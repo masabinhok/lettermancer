@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Lettermancer icon">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#1a1625" />
+      <stop offset="1" stop-color="#09080d" />
+    </linearGradient>
+    <linearGradient id="gold" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f5d98b" />
+      <stop offset="1" stop-color="#b8892f" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)" />
+  <rect x="76" y="144" width="360" height="224" rx="28" fill="#14111d" stroke="#3b3152" stroke-width="10" />
+  <rect x="106" y="176" width="300" height="28" rx="14" fill="#241d31" />
+  <rect x="106" y="226" width="88" height="88" rx="16" fill="#211a2c" stroke="url(#gold)" stroke-width="8" />
+  <rect x="206" y="226" width="88" height="88" rx="16" fill="#211a2c" />
+  <rect x="306" y="226" width="100" height="88" rx="16" fill="#211a2c" />
+  <path d="M190 118l18 22-18 22" fill="none" stroke="url(#gold)" stroke-linecap="round" stroke-linejoin="round" stroke-width="18" />
+  <path d="M172 98h28l-10 26h-28z" fill="url(#gold)" transform="rotate(-16 186 111)" />
+  <path d="M152 226l18 22-18 22" fill="none" stroke="#f0e0b3" stroke-linecap="round" stroke-linejoin="round" stroke-width="14" />
+  <path d="M246 244h36" stroke="#f0e0b3" stroke-linecap="round" stroke-width="10" />
+  <path d="M236 264h52" stroke="#f0e0b3" stroke-linecap="round" stroke-width="10" />
+  <path d="M236 284h36" stroke="#f0e0b3" stroke-linecap="round" stroke-width="10" />
+  <circle cx="356" cy="272" r="22" fill="none" stroke="url(#gold)" stroke-width="10" />
+  <path d="M330 272h52" stroke="url(#gold)" stroke-linecap="round" stroke-width="10" />
+  <path d="M356 246v52" stroke="url(#gold)" stroke-linecap="round" stroke-width="10" />
+</svg>
